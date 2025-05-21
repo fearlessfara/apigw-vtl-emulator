@@ -1,0 +1,18 @@
+{
+  "name": "vtl-emulator",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./tests/**/*test.js"
+  },
+  "private": true,
+  "dependencies": {
+    "velocityjs": "^2.1.5"
+  },
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "mocha": "^11.4.0"
+  }
+}

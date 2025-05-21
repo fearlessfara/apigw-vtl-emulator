@@ -1,0 +1,12 @@
+{
+  "headers": {
+    "X-Idempotency-Key": "abc-123"
+  },
+  "body": "{\"metadata\":{\"order_id\":\"order-456\"},\"payment_method\":[]}",
+  "context": {
+    "requestTimeEpoch": 1716317060000
+  },
+  "stageVariables": {
+    "state_machine_arn": "arn:aws:states:eu-west-1:123456789012:stateMachine:MyStateMachine"
+  }
+}
