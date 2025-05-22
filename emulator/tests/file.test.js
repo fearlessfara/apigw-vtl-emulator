@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { renderVTL } from '../vtl-emulator.js';
+import { renderVTL } from '../src/engine.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const testFilesDir = path.join(__dirname, 'files');

@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./tests/**/*test.js"
+    "test": "../node_modules/.bin/mocha emulator/tests/**/*test.js"
   },
   "private": true,
   "dependencies": {
