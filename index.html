@@ -901,7 +901,6 @@
         require(['vs/editor/editor.main'], () => {
           this.setupVelocityLanguage();
           this.createEditors();
-
           resolve();
         });
       });
@@ -1173,18 +1172,22 @@
         minimap: {enabled: this.settings.minimap},
         wordWrap: this.settings.wordWrap ? 'on' : 'off',
         theme: this.settings.theme === 'dark' ? 'vs-dark' : 'vs',
-        automaticLayout: false, // We'll handle layout manually
+        automaticLayout: true,
         scrollBeyondLastLine: false,
         renderWhitespace: 'boundary'
       };
 
-      // Template Editor
+      // Create a model for each template
+      this.templates.forEach(template => {
+        template.model = monaco.editor.createModel(template.content, 'velocity');
+      });
+
+      // Template Editor (attach to current template's model)
       this.editors.template = monaco.editor.create(
           document.getElementById('templateEditor'),
           {
             ...editorOptions,
-            value: this.templates[this.currentTemplate].content,
-            language: 'velocity'
+            model: this.templates[this.currentTemplate].model
           }
       );
 
@@ -1208,7 +1211,7 @@
           }
       );
 
-      // Setup change listeners
+      // Setup change listeners for auto-render and validation
       Object.keys(this.editors).forEach(key => {
         this.editors[key].onDidChangeModelContent(() => {
           this.validateEditor(key);
@@ -1221,54 +1224,6 @@
 
       // Setup keyboard shortcuts
       this.setupKeyboardShortcuts();
-
-      // Initial layout for visible editor
-      setTimeout(() => {
-        const activeTab = document.querySelector('.tab-pane.active');
-        if (activeTab) {
-          const editorKey = activeTab.id;
-          if (this.editors[editorKey]) {
-            this.editors[editorKey].layout();
-          }
-        }
-      }, 100);
-
-      // Handle window resize
-      window.addEventListener('resize', () => {
-        Object.values(this.editors).forEach(editor => {
-          if (editor) {
-            editor.layout();
-          }
-        });
-      });
-    }
-
-    handleEditorVisibility() {
-      // Use Intersection Observer to detect when editors become visible
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const editorId = entry.target.id;
-            const editorKey = editorId.replace('Editor', '');
-            if (this.editors[editorKey]) {
-              // Small delay to ensure container is fully rendered
-              setTimeout(() => {
-                this.editors[editorKey].layout();
-              }, 10);
-            }
-          }
-        });
-      }, {
-        threshold: 0.1
-      });
-
-      // Observe all editor containers
-      ['templateEditor', 'bodyEditor', 'contextEditor'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-          observer.observe(element);
-        }
-      });
     }
 
     setupKeyboardShortcuts() {
@@ -1390,7 +1345,6 @@
     }
 
     switchTab(target) {
-      // Remove active states
       document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
       document.querySelector(`[data-target="${target}"]`).classList.add('active');
 
@@ -1399,49 +1353,53 @@
       });
       document.getElementById(target).classList.add('show', 'active');
 
-      // CRITICAL: Layout editor after tab becomes visible
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        if (this.editors[target]) {
-          this.editors[target].layout();
-          // Force a second layout after a short delay for stubborn cases
-          setTimeout(() => {
-            this.editors[target].layout();
-          }, 100);
-        }
-      });
+      // Layout editor if it exists
+      if (this.editors[target]) {
+        setTimeout(() => this.editors[target].layout(), 0);
+      }
     }
 
     switchTemplate(templateId) {
-      // Save current template content
-      if (this.editors.template) {
-        this.templates[this.currentTemplate].content = this.editors.template.getValue();
+      const current = this.templates[this.currentTemplate];
+      const next = this.templates.find(t => t.id === templateId);
+
+      if (!next || !next.model) return;
+
+      if (this.editors.template && current?.model) {
+        // Save current editor content to current model
+        current.model.setValue(this.editors.template.getValue());
       }
 
       this.currentTemplate = templateId;
 
-      // Update tab active state
-      document.querySelectorAll('.template-tab .nav-link').forEach(el => el.classList.remove('active'));
-      document.querySelector(`[data-template="${templateId}"]`).classList.add('active');
+      // Switch to the new model
+      this.editors.template.setModel(next.model);
 
-      // Update editor content
-      if (this.editors.template) {
-        this.editors.template.setValue(this.templates[templateId].content);
-      }
+      // Update tab UI
+      document.querySelectorAll('.template-tab .nav-link').forEach(el => el.classList.remove('active'));
+      const newTab = document.querySelector(`.template-tab .nav-link[data-template="${templateId}"]`);
+      if (newTab) newTab.classList.add('active');
     }
+
 
     addTemplate() {
       const newId = Math.max(...this.templates.map(t => t.id)) + 1;
+
+      const content = '// New template\n$input.json("$")';
+      const model = monaco.editor.createModel(content, 'velocity');
+
       const template = {
         id: newId,
         name: `Template ${newId + 1}`,
-        content: '// New template\n$input.json("$")'
+        content,
+        model
       };
 
       this.templates.push(template);
       this.addTemplateTab(template);
       this.switchTemplate(newId);
     }
+
 
     addTemplateTab(template) {
       const tabsContainer = document.getElementById('templateTabs');
@@ -1450,14 +1408,30 @@
       const newTab = document.createElement('li');
       newTab.className = 'nav-item template-tab';
       newTab.innerHTML = `
-            <a class="nav-link" href="#" data-template="${template.id}">
-                ${template.name}
-                <button class="close-btn" data-template="${template.id}">&times;</button>
-            </a>
-        `;
+    <a class="nav-link" href="#" data-template="${template.id}">
+      ${template.name}
+      <button class="close-btn" data-template="${template.id}">&times;</button>
+    </a>
+  `;
 
       tabsContainer.insertBefore(newTab, addButton);
+
+      // Attach click listeners
+      const link = newTab.querySelector('.nav-link');
+      const closeBtn = newTab.querySelector('.close-btn');
+
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchTemplate(template.id);
+      });
+
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.closeTemplate(template.id);
+      });
     }
+
 
     closeTemplate(templateId) {
       if (this.templates.length <= 1) {
@@ -1753,8 +1727,7 @@
 
       try {
         this.showLoading(true);
-        this.clearErrors();
-        // Get template and input data
+        this.clearErrors();// Get template and input data
         const template = this.editors.template.getValue();
         const body = this.editors.body.getValue();
         const contextData = this.editors.context.getValue();
@@ -1783,42 +1756,15 @@
         }
 
         // Create VTL context
+        // Build full event structure expected by renderVTL
         const vtlContext = {
-          input: {
-            body: body,
-            json: (path) => {
-              if (path === '$') return inputData;
-              // Simple JSONPath implementation
-              return this.getNestedValue(inputData, path.replace('$.', ''));
-            },
-            params: (name) => {
-              if (name.startsWith('header.')) {
-                return variables.header[name.substring(7)] || '';
-              } else if (name.startsWith('path.')) {
-                return variables.path[name.substring(5)] || '';
-              } else {
-                return variables.query[name] || '';
-              }
-            }
-          },
-          util: {
-            escapeJavaScript: (str) => {
-              if (typeof str !== 'string') str = String(str);
-              return str.replace(/\\/g, '\\\\')
-                  .replace(/"/g, '\\"')
-                  .replace(/'/g, "\\'")
-                  .replace(/\n/g, '\\n')
-                  .replace(/\r/g, '\\r')
-                  .replace(/\t/g, '\\t');
-            },
-            urlEncode: (str) => encodeURIComponent(str),
-            urlDecode: (str) => decodeURIComponent(str),
-            base64Encode: (str) => btoa(str),
-            base64Decode: (str) => atob(str)
-          },
-          context: context,
-          stageVariables: variables.stage
-        };
+          body,
+          headers: variables.header,
+          queryStringParameters: variables.query,
+          pathParameters: variables.path,
+          stageVariables: variables.stage,
+          context: context
+        }
 
         // Debug mode
         if (this.debugMode) {
@@ -1830,11 +1776,8 @@
 
         // Use the VTL emulator library if available, otherwise basic processing
         let result;
-        if (window.renderVTLClient) {
-          result = await window.renderVTLClient(template, vtlContext);
-        } else {
-          result = this.basicVTLProcessor(template, vtlContext);
-        }
+        result = await window.renderVTLClient(template, vtlContext);
+        console.log(result)
 
         // Update result
         document.getElementById('result').textContent = result;
@@ -1856,65 +1799,6 @@
       } finally {
         this.showLoading(false);
       }
-    }
-
-    basicVTLProcessor(template, context) {
-      let result = template;
-
-      // Simple variable substitution
-      result = result.replace(/\$([a-zA-Z_][\w\.]*(?:\([^)]*\))?)/g, (match, varPath) => {
-        try {
-          if (varPath.includes('(')) {
-            // Function call
-            const [objPath, funcCall] = varPath.split('(');
-            const funcName = funcCall.replace(')', '').replace(/"/g, '');
-            const obj = this.getNestedValue(context, objPath);
-
-            if (objPath === 'input.json') {
-              return JSON.stringify(context.input.json(funcName));
-            } else if (objPath === 'input.params') {
-              return context.input.params(funcName);
-            } else if (objPath === 'util.escapeJavaScript') {
-              return context.util.escapeJavaScript(funcName);
-            }
-          } else {
-            // Simple variable
-            const value = this.getNestedValue(context, varPath);
-            return value !== undefined ? value : match;
-          }
-        } catch (e) {
-          return match;
-        }
-      });
-
-      // Basic #if/#end processing
-      result = result.replace(/#if\s*\(\s*([^)]+)\s*\)([\s\S]*?)#end/g, (match, condition, content) => {
-        try {
-          const conditionValue = this.evaluateCondition(condition, context);
-          return conditionValue ? content : '';
-        } catch (e) {
-          return match;
-        }
-      });
-
-      // Basic #foreach/#end processing
-      result = result.replace(/#foreach\s*\(\s*\$(\w+)\s+in\s+([^)]+)\s*\)([\s\S]*?)#end/g, (match, itemVar, collection, content) => {
-        try {
-          const collectionValue = this.getNestedValue(context, collection.replace('$', ''));
-          if (Array.isArray(collectionValue)) {
-            return collectionValue.map(item => {
-              let itemContent = content;
-              itemContent = itemContent.replace(new RegExp(`\\$${itemVar}`, 'g'), JSON.stringify(item));
-              return itemContent;
-            }).join('');
-          }
-        } catch (e) {
-          return match;
-        }
-        return match;
-      });
-
-      return result;
     }
 
     getNestedValue(obj, path) {
@@ -2113,7 +1997,11 @@
 
     exportConfiguration() {
       const config = {
-        templates: this.templates,
+        templates: this.templates.map(t => ({
+          id: t.id,
+          name: t.name,
+          content: t.model ? t.model.getValue() : t.content || ''
+        })),
         currentTemplate: this.currentTemplate,
         body: this.editors.body?.getValue() || '',
         context: this.editors.context?.getValue() || '',
@@ -2130,6 +2018,7 @@
       a.click();
       URL.revokeObjectURL(url);
     }
+
 
     loadConfiguration(config) {
       if (config.templates) {
@@ -2189,22 +2078,31 @@
 
     shareConfiguration() {
       const config = {
-        templates: this.templates,
+        templates: this.templates.map(t => ({
+          id: t.id,
+          name: t.name,
+          content: t.model ? t.model.getValue() : t.content || ''
+        })),
         currentTemplate: this.currentTemplate,
         body: this.editors.body?.getValue() || '',
         context: this.editors.context?.getValue() || '',
         variables: this.collectVariables()
       };
 
-      const encodedConfig = btoa(JSON.stringify(config));
-      const shareUrl = `${window.location.origin}${window.location.pathname}?config=${encodedConfig}`;
+      try {
+        const encodedConfig = btoa(JSON.stringify(config));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?config=${encodedConfig}`;
 
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        this.showSuccess('Share URL copied to clipboard!');
-      }).catch(() => {
-        prompt('Copy this URL to share your configuration:', shareUrl);
-      });
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          this.showSuccess('Share URL copied to clipboard!');
+        }).catch(() => {
+          prompt('Copy this URL to share your configuration:', shareUrl);
+        });
+      } catch (e) {
+        this.showError('Share Error', 'Failed to generate share URL: ' + e.message);
+      }
     }
+
 
     openComparison() {
       // Create a comparison view
