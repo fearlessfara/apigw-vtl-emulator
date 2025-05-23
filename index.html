@@ -2,308 +2,2369 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>VTL Emulator</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <title>VTL Emulator Pro</title>
+    <link rel="shortcut icon"
+          href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjMDA3QUNDIi8+Cjwvc3ZnPgo="
+          type="image/svg+xml">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        #editorTemplate, #editorBody, #editorContext {
-            height: 200px;
-            border: 1px solid #ccc;
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --accent-color: #007acc;
+            --success-color: #198754;
+            --error-color: #dc3545;
+            --warning-color: #fd7e14;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #404040;
+            --text-primary: #ffffff;
+            --text-secondary: #adb5bd;
+            --border-color: #495057;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .editor-container {
+            height: 300px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            position: relative;
+            transition: border-color 0.3s ease;
+        }
+
+        .editor-container.valid {
+            border-color: var(--success-color);
+        }
+
+        .editor-container.invalid {
+            border-color: var(--error-color);
+        }
+
+        .editor-container.loading {
+            border-color: var(--warning-color);
         }
 
         #result {
             white-space: pre-wrap;
-            font-family: monospace;
-            background: #f8f9fa;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: var(--bg-secondary);
             padding: 1rem;
-            border-radius: .25rem;
-            min-height: 100px;
+            border-radius: 8px;
+            min-height: 200px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: auto;
         }
 
-        .editor-tab-content {
-            display: none;
+        .tab-content {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 1rem;
         }
 
-        .editor-tab-content.active {
-            display: block;
+        .nav-tabs .nav-link {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-bottom: none;
+            margin-right: 2px;
+            transition: all 0.3s ease;
         }
 
-        .kv-row {
+        .nav-tabs .nav-link.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--bg-primary);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .variable-row {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
 
-        .kv-row select, .kv-row input {
+        .variable-row:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .variable-row.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .variable-row .drag-handle {
+            cursor: grab;
+            color: var(--text-secondary);
+            margin-right: 0.5rem;
+        }
+
+        .variable-row .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .variable-row select,
+        .variable-row input {
             flex: 1;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
 
-        #loadingCat {
-            display: none;
-            text-align: center;
-            margin: 1rem 0;
+        .template-tab {
+            position: relative;
         }
 
-        #loadingCat img {
-            height: 80px;
+        .template-tab .close-btn {
+            margin-left: 0.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
         }
+
+        .template-tab .close-btn:hover {
+            color: var(--error-color);
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.error {
+            background: var(--error-color);
+        }
+
+        .status-indicator.warning {
+            background: var(--warning-color);
+        }
+
+        .floating-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1050;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .resizable-panel {
+            resize: both;
+            overflow: auto;
+            min-width: 200px;
+            min-height: 150px;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        [data-theme="dark"] .loading-overlay {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .performance-stats {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .error-tooltip {
+            position: absolute;
+            background: var(--error-color);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .snippet-library {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+        }
+
+        .snippet-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .snippet-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .variable-group {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            background: var(--bg-secondary);
+        }
+
+        .variable-group-header {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .split-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .split-view {
+                grid-template-columns: 1fr;
+            }
+
+            .variable-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .debug-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .debug-step {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .debug-step:last-child {
+            border-bottom: none;
+        }
+
+        .debug-step.active {
+            background: rgba(0, 122, 204, 0.1);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        #templateEditor,
+        #bodyEditor,
+        #contextEditor {
+            height: 100%;
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
-<div class="container py-4">
-    <h3 class="mb-3 d-flex align-items-center gap-2">
-        <img src="favicon.ico" alt="Favicon" style="width: 24px; height: 24px;">
-        VTL Emulator
-    </h3>
+<div class="container-fluid py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-code-square text-primary"></i>
+            VTL Emulator Pro
+            <span class="badge bg-primary ms-2">v2.0</span>
+        </h2>
 
-    <ul class="nav nav-tabs mb-2" id="vtlTabs">
-        <li class="nav-item"><a class="nav-link active" href="#" data-target="#template">Template</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-target="#body">Body</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-target="#variables">Variables</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" data-target="#context">Context</a></li>
-    </ul>
-
-    <div id="template" class="editor-tab-content active">
-        <div id="editorTemplate"></div>
-    </div>
-    <div id="body" class="editor-tab-content">
-        <div id="editorBody"></div>
-    </div>
-    <div id="variables" class="editor-tab-content">
-        <div id="variableContainer"></div>
-        <button id="addVariable" class="btn btn-sm btn-secondary mt-2">+ Add Variable</button>
-    </div>
-    <div id="context" class="editor-tab-content">
-        <div id="editorContext"></div>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-secondary btn-sm" id="themeToggle">
+                    <i class="bi bi-moon"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" id="helpBtn">
+                    <i class="bi bi-question-circle"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" id="settingsBtn">
+                    <i class="bi bi-gear"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div id="loadingCat"><img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Loading cat"/></div>
-
-    <div class="mt-3 d-flex justify-content-between align-items-center">
-        <button id="renderBtn" class="btn btn-primary">Render</button>
-        <span class="text-muted">Result:</span>
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <button class="btn btn-primary" id="renderBtn">
+            <i class="bi bi-play-fill me-1"></i>Render
+        </button>
+        <button class="btn btn-success" id="autoRenderToggle">
+            <i class="bi bi-arrow-repeat me-1"></i>Auto
+        </button>
+        <div class="vr"></div>
+        <button class="btn btn-outline-secondary" id="importBtn">
+            <i class="bi bi-upload me-1"></i>Import
+        </button>
+        <button class="btn btn-outline-secondary" id="exportBtn">
+            <i class="bi bi-download me-1"></i>Export
+        </button>
+        <button class="btn btn-outline-secondary" id="shareBtn">
+            <i class="bi bi-share me-1"></i>Share
+        </button>
+        <div class="vr"></div>
+        <button class="btn btn-outline-info" id="debugToggle">
+            <i class="bi bi-bug me-1"></i>Debug
+        </button>
+        <button class="btn btn-outline-warning" id="compareBtn">
+            <i class="bi bi-files me-1"></i>Compare
+        </button>
+        <div class="ms-auto performance-stats">
+            <span id="renderTime">Render: 0ms</span>
+            <span id="templateSize">Size: 0 chars</span>
+        </div>
     </div>
 
-    <div id="result" class="mt-2"></div>
-    <footer class="mt-5 text-center text-muted small">
-        <hr>
-        <p>&copy; 2025 VTL Emulator - Christian Gennaro Faraone. All rights reserved. |
-            Found a bug or issue? <a href="mailto:christiangenn99+vtl@gmail.com">Contact me here</a></p>
-    </footer>
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Template Tabs -->
+            <div class="mb-3">
+                <ul class="nav nav-tabs" id="templateTabs">
+                    <li class="nav-item template-tab">
+                        <a class="nav-link active" href="#" data-template="0">
+                            Template 1
+                            <button class="close-btn" data-template="0">&times;</button>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-outline-secondary" id="addTemplateTab">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Editor Tabs -->
+            <ul class="nav nav-tabs" id="editorTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-target="template">
+                        <i class="bi bi-file-code me-1"></i>Template
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-target="body">
+                        <i class="bi bi-file-text me-1"></i>Body
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-target="variables">
+                        <i class="bi bi-list-ul me-1"></i>Variables
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-target="context">
+                        <i class="bi bi-gear me-1"></i>Context
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-target="snippets">
+                        <i class="bi bi-collection me-1"></i>Snippets
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Template Tab -->
+                <div id="template" class="tab-pane fade show active">
+                    <div class="editor-container" id="templateEditorContainer">
+                        <div id="templateEditor"></div>
+                        <div class="status-indicator" id="templateStatus"></div>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" id="formatTemplate">
+                                <i class="bi bi-code me-1"></i>Format
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="validateTemplate">
+                                <i class="bi bi-check-circle me-1"></i>Validate
+                            </button>
+                        </div>
+                        <small class="text-muted">
+                            <kbd>Ctrl+Space</kbd> for autocomplete | <kbd>Ctrl+F</kbd> to find
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Body Tab -->
+                <div id="body" class="tab-pane fade">
+                    <div class="editor-container" id="bodyEditorContainer">
+                        <div id="bodyEditor"></div>
+                        <div class="status-indicator" id="bodyStatus"></div>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-secondary" id="formatBody">
+                            <i class="bi bi-braces me-1"></i>Format JSON
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="minifyBody">
+                            <i class="bi bi-dash-square me-1"></i>Minify
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Variables Tab -->
+                <div id="variables" class="tab-pane fade">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Variable Groups</h6>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-primary" id="addVariable">
+                                <i class="bi bi-plus me-1"></i>Add Variable
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="importVariables">
+                                <i class="bi bi-upload me-1"></i>Import
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="clearVariables">
+                                <i class="bi bi-trash me-1"></i>Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="variableGroups">
+                        <!-- Query Parameters -->
+                        <div class="variable-group">
+                            <div class="variable-group-header">
+                                <span><i class="bi bi-link me-2"></i>Query Parameters</span>
+                                <button class="btn btn-sm btn-outline-secondary" data-group="query">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <div class="p-2" id="queryVariables"></div>
+                        </div>
+
+                        <!-- Path Parameters -->
+                        <div class="variable-group">
+                            <div class="variable-group-header">
+                                <span><i class="bi bi-signpost me-2"></i>Path Parameters</span>
+                                <button class="btn btn-sm btn-outline-secondary" data-group="path">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <div class="p-2" id="pathVariables"></div>
+                        </div>
+
+                        <!-- Headers -->
+                        <div class="variable-group">
+                            <div class="variable-group-header">
+                                <span><i class="bi bi-card-heading me-2"></i>Headers</span>
+                                <button class="btn btn-sm btn-outline-secondary" data-group="header">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <div class="p-2" id="headerVariables"></div>
+                        </div>
+
+                        <!-- Stage Variables -->
+                        <div class="variable-group">
+                            <div class="variable-group-header">
+                                <span><i class="bi bi-layers me-2"></i>Stage Variables</span>
+                                <button class="btn btn-sm btn-outline-secondary" data-group="stage">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <div class="p-2" id="stageVariables"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Context Tab -->
+                <div id="context" class="tab-pane fade">
+                    <div class="editor-container" id="contextEditorContainer">
+                        <div id="contextEditor"></div>
+                        <div class="status-indicator" id="contextStatus"></div>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-secondary" id="loadSampleContext">
+                            <i class="bi bi-file-code me-1"></i>Load Sample
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="formatContext">
+                            <i class="bi bi-braces me-1"></i>Format JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Snippets Tab -->
+                <div id="snippets" class="tab-pane fade">
+                    <div class="mb-3">
+                        <h6>VTL Snippet Library</h6>
+                        <input type="text" class="form-control" id="snippetSearch" placeholder="Search snippets...">
+                    </div>
+                    <div class="snippet-library" id="snippetLibrary">
+                        <!-- Snippets will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Result Panel -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0"><i class="bi bi-terminal me-1"></i>Output</h6>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-secondary" id="copyResult">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="downloadResult">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="clearResult">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="result" class="resizable-panel">
+                    Click "Render" to see the VTL output here...
+                </div>
+            </div>
+
+            <!-- Debug Panel -->
+            <div id="debugPanel" class="debug-panel" style="display: none;">
+                <h6><i class="bi bi-bug me-1"></i>Debug Information</h6>
+                <div id="debugSteps"></div>
+            </div>
+
+            <!-- Error Panel -->
+            <div id="errorPanel" class="alert alert-danger" style="display: none;">
+                <h6><i class="bi bi-exclamation-triangle me-1"></i>Errors</h6>
+                <div id="errorDetails"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-question-circle me-2"></i>VTL Emulator Pro Help</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="accordion" id="helpAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#gettingStarted">
+                                Getting Started
+                            </button>
+                        </h2>
+                        <div id="gettingStarted" class="accordion-collapse collapse show"
+                             data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <p>Welcome to VTL Emulator Pro! This tool helps you test and debug Apache Velocity
+                                    Template Language (VTL) templates for AWS API Gateway.</p>
+                                <ol>
+                                    <li>Write your VTL template in the <strong>Template</strong> tab</li>
+                                    <li>Configure your input data in the <strong>Body</strong> tab</li>
+                                    <li>Set up variables in the <strong>Variables</strong> tab</li>
+                                    <li>Click <strong>Render</strong> to see the output</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#shortcuts">
+                                Keyboard Shortcuts
+                            </button>
+                        </h2>
+                        <div id="shortcuts" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li><kbd>Ctrl + Enter</kbd> - Render template</li>
+                                    <li><kbd>Ctrl + Space</kbd> - Show autocomplete</li>
+                                    <li><kbd>Ctrl + F</kbd> - Find in editor</li>
+                                    <li><kbd>Ctrl + H</kbd> - Find and replace</li>
+                                    <li><kbd>Ctrl + S</kbd> - Export configuration</li>
+                                    <li><kbd>F11</kbd> - Toggle fullscreen</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-gear me-2"></i>Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Auto-render delay (ms)</label>
+                    <input type="number" class="form-control" id="autoRenderDelay" value="1000" min="100" max="5000">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Editor font size</label>
+                    <select class="form-select" id="editorFontSize">
+                        <option value="12">12px</option>
+                        <option value="14" selected>14px</option>
+                        <option value="16">16px</option>
+                        <option value="18">18px</option>
+                    </select>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableLineNumbers" checked>
+                    <label class="form-check-label">Show line numbers</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableMinimap">
+                    <label class="form-check-label">Show minimap</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="enableWordWrap" checked>
+                    <label class="form-check-label">Word wrap</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSettings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="text-center">
+        <div class="spinner-border text-primary mb-2" role="status"></div>
+        <div>Processing template...</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 <script type="module">
   import {renderVTL} from 'https://cdn.jsdelivr.net/npm/vtl-emulator@1.0.0/dist/vtl.mjs';
 
   window.renderVTLClient = renderVTL;
 </script>
-<script>
-  let editors = {};
 
-  require.config({paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs'}});
-  require(['vs/editor/editor.main'], function () {
-    monaco.languages.register({id: 'velocity'});
-    monaco.languages.setMonarchTokensProvider('velocity', {
-      tokenizer: {
-        root: [
-          [/\$[a-zA-Z_][\w\.]*/, 'variable'],
-          [/#.*/, 'comment'],
-          [/"([^"\\]|\\.)*$/, 'string.invalid'],
-          [/"([^"\\]|\\.)*"/, 'string'],
-          [/[{}]/, 'delimiter.bracket'],
-          [/[\[\]]/, 'delimiter.array'],
-        ]
+<script>
+  class VTLEmulatorPro {
+    constructor() {
+      this.editors = {};
+      this.templates = [{id: 0, name: 'Template 1', content: '$input.json("$")\n$util.escapeJavaScript($input.body)'}];
+      this.currentTemplate = 0;
+      this.autoRender = false;
+      this.autoRenderTimeout = null;
+      this.debugMode = false;
+      this.settings = {
+        autoRenderDelay: 1000,
+        fontSize: 14,
+        lineNumbers: true,
+        minimap: false,
+        wordWrap: true,
+        theme: 'light'
+      };
+
+      this.snippets = [
+        {
+          name: 'Basic Input JSON',
+          description: 'Parse input as JSON',
+          code: '$input.json("$")'
+        },
+        {
+          name: 'Escape JavaScript',
+          description: 'Escape string for JavaScript',
+          code: '$util.escapeJavaScript($input.body)'
+        },
+        {
+          name: 'URL Encode',
+          description: 'URL encode a string',
+          code: '$util.urlEncode($input.params("param"))'
+        },
+        {
+          name: 'Base64 Encode',
+          description: 'Base64 encode a string',
+          code: '$util.base64Encode($input.body)'
+        },
+        {
+          name: 'Get Query Parameter',
+          description: 'Get a query string parameter',
+          code: '$input.params("paramName")'
+        },
+        {
+          name: 'Get Path Parameter',
+          description: 'Get a path parameter',
+          code: '$input.params("path.paramName")'
+        },
+        {
+          name: 'Get Header',
+          description: 'Get a request header',
+          code: '$input.params("header.headerName")'
+        },
+        {
+          name: 'Context Request ID',
+          description: 'Get the request ID from context',
+          code: '$context.requestId'
+        },
+        {
+          name: 'Context User ID',
+          description: 'Get user ID from Cognito claims',
+          code: '$context.authorizer.claims.sub'
+        },
+        {
+          name: 'Conditional Block',
+          description: 'Simple if-else condition',
+          code: '#if($input.params("param"))\n  "paramExists": true\n#else\n  "paramExists": false\n#end'
+        },
+        {
+          name: 'Loop Through Array',
+          description: 'Iterate over an array',
+          code: '#foreach($item in $input.json("$.items"))\n  "$item.id": "$item.name"#if($foreach.hasNext),#end\n#end'
+        },
+        {
+          name: 'Set Variable',
+          description: 'Set a template variable',
+          code: '#set($myVar = $input.json("$.someValue"))\n$myVar'
+        },
+        {
+          name: 'Error Response',
+          description: 'Standard error response format',
+          code: '{\n  "error": {\n    "code": "$input.params(\'status\')",\n    "message": "$util.escapeJavaScript($input.body)",\n    "requestId": "$context.requestId"\n  }\n}'
+        },
+        {
+          name: 'Success Response',
+          description: 'Standard success response format',
+          code: '{\n  "success": true,\n  "data": $input.json("$"),\n  "timestamp": "$context.requestTime",\n  "requestId": "$context.requestId"\n}'
+        }
+      ];
+
+      this.loadSettings();
+      this.init();
+    }
+
+    async init() {
+      await this.initMonaco();
+      this.initEventListeners();
+      this.initTheme();
+      this.initSnippets();
+      this.updatePerformanceStats();
+    }
+
+    loadSettings() {
+      try {
+        const saved = JSON.parse(window.localStorage?.getItem('vtl-emulator-settings') || '{}');
+        this.settings = {...this.settings, ...saved};
+      } catch (e) {
+        console.warn('Could not load settings:', e);
       }
-    });
-    monaco.languages.registerCompletionItemProvider('velocity', {
-      triggerCharacters: ['$', '.'],
-      provideCompletionItems: () => {
-        return {
-          suggestions: [
-            {
-              label: '$input',
-              kind: monaco.languages.CompletionItemKind.Variable,
-              insertText: '$input',
-              documentation: 'AWS input utility'
-            },
+    }
+
+    saveSettings() {
+      try {
+        window.localStorage?.setItem('vtl-emulator-settings', JSON.stringify(this.settings));
+      } catch (e) {
+        console.warn('Could not save settings:', e);
+      }
+    }
+
+    async initMonaco() {
+      return new Promise((resolve) => {
+        require.config({paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs'}});
+        require(['vs/editor/editor.main'], () => {
+          this.setupVelocityLanguage();
+          this.createEditors();
+
+          resolve();
+        });
+      });
+    }
+
+    setupVelocityLanguage() {
+      // Register the Velocity language
+      monaco.languages.register({id: 'velocity'});
+
+      // Set up syntax highlighting
+      monaco.languages.setMonarchTokensProvider('velocity', {
+        tokenizer: {
+          root: [
+            // Velocity variables (e.g., $variable, $object.method())
+            [/\$[a-zA-Z_][\w\.]*(\([^)]*\))?/, 'variable'],
+
+            // Velocity directives (e.g., #if, #foreach, #set)
+            [/#[a-zA-Z]+/, 'keyword'],
+
+            // Multi-line comments
+            [/#\*[\s\S]*?\*#/, 'comment'],
+
+            // Single-line comments
+            [/##.*/, 'comment'],
+
+            // Double-quoted strings
+            [/"([^"\\]|\\.)*"/, 'string'],
+
+            // Single-quoted strings
+            [/'([^'\\]|\\.)*'/, 'string'],
+
+            // Delimiters
+            [/[{}()\[\]]/, 'delimiter'],
+
+            // Comparison operators
+            [/[<>]=?/, 'operator'],
+            [/[!=]=/, 'operator'],
+
+            // Logical operators
+            [/&&|\|\|/, 'operator'],
+
+            // Arithmetic operators
+            [/[+\-*\/]/, 'operator'],
+
+            // Numbers
+            [/\d+(\.\d+)?/, 'number']
+          ]
+        }
+      });
+
+      // Set up autocompletion
+      monaco.languages.registerCompletionItemProvider('velocity', {
+        triggerCharacters: ['$', '.', '#'],
+        provideCompletionItems: (model, position) => {
+          const suggestions = [
+            // Input utilities
             {
               label: '$input.json',
               kind: monaco.languages.CompletionItemKind.Function,
-              insertText: '$input.json("$1")',
+              insertText: '$input.json("${1:path}")',
               insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-              documentation: 'JSON parser'
+              documentation: 'Parse JSON from input body using JSONPath'
             },
+            {
+              label: '$input.params',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$input.params("${1:paramName}")',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Get parameter from request'
+            },
+            {
+              label: '$input.body',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$input.body',
+              documentation: 'Raw request body as string'
+            },
+            {
+              label: '$input.path',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$input.path("${1:pathParam}")',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Get path parameter'
+            },
+
+            // Utility functions
             {
               label: '$util.escapeJavaScript',
               kind: monaco.languages.CompletionItemKind.Function,
-              insertText: '$util.escapeJavaScript($1)',
+              insertText: '$util.escapeJavaScript(${1:string})',
               insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-              documentation: 'JS escape'
+              documentation: 'Escape string for JavaScript'
             },
+            {
+              label: '$util.urlEncode',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.urlEncode(${1:string})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'URL encode string'
+            },
+            {
+              label: '$util.urlDecode',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.urlDecode(${1:string})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'URL decode string'
+            },
+            {
+              label: '$util.base64Encode',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.base64Encode(${1:string})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Base64 encode string'
+            },
+            {
+              label: '$util.base64Decode',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.base64Decode(${1:string})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Base64 decode string'
+            },
+            {
+              label: '$util.parseJson',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.parseJson(${1:jsonString})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Parse JSON string'
+            },
+            {
+              label: '$util.toJson',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.toJson(${1:object})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Convert object to JSON string'
+            },
+
+            // Context properties
             {
               label: '$context.requestId',
               kind: monaco.languages.CompletionItemKind.Property,
               insertText: '$context.requestId',
-              documentation: 'Request ID'
-            }
-          ]
-        };
-      }
-    });
+              documentation: 'Unique request identifier'
+            },
+            {
+              label: '$context.accountId',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.accountId',
+              documentation: 'AWS account ID'
+            },
+            {
+              label: '$context.apiId',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.apiId',
+              documentation: 'API Gateway ID'
+            },
+            {
+              label: '$context.stage',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.stage',
+              documentation: 'API Gateway stage'
+            },
+            {
+              label: '$context.requestTime',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.requestTime',
+              documentation: 'Request timestamp'
+            },
+            {
+              label: '$context.requestTimeEpoch',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.requestTimeEpoch',
+              documentation: 'Request timestamp in epoch format'
+            },
+            {
+              label: '$context.httpMethod',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.httpMethod',
+              documentation: 'HTTP method (GET, POST, etc.)'
+            },
+            {
+              label: '$context.resourcePath',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.resourcePath',
+              documentation: 'Resource path'
+            },
+            {
+              label: '$context.authorizer.claims',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.authorizer.claims',
+              documentation: 'Cognito JWT claims object'
+            },
+            {
+              label: '$context.identity.sourceIp',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.identity.sourceIp',
+              documentation: 'Client source IP address'
+            },
+            {
+              label: '$context.identity.userAgent',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.identity.userAgent',
+              documentation: 'Client user agent'
+            },
 
-    editors.template = monaco.editor.create(document.getElementById('editorTemplate'), {
-      value: '$input.json("$")\n$util.escapeJavaScript($input.body)',
-      language: 'velocity',
-      minimap: {enabled: false}
-    });
-    editors.body = monaco.editor.create(document.getElementById('editorBody'), {
-      value: '{\n  \"foo\": \"bar\"\n}',
-      language: 'json',
-      minimap: {enabled: false}
-    });
-    editors.context = monaco.editor.create(document.getElementById('editorContext'), {
-      value: `{
+            // Control structures
+            {
+              label: '#if',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#if(${1:condition})\n\t${2:content}\n#end',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Conditional block'
+            },
+            {
+              label: '#elseif',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#elseif(${1:condition})\n\t${2:content}',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Else if condition'
+            },
+            {
+              label: '#else',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#else\n\t${1:content}',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Else block'
+            },
+            {
+              label: '#foreach',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#foreach(${1:item} in ${2:collection})\n\t${3:content}\n#end',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Loop over collection'
+            },
+            {
+              label: '#set',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#set(${1:$variable} = ${2:value})',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'Set variable'
+            },
+            {
+              label: '#end',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#end',
+              documentation: 'End block'
+            },
+            {
+              label: '#break',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#break',
+              documentation: 'Break from loop'
+            },
+            {
+              label: '#stop',
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: '#stop',
+              documentation: 'Stop template processing'
+            }
+          ];
+
+          return {suggestions};
+        }
+      });
+    }
+
+    createEditors() {
+      const editorOptions = {
+        fontSize: this.settings.fontSize,
+        lineNumbers: this.settings.lineNumbers ? 'on' : 'off',
+        minimap: {enabled: this.settings.minimap},
+        wordWrap: this.settings.wordWrap ? 'on' : 'off',
+        theme: this.settings.theme === 'dark' ? 'vs-dark' : 'vs',
+        automaticLayout: false, // We'll handle layout manually
+        scrollBeyondLastLine: false,
+        renderWhitespace: 'boundary'
+      };
+
+      // Template Editor
+      this.editors.template = monaco.editor.create(
+          document.getElementById('templateEditor'),
+          {
+            ...editorOptions,
+            value: this.templates[this.currentTemplate].content,
+            language: 'velocity'
+          }
+      );
+
+      // Body Editor
+      this.editors.body = monaco.editor.create(
+          document.getElementById('bodyEditor'),
+          {
+            ...editorOptions,
+            value: '{\n  "message": "Hello, World!",\n  "timestamp": "2025-05-23T10:30:00Z",\n  "items": [\n    {"id": 1, "name": "Item 1"},\n    {"id": 2, "name": "Item 2"}\n  ]\n}',
+            language: 'json'
+          }
+      );
+
+      // Context Editor
+      this.editors.context = monaco.editor.create(
+          document.getElementById('contextEditor'),
+          {
+            ...editorOptions,
+            value: this.getDefaultContext(),
+            language: 'json'
+          }
+      );
+
+      // Setup change listeners
+      Object.keys(this.editors).forEach(key => {
+        this.editors[key].onDidChangeModelContent(() => {
+          this.validateEditor(key);
+          if (this.autoRender) {
+            this.scheduleAutoRender();
+          }
+          this.updatePerformanceStats();
+        });
+      });
+
+      // Setup keyboard shortcuts
+      this.setupKeyboardShortcuts();
+
+      // Initial layout for visible editor
+      setTimeout(() => {
+        const activeTab = document.querySelector('.tab-pane.active');
+        if (activeTab) {
+          const editorKey = activeTab.id;
+          if (this.editors[editorKey]) {
+            this.editors[editorKey].layout();
+          }
+        }
+      }, 100);
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        Object.values(this.editors).forEach(editor => {
+          if (editor) {
+            editor.layout();
+          }
+        });
+      });
+    }
+
+    handleEditorVisibility() {
+      // Use Intersection Observer to detect when editors become visible
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const editorId = entry.target.id;
+            const editorKey = editorId.replace('Editor', '');
+            if (this.editors[editorKey]) {
+              // Small delay to ensure container is fully rendered
+              setTimeout(() => {
+                this.editors[editorKey].layout();
+              }, 10);
+            }
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      // Observe all editor containers
+      ['templateEditor', 'bodyEditor', 'contextEditor'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          observer.observe(element);
+        }
+      });
+    }
+
+    setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          switch (e.key) {
+            case 'Enter':
+              e.preventDefault();
+              this.render();
+              break;
+            case 's':
+              e.preventDefault();
+              this.exportConfiguration();
+              break;
+          }
+        }
+        if (e.key === 'F11') {
+          e.preventDefault();
+          this.toggleFullscreen();
+        }
+      });
+    }
+
+    initEventListeners() {
+      // Tab switching
+      document.getElementById('editorTabs').addEventListener('click', (e) => {
+        if (e.target.dataset.target) {
+          e.preventDefault();
+          this.switchTab(e.target.dataset.target);
+        }
+      });
+
+      // Template tabs
+      document.getElementById('templateTabs').addEventListener('click', (e) => {
+        if (e.target.dataset.template !== undefined) {
+          e.preventDefault();
+          this.switchTemplate(parseInt(e.target.dataset.template));
+        }
+        if (e.target.classList.contains('close-btn')) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.closeTemplate(parseInt(e.target.dataset.template));
+        }
+      });
+
+      // Toolbar buttons
+      document.getElementById('renderBtn').addEventListener('click', () => this.render());
+      document.getElementById('autoRenderToggle').addEventListener('click', () => this.toggleAutoRender());
+      document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+      document.getElementById('importBtn').addEventListener('click', () => this.importConfiguration());
+      document.getElementById('exportBtn').addEventListener('click', () => this.exportConfiguration());
+      document.getElementById('shareBtn').addEventListener('click', () => this.shareConfiguration());
+      document.getElementById('debugToggle').addEventListener('click', () => this.toggleDebug());
+      document.getElementById('compareBtn').addEventListener('click', () => this.openComparison());
+      document.getElementById('addTemplateTab').addEventListener('click', () => this.addTemplate());
+
+      // Variable management
+      document.getElementById('addVariable').addEventListener('click', () => this.addVariable());
+      document.getElementById('importVariables').addEventListener('click', () => this.importVariables());
+      document.getElementById('clearVariables').addEventListener('click', () => this.clearVariables());
+
+      // Variable group buttons
+      document.querySelectorAll('[data-group]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const group = e.target.closest('[data-group]').dataset.group;
+          this.addVariableToGroup(group);
+        });
+      });
+
+      // Format buttons
+      document.getElementById('formatTemplate').addEventListener('click', () => this.formatEditor('template'));
+      document.getElementById('validateTemplate').addEventListener('click', () => this.validateTemplate());
+      document.getElementById('formatBody').addEventListener('click', () => this.formatEditor('body'));
+      document.getElementById('minifyBody').addEventListener('click', () => this.minifyBody());
+      document.getElementById('formatContext').addEventListener('click', () => this.formatEditor('context'));
+      document.getElementById('loadSampleContext').addEventListener('click', () => this.loadSampleContext());
+
+      // Result actions
+      document.getElementById('copyResult').addEventListener('click', () => this.copyResult());
+      document.getElementById('downloadResult').addEventListener('click', () => this.downloadResult());
+      document.getElementById('clearResult').addEventListener('click', () => this.clearResult());
+
+      // Modal buttons
+      document.getElementById('helpBtn').addEventListener('click', () => {
+        new bootstrap.Modal(document.getElementById('helpModal')).show();
+      });
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        this.openSettings();
+      });
+      document.getElementById('saveSettings').addEventListener('click', () => this.saveSettingsFromModal());
+
+      // Snippet search
+      document.getElementById('snippetSearch').addEventListener('input', (e) => {
+        this.filterSnippets(e.target.value);
+      });
+    }
+
+    initTheme() {
+      if (this.settings.theme === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggle').innerHTML = '<i class="bi bi-sun"></i>';
+      }
+    }
+
+    initSnippets() {
+      const container = document.getElementById('snippetLibrary');
+      this.snippets.forEach(snippet => {
+        const item = document.createElement('div');
+        item.className = 'snippet-item';
+        item.innerHTML = `
+                <div class="fw-bold">${snippet.name}</div>
+                <div class="small text-muted">${snippet.description}</div>
+            `;
+        item.addEventListener('click', () => {
+          this.insertSnippet(snippet.code);
+        });
+        container.appendChild(item);
+      });
+    }
+
+    switchTab(target) {
+      // Remove active states
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      document.querySelector(`[data-target="${target}"]`).classList.add('active');
+
+      document.querySelectorAll('.tab-pane').forEach(el => {
+        el.classList.remove('show', 'active');
+      });
+      document.getElementById(target).classList.add('show', 'active');
+
+      // CRITICAL: Layout editor after tab becomes visible
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        if (this.editors[target]) {
+          this.editors[target].layout();
+          // Force a second layout after a short delay for stubborn cases
+          setTimeout(() => {
+            this.editors[target].layout();
+          }, 100);
+        }
+      });
+    }
+
+    switchTemplate(templateId) {
+      // Save current template content
+      if (this.editors.template) {
+        this.templates[this.currentTemplate].content = this.editors.template.getValue();
+      }
+
+      this.currentTemplate = templateId;
+
+      // Update tab active state
+      document.querySelectorAll('.template-tab .nav-link').forEach(el => el.classList.remove('active'));
+      document.querySelector(`[data-template="${templateId}"]`).classList.add('active');
+
+      // Update editor content
+      if (this.editors.template) {
+        this.editors.template.setValue(this.templates[templateId].content);
+      }
+    }
+
+    addTemplate() {
+      const newId = Math.max(...this.templates.map(t => t.id)) + 1;
+      const template = {
+        id: newId,
+        name: `Template ${newId + 1}`,
+        content: '// New template\n$input.json("$")'
+      };
+
+      this.templates.push(template);
+      this.addTemplateTab(template);
+      this.switchTemplate(newId);
+    }
+
+    addTemplateTab(template) {
+      const tabsContainer = document.getElementById('templateTabs');
+      const addButton = tabsContainer.querySelector('.nav-item:last-child');
+
+      const newTab = document.createElement('li');
+      newTab.className = 'nav-item template-tab';
+      newTab.innerHTML = `
+            <a class="nav-link" href="#" data-template="${template.id}">
+                ${template.name}
+                <button class="close-btn" data-template="${template.id}">&times;</button>
+            </a>
+        `;
+
+      tabsContainer.insertBefore(newTab, addButton);
+    }
+
+    closeTemplate(templateId) {
+      if (this.templates.length <= 1) {
+        alert('Cannot close the last template');
+        return;
+      }
+
+      const templateIndex = this.templates.findIndex(t => t.id === templateId);
+      this.templates.splice(templateIndex, 1);
+
+      // Remove tab
+      document.querySelector(`[data-template="${templateId}"]`).closest('.template-tab').remove();
+
+      // Switch to first template if current was closed
+      if (this.currentTemplate === templateId) {
+        this.switchTemplate(this.templates[0].id);
+      }
+    }
+
+    addVariableToGroup(group) {
+      const container = document.getElementById(`${group}Variables`);
+      this.createVariableRow(container, group);
+    }
+
+    addVariable() {
+      this.addVariableToGroup('query');
+      this.switchTab('variables');
+    }
+
+    createVariableRow(container, group, key = '', value = '') {
+      const row = document.createElement('div');
+      row.className = 'variable-row slide-in';
+      row.draggable = true;
+      row.innerHTML = `
+            <i class="bi bi-grip-vertical drag-handle"></i>
+            <input class="form-control var-key" placeholder="Key" value="${key}" />
+            <input class="form-control var-value" placeholder="Value" value="${value}" />
+            <button class="btn btn-outline-danger btn-sm remove-btn" title="Remove">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+
+      // Remove button handler
+      row.querySelector('.remove-btn').addEventListener('click', () => {
+        row.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => row.remove(), 300);
+      });
+
+      // Drag and drop handlers
+      row.addEventListener('dragstart', (e) => {
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', row.outerHTML);
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+      });
+
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+
+      container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const draggedElement = document.querySelector('.dragging');
+        if (draggedElement && e.target.closest('.variable-row') !== draggedElement) {
+          const targetRow = e.target.closest('.variable-row');
+          if (targetRow) {
+            container.insertBefore(draggedElement, targetRow.nextSibling);
+          }
+        }
+      });
+
+      container.appendChild(row);
+      row.querySelector('.var-key').focus();
+    }
+
+    importVariables() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json,.csv';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            if (file.name.endsWith('.json')) {
+              const data = JSON.parse(event.target.result);
+              this.importVariablesFromJSON(data);
+            } else if (file.name.endsWith('.csv')) {
+              this.importVariablesFromCSV(event.target.result);
+            }
+          } catch (error) {
+            alert('Error importing variables: ' + error.message);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    importVariablesFromJSON(data) {
+      Object.keys(data).forEach(group => {
+        if (data[group] && typeof data[group] === 'object') {
+          const container = document.getElementById(`${group}Variables`);
+          if (container) {
+            Object.keys(data[group]).forEach(key => {
+              this.createVariableRow(container, group, key, data[group][key]);
+            });
+          }
+        }
+      });
+    }
+
+    importVariablesFromCSV(csvText) {
+      const lines = csvText.split('\n').filter(line => line.trim());
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+
+      if (headers.length < 3 || !['group', 'key', 'value'].every(h => headers.includes(h))) {
+        alert('CSV must have columns: group, key, value');
+        return;
+      }
+
+      const groupIdx = headers.indexOf('group');
+      const keyIdx = headers.indexOf('key');
+      const valueIdx = headers.indexOf('value');
+
+      lines.slice(1).forEach(line => {
+        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+        const group = values[groupIdx];
+        const key = values[keyIdx];
+        const value = values[valueIdx];
+
+        const container = document.getElementById(`${group}Variables`);
+        if (container) {
+          this.createVariableRow(container, group, key, value);
+        }
+      });
+    }
+
+    clearVariables() {
+      if (confirm('Are you sure you want to clear all variables?')) {
+        ['query', 'path', 'header', 'stage'].forEach(group => {
+          document.getElementById(`${group}Variables`).innerHTML = '';
+        });
+      }
+    }
+
+    validateEditor(editorKey) {
+      const editor = this.editors[editorKey];
+      const container = document.getElementById(`${editorKey}EditorContainer`);
+      const status = document.getElementById(`${editorKey}Status`);
+
+      if (!editor || !container || !status) return;
+
+      try {
+        const value = editor.getValue();
+
+        if (editorKey === 'body' || editorKey === 'context') {
+          if (value.trim()) {
+            JSON.parse(value);
+          }
+        }
+
+        container.classList.remove('invalid', 'loading');
+        container.classList.add('valid');
+        status.classList.remove('error', 'warning');
+        status.title = 'Valid';
+      } catch (error) {
+        container.classList.remove('valid', 'loading');
+        container.classList.add('invalid');
+        status.classList.add('error');
+        status.title = error.message;
+      }
+    }
+
+    validateTemplate() {
+      // Basic VTL syntax validation
+      const template = this.editors.template.getValue();
+      const issues = [];
+
+      // Check for unclosed blocks
+      const blockStarts = (template.match(/#(if|foreach|macro)\b/g) || []).length;
+      const blockEnds = (template.match(/#end\b/g) || []).length;
+      if (blockStarts !== blockEnds) {
+        issues.push(`Unmatched #if/#foreach/#macro blocks (${blockStarts} starts, ${blockEnds} ends)`);
+      }
+
+      // Check for unclosed quotes
+      const quotes = template.match(/"/g) || [];
+      if (quotes.length % 2 !== 0) {
+        issues.push('Unclosed quote detected');
+      }
+
+      // Check for unclosed parentheses
+      const openParens = (template.match(/\(/g) || []).length;
+      const closeParens = (template.match(/\)/g) || []).length;
+      if (openParens !== closeParens) {
+        issues.push(`Unmatched parentheses (${openParens} open, ${closeParens} close)`);
+      }
+
+      if (issues.length > 0) {
+        this.showError('Template Validation Issues', issues.join('\n'));
+      } else {
+        this.showSuccess('Template validation passed!');
+      }
+    }
+
+    formatEditor(editorKey) {
+      const editor = this.editors[editorKey];
+      if (!editor) return;
+
+      if (editorKey === 'body' || editorKey === 'context') {
+        try {
+          const value = editor.getValue();
+          const formatted = JSON.stringify(JSON.parse(value), null, 2);
+          editor.setValue(formatted);
+        } catch (error) {
+          this.showError('Format Error', 'Invalid JSON cannot be formatted');
+        }
+      } else {
+        editor.getAction('editor.action.formatDocument').run();
+      }
+    }
+
+    minifyBody() {
+      try {
+        const value = this.editors.body.getValue();
+        const minified = JSON.stringify(JSON.parse(value));
+        this.editors.body.setValue(minified);
+      } catch (error) {
+        this.showError('Minify Error', 'Invalid JSON cannot be minified');
+      }
+    }
+
+    loadSampleContext() {
+      this.editors.context.setValue(this.getDefaultContext());
+    }
+
+    getDefaultContext() {
+      return `{
   "accountId": "112233445566",
   "apiId": "a1b2c3d4e5",
   "domainPrefix": "a1b2c3d4e5",
-  "domainName": "a1b2c3d4e5.execute-api.up-down-1.amazonaws.com",
+  "domainName": "a1b2c3d4e5.execute-api.us-east-1.amazonaws.com",
   "extendedRequestId": "ABCdEFGhIJKLMnO=",
   "httpMethod": "POST",
   "stage": "prod",
-  "path": "/prod",
+  "path": "/api/users",
   "protocol": "HTTP/1.1",
   "requestId": "7b776519-78de-4539-8e04-ff300f5c2528",
-  "requestTime": "4/Mar/2021:05:43:21 +0000",
-  "requestTimeEpoch": "1614836601444",
+  "requestTime": "23/May/2025:10:30:00 +0000",
+  "requestTimeEpoch": 1716458200000,
   "resourceId": "1a2b3c4d5e",
-  "resourcePath": "/",
+  "resourcePath": "/users",
   "authorizer": {
     "claims": {
       "sub": "4bf08bda-88a3-47b8-90b0-f08291a9e7af",
       "aud": "tfcrxvwog56v9sxpcbcesams65",
       "email_verified": true,
-      "event_id": "17c18670-01b0-4bba-b118-1bfecf2db099",
       "token_use": "id",
-      "auth_time": 1640159000,
-      "iss": "https://cognito-idp.ap-south-1.amazonaws.com/ap-south-1_cpdRLf1K2h",
-      "cognito:username": "yqpsze151",
-      "exp": 4793760722,
-      "iat": 1640160722,
-      "email": "yqpsze151@t9tZ1f139.net"
+      "auth_time": 1716458000,
+      "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_example",
+      "cognito:username": "john.doe",
+      "exp": 1716461800,
+      "iat": 1716458200,
+      "email": "john.doe@example.com"
     },
     "principalId": "4bf08bda-88a3-47b8-90b0-f08291a9e7af"
   },
   "identity": {
-    "accountId": "778899101112",
+    "accountId": "112233445566",
     "apiKey": "DM8ua1AIkO292b9gAwRst87qNc296DyNEU3y8Ll4",
     "apiKeyId": "2zmu863a9k",
     "caller": "4bf08bda-88a3-47b8-90b0-f08291a9e7af",
-    "cognitoAuthenticationProvider": "\\"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_cpdRLf1K2h\\",\\"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_cpdRLf1K2h:CognitoSignIn:f350ee4c-4b07-40f7-b7f7-9f2d1c4cc21e\\"",
     "cognitoAuthenticationType": "authenticated",
-    "cognitoIdentityId": "ap-south-1:4bf08bda-88a3-47b8-90b0-f08291a9e7af",
-    "cognitoIdentityPoolId": "ap-south-1:5f658b59-d1fb-4499-8b24-92246a5c2a05",
-    "principalOrgId": "o-wsr8h7a6s4",
-    "sourceIp": "158.233.247.210",
-    "user": "api-caller",
-    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
-    "userArn": "arn:aws:iam::778899101112:role/api-caller",
-    "clientCert": {
-      "clientCertPem": "-----BEGIN CERTIFICATE-----\\nMIIEZTCCAk0CAQEwDQ...",
-      "subjectDN": "C=US,ST=Washington,L=Seattle,O=Amazon Web Services,OU=Security,CN=My Client",
-      "issuerDN": "C=US,ST=Washington,L=Seattle,O=Amazon Web Services,OU=Security,CN=My Private CA",
-      "serialNumber": "1",
-      "validity": {
-        "notAfter": "Aug  5 00:28:21 2120 GMT",
-        "notBefore": "Aug 29 00:28:21 2020 GMT"
+    "cognitoIdentityId": "us-east-1:4bf08bda-88a3-47b8-90b0-f08291a9e7af",
+    "cognitoIdentityPoolId": "us-east-1:5f658b59-d1fb-4499-8b24-92246a5c2a05",
+    "sourceIp": "203.0.113.1",
+    "user": "john.doe",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "userArn": "arn:aws:iam::112233445566:role/CognitoAuthorizedRole"
+  }
+}`;
+    }
+
+    async render() {
+      const startTime = performance.now();
+
+      try {
+        this.showLoading(true);
+        this.clearErrors();
+        // Get template and input data
+        const template = this.editors.template.getValue();
+        const body = this.editors.body.getValue();
+        const contextData = this.editors.context.getValue();
+
+        // Collect variables
+        const variables = this.collectVariables();
+
+        // Parse context
+        let context = {};
+        try {
+          if (contextData.trim()) {
+            context = JSON.parse(contextData);
+          }
+        } catch (error) {
+          throw new Error('Invalid context JSON: ' + error.message);
+        }
+
+        // Parse body
+        let inputData = {};
+        try {
+          if (body.trim()) {
+            inputData = JSON.parse(body);
+          }
+        } catch (error) {
+          throw new Error('Invalid body JSON: ' + error.message);
+        }
+
+        // Create VTL context
+        const vtlContext = {
+          input: {
+            body: body,
+            json: (path) => {
+              if (path === '$') return inputData;
+              // Simple JSONPath implementation
+              return this.getNestedValue(inputData, path.replace('$.', ''));
+            },
+            params: (name) => {
+              if (name.startsWith('header.')) {
+                return variables.header[name.substring(7)] || '';
+              } else if (name.startsWith('path.')) {
+                return variables.path[name.substring(5)] || '';
+              } else {
+                return variables.query[name] || '';
+              }
+            }
+          },
+          util: {
+            escapeJavaScript: (str) => {
+              if (typeof str !== 'string') str = String(str);
+              return str.replace(/\\/g, '\\\\')
+                  .replace(/"/g, '\\"')
+                  .replace(/'/g, "\\'")
+                  .replace(/\n/g, '\\n')
+                  .replace(/\r/g, '\\r')
+                  .replace(/\t/g, '\\t');
+            },
+            urlEncode: (str) => encodeURIComponent(str),
+            urlDecode: (str) => decodeURIComponent(str),
+            base64Encode: (str) => btoa(str),
+            base64Decode: (str) => atob(str)
+          },
+          context: context,
+          stageVariables: variables.stage
+        };
+
+        // Debug mode
+        if (this.debugMode) {
+          this.debugSteps = [];
+          this.addDebugStep('Starting VTL rendering');
+          this.addDebugStep('Template: ' + template.substring(0, 100) + '...');
+          this.addDebugStep('Variables: ' + JSON.stringify(variables, null, 2));
+        }
+
+        // Use the VTL emulator library if available, otherwise basic processing
+        let result;
+        if (window.renderVTLClient) {
+          result = await window.renderVTLClient(template, vtlContext);
+        } else {
+          result = this.basicVTLProcessor(template, vtlContext);
+        }
+
+        // Update result
+        document.getElementById('result').textContent = result;
+
+        const endTime = performance.now();
+        const renderTime = Math.round(endTime - startTime);
+        document.getElementById('renderTime').textContent = `Render: ${renderTime}ms`;
+
+        if (this.debugMode) {
+          this.addDebugStep(`Rendering completed in ${renderTime}ms`);
+          this.updateDebugPanel();
+        }
+
+        this.showSuccess('Template rendered successfully!');
+
+      } catch (error) {
+        this.showError('Render Error', error.message);
+        console.error('VTL Render Error:', error);
+      } finally {
+        this.showLoading(false);
+      }
+    }
+
+    basicVTLProcessor(template, context) {
+      let result = template;
+
+      // Simple variable substitution
+      result = result.replace(/\$([a-zA-Z_][\w\.]*(?:\([^)]*\))?)/g, (match, varPath) => {
+        try {
+          if (varPath.includes('(')) {
+            // Function call
+            const [objPath, funcCall] = varPath.split('(');
+            const funcName = funcCall.replace(')', '').replace(/"/g, '');
+            const obj = this.getNestedValue(context, objPath);
+
+            if (objPath === 'input.json') {
+              return JSON.stringify(context.input.json(funcName));
+            } else if (objPath === 'input.params') {
+              return context.input.params(funcName);
+            } else if (objPath === 'util.escapeJavaScript') {
+              return context.util.escapeJavaScript(funcName);
+            }
+          } else {
+            // Simple variable
+            const value = this.getNestedValue(context, varPath);
+            return value !== undefined ? value : match;
+          }
+        } catch (e) {
+          return match;
+        }
+      });
+
+      // Basic #if/#end processing
+      result = result.replace(/#if\s*\(\s*([^)]+)\s*\)([\s\S]*?)#end/g, (match, condition, content) => {
+        try {
+          const conditionValue = this.evaluateCondition(condition, context);
+          return conditionValue ? content : '';
+        } catch (e) {
+          return match;
+        }
+      });
+
+      // Basic #foreach/#end processing
+      result = result.replace(/#foreach\s*\(\s*\$(\w+)\s+in\s+([^)]+)\s*\)([\s\S]*?)#end/g, (match, itemVar, collection, content) => {
+        try {
+          const collectionValue = this.getNestedValue(context, collection.replace('$', ''));
+          if (Array.isArray(collectionValue)) {
+            return collectionValue.map(item => {
+              let itemContent = content;
+              itemContent = itemContent.replace(new RegExp(`\\$${itemVar}`, 'g'), JSON.stringify(item));
+              return itemContent;
+            }).join('');
+          }
+        } catch (e) {
+          return match;
+        }
+        return match;
+      });
+
+      return result;
+    }
+
+    getNestedValue(obj, path) {
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+
+    evaluateCondition(condition, context) {
+      // Very basic condition evaluation
+      const varMatch = condition.match(/\$([a-zA-Z_][\w\.]*)/);
+      if (varMatch) {
+        const value = this.getNestedValue(context, varMatch[1]);
+        return Boolean(value);
+      }
+      return false;
+    }
+
+    collectVariables() {
+      const variables = {
+        query: {},
+        path: {},
+        header: {},
+        stage: {}
+      };
+
+      ['query', 'path', 'header', 'stage'].forEach(group => {
+        const container = document.getElementById(`${group}Variables`);
+        if (container) {
+          container.querySelectorAll('.variable-row').forEach(row => {
+            const key = row.querySelector('.var-key').value.trim();
+            const value = row.querySelector('.var-value').value.trim();
+            if (key) {
+              variables[group][key] = value;
+            }
+          });
+        }
+      });
+
+      return variables;
+    }
+
+    addDebugStep(message) {
+      if (this.debugSteps) {
+        this.debugSteps.push({
+          timestamp: new Date().toISOString(),
+          message: message
+        });
+      }
+    }
+
+    updateDebugPanel() {
+      const panel = document.getElementById('debugSteps');
+      if (panel && this.debugSteps) {
+        panel.innerHTML = this.debugSteps.map(step =>
+            `<div class="debug-step">[${step.timestamp.substring(11, 19)}] ${step.message}</div>`
+        ).join('');
+      }
+    }
+
+    scheduleAutoRender() {
+      if (this.autoRenderTimeout) {
+        clearTimeout(this.autoRenderTimeout);
+      }
+      this.autoRenderTimeout = setTimeout(() => {
+        this.render();
+      }, this.settings.autoRenderDelay);
+    }
+
+    toggleAutoRender() {
+      this.autoRender = !this.autoRender;
+      const btn = document.getElementById('autoRenderToggle');
+      if (this.autoRender) {
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Auto ON';
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Auto';
+        if (this.autoRenderTimeout) {
+          clearTimeout(this.autoRenderTimeout);
+        }
+      }
+    }
+
+    toggleTheme() {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.body.removeAttribute('data-theme');
+        document.getElementById('themeToggle').innerHTML = '<i class="bi bi-moon"></i>';
+        this.settings.theme = 'light';
+      } else {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggle').innerHTML = '<i class="bi bi-sun"></i>';
+        this.settings.theme = 'dark';
+      }
+
+      // Update editor themes
+      Object.values(this.editors).forEach(editor => {
+        if (editor) {
+          monaco.editor.setTheme(this.settings.theme === 'dark' ? 'vs-dark' : 'vs');
+        }
+      });
+
+      this.saveSettings();
+    }
+
+    toggleDebug() {
+      this.debugMode = !this.debugMode;
+      const panel = document.getElementById('debugPanel');
+      const btn = document.getElementById('debugToggle');
+
+      if (this.debugMode) {
+        panel.style.display = 'block';
+        btn.classList.add('active');
+      } else {
+        panel.style.display = 'none';
+        btn.classList.remove('active');
+      }
+    }
+
+    toggleFullscreen() {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    }
+
+    insertSnippet(code) {
+      const editor = this.editors.template;
+      if (editor) {
+        const position = editor.getPosition();
+        editor.executeEdits('snippet-insert', [{
+          range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
+          text: code
+        }]);
+        editor.focus();
+      }
+    }
+
+    filterSnippets(searchTerm) {
+      const items = document.querySelectorAll('.snippet-item');
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const matches = text.includes(searchTerm.toLowerCase());
+        item.style.display = matches ? 'block' : 'none';
+      });
+    }
+
+    copyResult() {
+      const result = document.getElementById('result').textContent;
+      navigator.clipboard.writeText(result).then(() => {
+        this.showSuccess('Result copied to clipboard!');
+      }).catch(() => {
+        this.showError('Copy Error', 'Failed to copy to clipboard');
+      });
+    }
+
+    downloadResult() {
+      const result = document.getElementById('result').textContent;
+      const blob = new Blob([result], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vtl-result.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    clearResult() {
+      document.getElementById('result').textContent = 'Click "Render" to see the VTL output here...';
+    }
+
+    importConfiguration() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const config = JSON.parse(event.target.result);
+            this.loadConfiguration(config);
+            this.showSuccess('Configuration imported successfully!');
+          } catch (error) {
+            this.showError('Import Error', 'Invalid configuration file: ' + error.message);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    exportConfiguration() {
+      const config = {
+        templates: this.templates,
+        currentTemplate: this.currentTemplate,
+        body: this.editors.body?.getValue() || '',
+        context: this.editors.context?.getValue() || '',
+        variables: this.collectVariables(),
+        settings: this.settings,
+        timestamp: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(config, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vtl-config-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    loadConfiguration(config) {
+      if (config.templates) {
+        this.templates = config.templates;
+        this.currentTemplate = config.currentTemplate || 0;
+
+        // Rebuild template tabs
+        document.getElementById('templateTabs').innerHTML = `
+          <li class="nav-item">
+            <button class="btn btn-sm btn-outline-secondary" id="addTemplateTab">
+              <i class="bi bi-plus"></i>
+            </button>
+          </li>
+        `;
+
+        this.templates.forEach(template => {
+          this.addTemplateTab(template);
+        });
+
+        this.switchTemplate(this.currentTemplate);
+      }
+
+      if (config.body && this.editors.body) {
+        this.editors.body.setValue(config.body);
+      }
+
+      if (config.context && this.editors.context) {
+        this.editors.context.setValue(config.context);
+      }
+
+      if (config.variables) {
+        this.loadVariables(config.variables);
+      }
+
+      if (config.settings) {
+        this.settings = {...this.settings, ...config.settings};
+        this.saveSettings();
+      }
+    }
+
+    loadVariables(variables) {
+      // Clear existing variables
+      ['query', 'path', 'header', 'stage'].forEach(group => {
+        document.getElementById(`${group}Variables`).innerHTML = '';
+      });
+
+      // Load new variables
+      Object.keys(variables).forEach(group => {
+        const container = document.getElementById(`${group}Variables`);
+        if (container && variables[group]) {
+          Object.keys(variables[group]).forEach(key => {
+            this.createVariableRow(container, group, key, variables[group][key]);
+          });
+        }
+      });
+    }
+
+    shareConfiguration() {
+      const config = {
+        templates: this.templates,
+        currentTemplate: this.currentTemplate,
+        body: this.editors.body?.getValue() || '',
+        context: this.editors.context?.getValue() || '',
+        variables: this.collectVariables()
+      };
+
+      const encodedConfig = btoa(JSON.stringify(config));
+      const shareUrl = `${window.location.origin}${window.location.pathname}?config=${encodedConfig}`;
+
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        this.showSuccess('Share URL copied to clipboard!');
+      }).catch(() => {
+        prompt('Copy this URL to share your configuration:', shareUrl);
+      });
+    }
+
+    openComparison() {
+      // Create a comparison view
+      const modal = document.createElement('div');
+      modal.className = 'floating-panel';
+      modal.style.width = '80vw';
+      modal.style.height = '80vh';
+      modal.innerHTML = `
+        <div class="p-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5><i class="bi bi-files me-2"></i>Template Comparison</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.floating-panel').remove()">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          <div class="split-view">
+            <div>
+              <h6>Template A</h6>
+              <div id="compareEditorA" style="height: 300px; border: 1px solid var(--border-color);"></div>
+            </div>
+            <div>
+              <h6>Template B</h6>
+              <div id="compareEditorB" style="height: 300px; border: 1px solid var(--border-color);"></div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-primary" onclick="this.compareTemplates()">Compare</button>
+          </div>
+          <div id="comparisonResult" class="mt-3"></div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      // Initialize comparison editors
+      setTimeout(() => {
+        const editorA = monaco.editor.create(document.getElementById('compareEditorA'), {
+          value: this.templates[this.currentTemplate].content,
+          language: 'velocity',
+          theme: this.settings.theme === 'dark' ? 'vs-dark' : 'vs'
+        });
+
+        const editorB = monaco.editor.create(document.getElementById('compareEditorB'), {
+          value: '',
+          language: 'velocity',
+          theme: this.settings.theme === 'dark' ? 'vs-dark' : 'vs'
+        });
+      }, 100);
+    }
+
+    openSettings() {
+      const modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+
+      // Populate current settings
+      document.getElementById('autoRenderDelay').value = this.settings.autoRenderDelay;
+      document.getElementById('editorFontSize').value = this.settings.fontSize;
+      document.getElementById('enableLineNumbers').checked = this.settings.lineNumbers;
+      document.getElementById('enableMinimap').checked = this.settings.minimap;
+      document.getElementById('enableWordWrap').checked = this.settings.wordWrap;
+
+      modal.show();
+    }
+
+    saveSettingsFromModal() {
+      this.settings.autoRenderDelay = parseInt(document.getElementById('autoRenderDelay').value);
+      this.settings.fontSize = parseInt(document.getElementById('editorFontSize').value);
+      this.settings.lineNumbers = document.getElementById('enableLineNumbers').checked;
+      this.settings.minimap = document.getElementById('enableMinimap').checked;
+      this.settings.wordWrap = document.getElementById('enableWordWrap').checked;
+
+      // Apply settings to editors
+      Object.values(this.editors).forEach(editor => {
+        if (editor) {
+          editor.updateOptions({
+            fontSize: this.settings.fontSize,
+            lineNumbers: this.settings.lineNumbers ? 'on' : 'off',
+            minimap: {enabled: this.settings.minimap},
+            wordWrap: this.settings.wordWrap ? 'on' : 'off'
+          });
+        }
+      });
+
+      this.saveSettings();
+      bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+      this.showSuccess('Settings saved successfully!');
+    }
+
+    updatePerformanceStats() {
+      const template = this.editors.template?.getValue() || '';
+      document.getElementById('templateSize').textContent = `Size: ${template.length} chars`;
+    }
+
+    showLoading(show) {
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.style.display = show ? 'flex' : 'none';
+    }
+
+    showSuccess(message) {
+      this.showToast(message, 'success');
+    }
+
+    showError(title, message) {
+      const errorPanel = document.getElementById('errorPanel');
+      const errorDetails = document.getElementById('errorDetails');
+      errorDetails.innerHTML = `<strong>${title}:</strong> ${message}`;
+      errorPanel.style.display = 'block';
+
+      setTimeout(() => {
+        errorPanel.style.display = 'none';
+      }, 5000);
+    }
+
+    clearErrors() {
+      document.getElementById('errorPanel').style.display = 'none';
+    }
+
+    showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `alert alert-${type} position-fixed`;
+      toast.style.top = '20px';
+      toast.style.right = '20px';
+      toast.style.zIndex = '9999';
+      toast.textContent = message;
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('fade-in');
+      }, 10);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Load shared configuration from URL
+    loadSharedConfig() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const configParam = urlParams.get('config');
+
+      if (configParam) {
+        try {
+          const config = JSON.parse(atob(configParam));
+          this.loadConfiguration(config);
+          this.showSuccess('Shared configuration loaded!');
+        } catch (error) {
+          this.showError('Share Error', 'Invalid shared configuration');
+        }
       }
     }
   }
-}`,
-      language: 'json',
-      minimap: {enabled: false}
-    });
-  });
 
-  document.getElementById('vtlTabs').addEventListener('click', (e) => {
-    if (e.target.dataset.target) {
-      e.preventDefault();
-      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-      e.target.classList.add('active');
-      document.querySelectorAll('.editor-tab-content').forEach(el => el.classList.remove('active'));
-      const target = document.querySelector(e.target.dataset.target);
-      target.classList.add('active');
-      const editorKey = e.target.dataset.target.replace('#', '');
-      if (editors[editorKey]) {
-        setTimeout(() => editors[editorKey].layout(), 0);
-      }
-    }
-  });
+  // Initialize the application
+  document.addEventListener('DOMContentLoaded', () => {
+    window.vtlEmulator = new VTLEmulatorPro();
 
-  document.getElementById('addVariable').addEventListener('click', () => {
-    const container = document.getElementById('variableContainer');
-    const row = document.createElement('div');
-    row.className = 'kv-row';
-    row.innerHTML = `
-      <select class="form-select var-type">
-        <option value="query">Query</option>
-        <option value="path">Path</option>
-        <option value="header">Header</option>
-        <option value="stage">Stage</option>
-      </select>
-      <input class="form-control var-key" placeholder="Key" />
-      <input class="form-control var-value" placeholder="Value" />
-      <button class="btn btn-danger btn-sm remove-btn">x</button>
-    `;
-    row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
-    container.appendChild(row);
-  });
-
-  document.getElementById('renderBtn').addEventListener('click', async () => {
-    const template = editors.template.getValue();
-    const body = editors.body.getValue();
-    const context = editors.context.getValue();
-
-    const parsedBody = (() => {
-      try {
-        return JSON.parse(body);
-      } catch {
-        return {};
-      }
-    })();
-    const parsedContext = (() => {
-      try {
-        return JSON.parse(context);
-      } catch {
-        return {};
-      }
-    })();
-
-    const vars = {};
-    document.querySelectorAll('#variableContainer .kv-row').forEach(row => {
-      const type = row.querySelector('.var-type').value;
-      const key = row.querySelector('.var-key').value;
-      const value = row.querySelector('.var-value').value;
-      if (!vars[type]) vars[type] = {};
-      vars[type][key] = value;
-    });
-
-    document.getElementById('loadingCat').style.display = 'block';
-    document.getElementById('result').textContent = '';
-
-    const result = window.renderVTLClient(template, {
-      body: parsedBody,
-      headers: vars.header || {},
-      queryStringParameters: vars.query || {},
-      pathParameters: vars.path || {},
-      stageVariables: vars.stage || {},
-      context: parsedContext,
-      httpMethod: 'POST',
-      path: '/vtl'
-    });
-    document.getElementById('loadingCat').style.display = 'none';
-    document.getElementById('result').textContent = result;
+    // Load shared config if present
+    window.vtlEmulator.loadSharedConfig();
   });
 </script>
+
 </body>
 </html>
