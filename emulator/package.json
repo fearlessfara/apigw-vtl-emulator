@@ -1,16 +1,16 @@
 {
   "name": "apigw-vtl-emulator",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "VTL evaluator using velocityjs, simulating AWS API Gateway mapping template behavior",
   "type": "module",
-  "main": "dist/vtl.umd.js",
-  "module": "dist/vtl.mjs",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
   "exports": {
-    "import": "./dist/vtl.mjs",
-    "require": "./dist/vtl.umd.js"
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.umd.js"
   },
   "scripts": {
-    "build": "esbuild src/engine.js --bundle --minify --outfile=dist/vtl.mjs --format=esm && esbuild src/engine.js --bundle --minify --outfile=dist/vtl.umd.js --format=iife --global-name=VTL",
+    "build": "esbuild src/index.js --bundle --minify --outfile=dist/index.mjs --format=esm && esbuild src/index.js --bundle --minify --outfile=dist/index.umd.js --format=iife --global-name=VTL",
     "test": "mocha tests/**/*test.js"
   },
   "keywords": [
@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fearlessfara/apigw-vtl-emulator.git"
+    "url": "git+https://github.com/fearlessfara/apigw-vtl-emulator.git"
   },
   "bugs": {
     "url": "https://github.com/fearlessfara/apigw-vtl-emulator/issues"
