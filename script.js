@@ -1150,15 +1150,20 @@ class VTLEmulatorPro {
   }
 
   insertSnippet(code) {
-    const editor = this.editors.template;
-    if (editor) {
-      const position = editor.getPosition();
-      editor.executeEdits('snippet-insert', [{
-        range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
-        text: code
-      }]);
-      editor.focus();
-    }
+    const newId = Math.max(...this.templates.map(t => t.id)) + 1;
+    const model = monaco.editor.createModel(code, 'velocity');
+
+    const template = {
+      id: newId,
+      name: `Snippet ${newId + 1}`,
+      content: code,
+      model
+    };
+
+    this.templates.push(template);
+    this.addTemplateTab(template);
+    this.switchTemplate(newId);
+    this.switchTab('template'); // Ensure the editor tab is active
   }
 
   filterSnippets(searchTerm) {
