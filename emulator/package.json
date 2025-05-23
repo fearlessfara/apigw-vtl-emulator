@@ -16,14 +16,23 @@
   "keywords": [
     "vtl",
     "velocity",
-    "appsync",
+    "velocityjs",
+    "apigateway",
     "emulator",
     "serverless"
   ],
   "author": "Christian Gennaro Faraone",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fearlessfara/vtl-emulator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fearlessfara/vtl-emulator/issues"
+  },
+  "homepage": "https://github.com/fearlessfara/vtl-emulator#readme",
   "dependencies": {
-    "velocityjs": "^2.1.5"
+    "velocityjs": "~2.1.5"
   },
   "devDependencies": {
     "esbuild": "~0.25.4",
