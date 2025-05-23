@@ -1,18 +1,33 @@
 {
   "name": "vtl-emulator",
-  "type": "module",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "../node_modules/.bin/mocha emulator/tests/**/*test.js"
+  "description": "Frontend-only VTL evaluator using velocityjs, simulating AWS ApiGateway mapping template behavior",
+  "type": "module",
+  "main": "dist/vtl.umd.js",
+  "module": "dist/vtl.mjs",
+  "exports": {
+    "import": "./dist/vtl.mjs",
+    "require": "./dist/vtl.umd.js"
   },
-  "private": true,
+  "scripts": {
+    "build": "esbuild src/engine.js --bundle --minify --outfile=dist/vtl.mjs --format=esm && esbuild src/engine.js --bundle --minify --outfile=dist/vtl.umd.js --format=iife --global-name=VTL",
+    "test": "mocha tests/**/*test.js"
+  },
+  "keywords": [
+    "vtl",
+    "velocity",
+    "appsync",
+    "emulator",
+    "serverless"
+  ],
+  "author": "Christian Gennaro Faraone",
+  "license": "MIT",
   "dependencies": {
     "velocityjs": "^2.1.5"
   },
   "devDependencies": {
-    "chai": "^5.2.0",
-    "mocha": "^11.4.0"
+    "esbuild": "~0.25.4",
+    "chai": "~5.2.0",
+    "mocha": "~11.4.0"
   }
 }

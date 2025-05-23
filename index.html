@@ -51,7 +51,10 @@
 </head>
 <body>
 <div class="container py-4">
-    <h3 class="mb-3">VTL Emulator</h3>
+    <h3 class="mb-3 d-flex align-items-center gap-2">
+        <img src="favicon.ico" alt="Favicon" style="width: 24px; height: 24px;">
+        VTL Emulator
+    </h3>
 
     <ul class="nav nav-tabs mb-2" id="vtlTabs">
         <li class="nav-item"><a class="nav-link active" href="#" data-target="#template">Template</a></li>
@@ -90,6 +93,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+<script type="module">
+  import {renderVTL} from 'https://cdn.jsdelivr.net/npm/vtl-emulator@1.0.0/dist/vtl.mjs';
+
+  window.renderVTLClient = renderVTL;
+</script>
 <script>
   let editors = {};
 
@@ -283,27 +291,18 @@
     document.getElementById('loadingCat').style.display = 'block';
     document.getElementById('result').textContent = '';
 
-    const res = await fetch('https://l7g5xwizt5.execute-api.eu-west-1.amazonaws.com/vtl', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        template,
-        context: {
-          body: JSON.stringify(parsedBody),
-          parsedBody,
-          query: vars.query || {},
-          pathParams: vars.path || {},
-          headers: vars.header || {},
-          stageVariables: vars.stage || {},
-          event: {httpMethod: 'POST', path: '/vtl'},
-          eventContext: parsedContext
-        }
-      })
+    const result = window.renderVTLClient(template, {
+      body: parsedBody,
+      headers: vars.header || {},
+      queryStringParameters: vars.query || {},
+      pathParameters: vars.path || {},
+      stageVariables: vars.stage || {},
+      context: parsedContext,
+      httpMethod: 'POST',
+      path: '/vtl'
     });
-
-    const data = await res.json();
     document.getElementById('loadingCat').style.display = 'none';
-    document.getElementById('result').textContent = data.result || data.error || 'Unknown error';
+    document.getElementById('result').textContent = result;
   });
 </script>
 </body>
