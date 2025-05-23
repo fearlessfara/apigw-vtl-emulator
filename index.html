@@ -149,7 +149,63 @@
       minimap: {enabled: false}
     });
     editors.context = monaco.editor.create(document.getElementById('editorContext'), {
-      value: '{}',
+      value: `{
+  "accountId": "112233445566",
+  "apiId": "a1b2c3d4e5",
+  "domainPrefix": "a1b2c3d4e5",
+  "domainName": "a1b2c3d4e5.execute-api.up-down-1.amazonaws.com",
+  "extendedRequestId": "ABCdEFGhIJKLMnO=",
+  "httpMethod": "POST",
+  "stage": "prod",
+  "path": "/prod",
+  "protocol": "HTTP/1.1",
+  "requestId": "7b776519-78de-4539-8e04-ff300f5c2528",
+  "requestTime": "4/Mar/2021:05:43:21 +0000",
+  "requestTimeEpoch": "1614836601444",
+  "resourceId": "1a2b3c4d5e",
+  "resourcePath": "/",
+  "authorizer": {
+    "claims": {
+      "sub": "4bf08bda-88a3-47b8-90b0-f08291a9e7af",
+      "aud": "tfcrxvwog56v9sxpcbcesams65",
+      "email_verified": true,
+      "event_id": "17c18670-01b0-4bba-b118-1bfecf2db099",
+      "token_use": "id",
+      "auth_time": 1640159000,
+      "iss": "https://cognito-idp.ap-south-1.amazonaws.com/ap-south-1_cpdRLf1K2h",
+      "cognito:username": "yqpsze151",
+      "exp": 4793760722,
+      "iat": 1640160722,
+      "email": "yqpsze151@t9tZ1f139.net"
+    },
+    "principalId": "4bf08bda-88a3-47b8-90b0-f08291a9e7af"
+  },
+  "identity": {
+    "accountId": "778899101112",
+    "apiKey": "DM8ua1AIkO292b9gAwRst87qNc296DyNEU3y8Ll4",
+    "apiKeyId": "2zmu863a9k",
+    "caller": "4bf08bda-88a3-47b8-90b0-f08291a9e7af",
+    "cognitoAuthenticationProvider": "\\"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_cpdRLf1K2h\\",\\"cognito-idp.ap-south-1.amazonaws.com/ap-south-1_cpdRLf1K2h:CognitoSignIn:f350ee4c-4b07-40f7-b7f7-9f2d1c4cc21e\\"",
+    "cognitoAuthenticationType": "authenticated",
+    "cognitoIdentityId": "ap-south-1:4bf08bda-88a3-47b8-90b0-f08291a9e7af",
+    "cognitoIdentityPoolId": "ap-south-1:5f658b59-d1fb-4499-8b24-92246a5c2a05",
+    "principalOrgId": "o-wsr8h7a6s4",
+    "sourceIp": "158.233.247.210",
+    "user": "api-caller",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
+    "userArn": "arn:aws:iam::778899101112:role/api-caller",
+    "clientCert": {
+      "clientCertPem": "-----BEGIN CERTIFICATE-----\\nMIIEZTCCAk0CAQEwDQ...",
+      "subjectDN": "C=US,ST=Washington,L=Seattle,O=Amazon Web Services,OU=Security,CN=My Client",
+      "issuerDN": "C=US,ST=Washington,L=Seattle,O=Amazon Web Services,OU=Security,CN=My Private CA",
+      "serialNumber": "1",
+      "validity": {
+        "notAfter": "Aug  5 00:28:21 2120 GMT",
+        "notBefore": "Aug 29 00:28:21 2020 GMT"
+      }
+    }
+  }
+}`,
       language: 'json',
       minimap: {enabled: false}
     });
