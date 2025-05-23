@@ -64,8 +64,8 @@ const customMethodHandlers = [
     uid: 'util.escapeJavaScript',
     match: ({ property }) => property === 'escapeJavaScript',
     resolve: ({ params }) => {
-      const raw = JSON.stringify(params[0] ?? {});
-      return raw.replace(/["'\\\r\n\t\f\b]/g, (c) => ({
+      const input = String(params[0] ?? '');
+      return input.replace(/["'\\\r\n\t\f\b]/g, c => ({
         '\\': '\\\\',
         '"': '\\"',
         "'": "\\'",
