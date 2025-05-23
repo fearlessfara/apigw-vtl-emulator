@@ -83,19 +83,68 @@
     <div id="result" class="mt-2"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 <script>
   let editors = {};
 
-  require.config({paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'}});
+  require.config({paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs'}});
   require(['vs/editor/editor.main'], function () {
+    monaco.languages.register({id: 'velocity'});
+    monaco.languages.setMonarchTokensProvider('velocity', {
+      tokenizer: {
+        root: [
+          [/\$[a-zA-Z_][\w\.]*/, 'variable'],
+          [/#.*/, 'comment'],
+          [/"([^"\\]|\\.)*$/, 'string.invalid'],
+          [/"([^"\\]|\\.)*"/, 'string'],
+          [/[{}]/, 'delimiter.bracket'],
+          [/[\[\]]/, 'delimiter.array'],
+        ]
+      }
+    });
+    monaco.languages.registerCompletionItemProvider('velocity', {
+      triggerCharacters: ['$', '.'],
+      provideCompletionItems: () => {
+        return {
+          suggestions: [
+            {
+              label: '$input',
+              kind: monaco.languages.CompletionItemKind.Variable,
+              insertText: '$input',
+              documentation: 'AWS input utility'
+            },
+            {
+              label: '$input.json',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$input.json("$1")',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'JSON parser'
+            },
+            {
+              label: '$util.escapeJavaScript',
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: '$util.escapeJavaScript($1)',
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: 'JS escape'
+            },
+            {
+              label: '$context.requestId',
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: '$context.requestId',
+              documentation: 'Request ID'
+            }
+          ]
+        };
+      }
+    });
+
     editors.template = monaco.editor.create(document.getElementById('editorTemplate'), {
-      value: '$input.body',
-      language: 'javascript',
+      value: '$input.json("$")\n$util.escapeJavaScript($input.body)',
+      language: 'velocity',
       minimap: {enabled: false}
     });
     editors.body = monaco.editor.create(document.getElementById('editorBody'), {
-      value: '{\n  "foo": "bar"\n}',
+      value: '{\n  \"foo\": \"bar\"\n}',
       language: 'json',
       minimap: {enabled: false}
     });
