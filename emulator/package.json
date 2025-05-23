@@ -1,7 +1,7 @@
 {
-  "name": "vtl-emulator",
+  "name": "apigw-vtl-emulator",
   "version": "1.0.0",
-  "description": "VTL evaluator using velocityjs, simulating AWS ApiGateway mapping template behavior",
+  "description": "VTL evaluator using velocityjs, simulating AWS API Gateway mapping template behavior",
   "type": "module",
   "main": "dist/vtl.umd.js",
   "module": "dist/vtl.mjs",
@@ -18,19 +18,22 @@
     "velocity",
     "velocityjs",
     "apigateway",
+    "apigw",
     "emulator",
-    "serverless"
+    "serverless",
+    "mapping-template",
+    "aws"
   ],
   "author": "Christian Gennaro Faraone",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fearlessfara/vtl-emulator.git"
+    "url": "https://github.com/fearlessfara/apigw-vtl-emulator.git"
   },
   "bugs": {
-    "url": "https://github.com/fearlessfara/vtl-emulator/issues"
+    "url": "https://github.com/fearlessfara/apigw-vtl-emulator/issues"
   },
-  "homepage": "https://github.com/fearlessfara/vtl-emulator#readme",
+  "homepage": "https://github.com/fearlessfara/apigw-vtl-emulator#readme",
   "dependencies": {
     "velocityjs": "~2.1.5"
   },

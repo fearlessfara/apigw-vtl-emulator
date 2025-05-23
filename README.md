@@ -15,7 +15,7 @@ This tool lets you:
 
 The web version is available at:
 
-👉 **[https://fearlessfara.github.io/vtl-emulator](https://fearlessfara.github.io/vtl-emulator)**
+👉 **[https://fearlessfara.github.io/apigw-vtl-emulator](https://fearlessfara.github.io/apigw-vtl-emulator)**
 
 ⚠️ **No data is ever sent to any backend.** Everything runs 100% in your browser. Perfect for privacy-sensitive workflows.
 
@@ -25,8 +25,8 @@ The web version is available at:
 
 This repository contains **both**:
 
-- 🖥️ **The website**, which is hosted via GitHub Pages at [https://fearlessfara.github.io/vtl-emulator](https://fearlessfara.github.io/vtl-emulator)
-- 🧩 **The library/engine code**, found in the `emulator/` folder, and published on NPM as [`vtl-emulator`](https://www.npmjs.com/package/vtl-emulator)
+- 🖥️ **The website**, which is hosted via GitHub Pages at [https://fearlessfara.github.io/apigw-vtl-emulator](https://fearlessfara.github.io/apigw-vtl-emulator)
+- 🧩 **The library/engine code**, found in the `emulator/` folder, and published on NPM as [`apigw-vtl-emulator`](https://www.npmjs.com/package/apigw-vtl-emulator)
 
 You can contribute to either part — feel free to improve the UI, fix bugs in the engine, or add new template utilities.
 
@@ -53,9 +53,9 @@ Happy templating! 🎉
 
 This project includes a fully browser-compatible JavaScript engine that emulates AWS API Gateway's VTL behavior.
 
-- **NPM:** [https://www.npmjs.com/package/vtl-emulator](https://www.npmjs.com/package/vtl-emulator)
+- **NPM:** [https://www.npmjs.com/package/apigw-vtl-emulator](https://www.npmjs.com/package/apigw-vtl-emulator)
 
-- **CDN:** [https://cdn.jsdelivr.net/npm/vtl-emulator@1.0.0/dist/vtl.mjs](https://cdn.jsdelivr.net/npm/vtl-emulator@1.0.0/dist/vtl.mjs)
+- **CDN:** [https://cdn.jsdelivr.net/npm/apigw-vtl-emulator@1.0.0/dist/vtl.mjs](https://cdn.jsdelivr.net/npm/apigw-vtl-emulator@1.0.0/dist/vtl.mjs)
 
 The engine runs entirely in the browser and **does not send any data to a backend**, making it an excellent choice for privacy-sensitive debugging and development.
 
@@ -65,7 +65,7 @@ The engine runs entirely in the browser and **does not send any data to a backen
 Clone the repository and open `index.html` in your browser:
 
 ```bash
-git clone https://github.com/fearlessfara/vtl-emulator.git
+git clone https://github.com/fearlessfara/apigw-vtl-emulator.git
 cd vtl-emulator
 open index.html # or use a local server
 
