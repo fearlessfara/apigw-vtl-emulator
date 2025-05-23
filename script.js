@@ -85,6 +85,15 @@ class VTLEmulatorPro {
         name: 'Success Response',
         description: 'Standard success response format',
         code: '{\n  "success": true,\n  "data": $input.json("$"),\n  "timestamp": "$context.requestTime",\n  "requestId": "$context.requestId"\n}'
+      },
+      {
+        name: 'Invoke Step Function',
+        description: 'Invoke a Step Function with idempotency key and stringified body',
+        code: `{
+  "stateMachineArn": "arn:aws:states:REGION:ACCOUNT_ID:stateMachine:YourStateMachineName",
+  "name": "$context.requestTimeEpoch",
+  "input": "{\\"idempotency_key\\": \\"$input.params().header['X-Idempotency-Key']\\", \\"request_body\\": $util.escapeJavaScript($input.body) }"
+}`
       }
     ];
 
