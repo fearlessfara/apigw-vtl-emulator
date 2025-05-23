@@ -1,7 +1,7 @@
 {
   "name": "vtl-emulator",
   "version": "1.0.0",
-  "description": "Frontend-only VTL evaluator using velocityjs, simulating AWS ApiGateway mapping template behavior",
+  "description": "VTL evaluator using velocityjs, simulating AWS ApiGateway mapping template behavior",
   "type": "module",
   "main": "dist/vtl.umd.js",
   "module": "dist/vtl.mjs",
