@@ -1,7 +1,7 @@
 class VTLEmulatorPro {
   constructor() {
     this.editors = {};
-    this.templates = [{id: 0, name: 'Template 1', content: '$input.json("$")\n$util.escapeJavaScript($input.body)'}];
+    this.templates = [{id: 0, name: 'Template 1', content: '$input.json("$")'}];
     this.currentTemplate = 0;
     this.autoRender = false;
     this.autoRenderTimeout = null;
@@ -1347,29 +1347,29 @@ class VTLEmulatorPro {
     modal.style.width = '80vw';
     modal.style.height = '80vh';
     modal.innerHTML = `
-        <div class="p-3">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5><i class="bi bi-files me-2"></i>Template Comparison</h5>
-            <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.floating-panel').remove()">
-              <i class="bi bi-x"></i>
-            </button>
-          </div>
-          <div class="split-view">
-            <div>
-              <h6>Template A</h6>
-              <div id="compareEditorA" style="height: 300px; border: 1px solid var(--border-color);"></div>
-            </div>
-            <div>
-              <h6>Template B</h6>
-              <div id="compareEditorB" style="height: 300px; border: 1px solid var(--border-color);"></div>
-            </div>
-          </div>
-          <div class="mt-3">
-            <button class="btn btn-primary" onclick="this.compareTemplates()">Compare</button>
-          </div>
-          <div id="comparisonResult" class="mt-3"></div>
+    <div class="p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5><i class="bi bi-files me-2"></i>Template Comparison</h5>
+        <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.floating-panel').remove()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="split-view">
+        <div>
+          <h6>Template A</h6>
+          <div id="compareEditorA" style="height: 300px; border: 1px solid var(--border-color);"></div>
         </div>
-      `;
+        <div>
+          <h6>Template B</h6>
+          <div id="compareEditorB" style="height: 300px; border: 1px solid var(--border-color);"></div>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button class="btn btn-primary" id="compareTemplatesBtn">Compare</button>
+      </div>
+      <div id="comparisonResult" class="mt-3"></div>
+    </div>
+  `;
 
     document.body.appendChild(modal);
 
@@ -1386,8 +1386,20 @@ class VTLEmulatorPro {
         language: 'velocity',
         theme: this.settings.theme === 'dark' ? 'vs-dark' : 'vs'
       });
+
+      document.getElementById('compareTemplatesBtn').addEventListener('click', () => {
+        const contentA = editorA.getValue();
+        const contentB = editorB.getValue();
+
+        const diff = contentA === contentB
+            ? '<div class="text-success">Templates are identical.</div>'
+            : '<div class="text-warning">Templates differ.</div>';
+
+        document.getElementById('comparisonResult').innerHTML = diff;
+      });
     }, 100);
   }
+
 
   openSettings() {
     const modal = new bootstrap.Modal(document.getElementById('settingsModal'));
@@ -1489,6 +1501,26 @@ class VTLEmulatorPro {
       }
     }
   }
+
+  compareTemplates() {
+    const editorA = monaco.editor.getModels().find(m => m.uri.path.includes('compareEditorA'));
+    const editorB = monaco.editor.getModels().find(m => m.uri.path.includes('compareEditorB'));
+
+    if (!editorA || !editorB) {
+      document.getElementById('comparisonResult').innerHTML = '<div class="text-danger">Editors not found.</div>';
+      return;
+    }
+
+    const contentA = editorA.getValue();
+    const contentB = editorB.getValue();
+
+    const diff = contentA === contentB
+        ? '<div class="text-success">Templates are identical.</div>'
+        : '<div class="text-warning">Templates differ.</div>';
+
+    document.getElementById('comparisonResult').innerHTML = diff;
+  }
+
 }
 
 // Initialize the application
