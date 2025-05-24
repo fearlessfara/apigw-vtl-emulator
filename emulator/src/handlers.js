@@ -1,6 +1,13 @@
 function getValueByJsonPath(obj, path) {
-  if (!path || path === '$') return obj;
+  // Handle null, undefined, or empty string paths
+  if (!path || path === '') return null;
+
+  // Handle root path
+  if (path === '$') return obj;
+
+  // Handle invalid paths that don't start with $.
   if (!path.startsWith('$.')) return null;
+
   const segments = path.slice(2).split('.');
   return segments.reduce((o, s) => (o ? o[s] : null), obj);
 }
@@ -18,7 +25,18 @@ const customMethodHandlers = [
   {
     uid: 'input.json.handler',
     match: ({property, context}) => context?.__type === 'input' && property === 'json',
-    resolve: ({context, params}) => getValueByJsonPath(context.parsedBody, params[0])
+    resolve: ({context, params}) => {
+      const result = getValueByJsonPath(context.parsedBody, params[0]);
+      // If result is null (invalid path), return empty string to match API Gateway behavior
+      if (result === null) {
+        return '';
+      }
+      // If the result is an object, stringify it so it can be parsed as JSON
+      if (typeof result === 'object' && result !== null) {
+        return JSON.stringify(result);
+      }
+      return result;
+    }
   },
   {
     uid: 'input.body.handler',
@@ -48,27 +66,16 @@ const customMethodHandlers = [
     match: ({property, context}) => context?.__type === 'input' && property === 'method',
     resolve: ({context}) => context.event.httpMethod || 'GET'
   },
-  {
-    uid: 'input.all.handler',
-    match: ({property, context}) => context?.__type === 'input' && property === 'all',
-    resolve: ({context}) => JSON.stringify({
-      body: context.parsedBody,
-      path: context.pathParams,
-      querystring: context.query,
-      header: context.headers
-    })
-  },
 
   // $util methods
   {
     uid: 'util.escapeJavaScript',
-    match: ({ property }) => property === 'escapeJavaScript',
-    resolve: ({ params }) => {
+    match: ({property}) => property === 'escapeJavaScript',
+    resolve: ({params}) => {
       const input = String(params[0] ?? '');
-      return input.replace(/["'\\\r\n\t\f\b]/g, c => ({
-        '\\': '\\\\',
+      // Only escape quotes and actual control characters, not literal backslashes
+      return input.replace(/["\r\n\t\f\b]/g, c => ({
         '"': '\\"',
-        "'": "\\'",
         '\r': '\\r',
         '\n': '\\n',
         '\t': '\\t',
@@ -90,12 +97,24 @@ const customMethodHandlers = [
   {
     uid: 'util.urlEncode',
     match: ({property}) => property === 'urlEncode',
-    resolve: ({params}) => encodeURIComponent(params[0] ?? '')
+    resolve: ({params}) => {
+      const input = String(params[0] ?? '');
+      // AWS VTL urlEncode uses application/x-www-form-urlencoded encoding
+      // - Spaces become '+'
+      // - Other special characters are percent-encoded
+      return encodeURIComponent(input)
+          .replace(/%20/g, '+')  // Replace %20 with +
+          .replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+    }
   },
   {
     uid: 'util.urlDecode',
     match: ({property}) => property === 'urlDecode',
-    resolve: ({params}) => decodeURIComponent(params[0] ?? '')
+    resolve: ({params}) => {
+      const input = String(params[0] ?? '');
+      // Handle both + and %20 for spaces, then decode the rest
+      return decodeURIComponent(input.replace(/\+/g, ' '));
+    }
   },
   {
     uid: 'util.parseJson',
@@ -117,7 +136,14 @@ const customMethodHandlers = [
     uid: `context.${key}`,
     match: ({property, context}) => context?.__type === 'context' && property === key,
     resolve: ({context}) => context?.eventContext?.[key] ?? ''
-  }))
+  })),
+
+  {
+    uid: 'context.fallback',
+    match: ({context, property}) => context?.__type === 'context',
+    resolve: ({context, property}) => context?.[property] ?? ''
+  }
+
 ];
 
 export default customMethodHandlers;
