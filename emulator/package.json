@@ -1,6 +1,6 @@
 {
   "name": "apigw-vtl-emulator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "VTL evaluator using velocityjs, simulating AWS API Gateway mapping template behavior",
   "type": "module",
   "main": "dist/index.umd.js",

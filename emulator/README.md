@@ -1,8 +1,8 @@
 # apigw-vtl-emulator
 
-**apigw-vtl-emulator** is a frontend-compatible JavaScript library that evaluates [Apache Velocity Template Language (VTL)](https://velocity.apache.org/engine/1.7/user-guide.html) templates in the browser or Node.js, simulating AWS API Gateway's mapping template behavior.
+**apigw-vtl-emulator** is a JavaScript library for evaluating [Apache Velocity Template Language (VTL)](https://velocity.apache.org/engine/1.7/user-guide.html) templates, simulating AWS API Gateway's integration request/response mapping behavior.
 
-It uses `velocityjs` with custom method handlers to closely match how AWS handles `$input`, `$context`, and `$util` in integration request/response templates.
+It uses `velocityjs` under the hood with custom method handlers to emulate `$input`, `$context`, and `$util` — matching AWS's behavior as closely as possible.
 
 ---
 
@@ -14,10 +14,10 @@ npm install apigw-vtl-emulator
 pnpm add apigw-vtl-emulator
 ```
 
-CDN:
+CDN (ESM module):
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/apigw-vtl-emulator@1.0.0/dist/vtl.mjs"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/apigw-vtl-emulator@1.0.3/dist/index.mjs"></script>
 ```
 
 ---
@@ -56,10 +56,13 @@ Output:
 
 ## ⚙️ Features
 
-- Emulates `$input`, `$util`, `$context` as in AWS API Gateway
-- Works in **browsers** and **Node.js**
-- No external backend — great for privacy and portability
-- Ships as both ESM (`vtl.mjs`) and UMD (`vtl.umd.js`)
+- Emulates AWS API Gateway VTL behavior (`$input`, `$util`, `$context`)
+- Supports conditionals, loops, JSONPath, encoding, and more
+- Runs in **Node.js** and **modern browsers**
+- Zero backend dependency — excellent for portability and privacy
+- Ships with:
+    - **ESM**: `dist/index.mjs`
+    - **UMD**: `dist/index.umd.js` (global: `VTL`)
 
 ---
 
@@ -67,15 +70,18 @@ Output:
 
 ### `renderVTL(template: string, event: object): string`
 
-- **template**: VTL template string.
-- **event**: Mocked API Gateway event object.
+- **template**: VTL template string
+- **event**: Mock API Gateway request-style object
+
+Returns: Rendered string output
 
 ---
 
 ## 📁 Project Structure
 
-- `src/engine.js`: Main entry for rendering templates.
-- `src/handlers.js`: Custom method handlers to simulate `$input`, `$util`, and `$context`.
+- `src/engine.js` — Main entry that parses and renders templates
+- `src/handlers.js` — Implements method mappings for AWS-style `$input`, `$util`, `$context`
+- `tests/` — Unit tests verifying handler correctness and output matching
 
 ---
 
@@ -87,19 +93,19 @@ To run tests:
 npm test
 ```
 
-Tests live in `tests/` and cover rendering correctness and handler behaviors.
+Tests use Mocha plus Chai and live in the `tests/` directory.
 
 ---
 
 ## 🤝 Contributing
 
-Merge requests are welcome!
+Contributions are welcome!
 
-- Add features or bug fixes in `src/`
-- Include tests for all changes in `tests/`
-- Use realistic API Gateway event mocks
+- Code lives in `src/`
+- Tests go in `tests/`
+- Please use real-world API Gateway payloads for input where possible
 
-Only well-tested features will be merged.
+All PRs must include tests to be accepted.
 
 ---
 
