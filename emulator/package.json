@@ -1,16 +1,18 @@
 {
   "name": "apigw-vtl-emulator",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "VTL evaluator using velocityjs, simulating AWS API Gateway mapping template behavior",
   "type": "module",
-  "main": "dist/index.umd.js",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "exports": {
+    "types": "./dist/index.d.ts",
     "import": "./dist/index.mjs",
-    "require": "./dist/index.umd.js"
+    "require": "./dist/index.cjs"
   },
   "scripts": {
-    "build": "esbuild src/index.js --bundle --minify --outfile=dist/index.mjs --format=esm && esbuild src/index.js --bundle --minify --outfile=dist/index.umd.js --format=iife --global-name=VTL",
+    "build": "tsc && rollup -c",
     "test": "mocha tests/**/*test.js"
   },
   "keywords": [
@@ -45,8 +47,13 @@
     "velocityjs": "~2.1.5"
   },
   "devDependencies": {
-    "esbuild": "~0.25.4",
     "chai": "~5.2.0",
-    "mocha": "~11.4.0"
+    "esbuild": "~0.25.4",
+    "mocha": "~11.4.0",
+    "typescript": "~5.8.3",
+    "@rollup/plugin-commonjs": "~28.0.3",
+    "@rollup/plugin-node-resolve": "~16.0.1",
+    "@rollup/plugin-terser": "~0.4.4",
+    "rollup-plugin-polyfill-node": "~0.13.0"
   }
 }

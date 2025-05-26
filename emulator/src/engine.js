@@ -1,10 +1,21 @@
 import velocity from 'velocityjs';
 import customMethodHandlers from './handlers.js';
 
+/**
+ * Normalizes headers by converting all keys to lowercase.
+ * @param {Record<string, string>} headers
+ * @returns {Record<string, string>}
+ */
 function normalizeHeaders(headers = {}) {
   return Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
 }
 
+/**
+ * Safely parses a JSON string or returns the original object if already parsed.
+ * Returns an empty object on parse failure.
+ * @param {string|object} data
+ * @returns {object}
+ */
 function safeParseJson(data) {
   if (typeof data === 'object' && data !== null) return data;
   if (typeof data !== 'string') return {};
@@ -15,13 +26,18 @@ function safeParseJson(data) {
   }
 }
 
+/**
+ * Builds the Velocity rendering context, simulating API Gateway structure.
+ * @param {ApiGatewayProxyEvent} [event={}] - Mocked API Gateway event object
+ * @returns {object} Velocity-compatible context
+ */
 function buildContext(event = {}) {
   const query = event.queryStringParameters || {};
   const headers = normalizeHeaders(event.headers || {});
   const pathParams = event.pathParameters || {};
   const body = event.body || '{}';
   const parsedBody = safeParseJson(body);
-  const eventContext = event.context || {};
+  const eventContext = event.requestContext || {};
   const stageVariables = event.stageVariables || {};
 
   return {
@@ -48,6 +64,14 @@ function buildContext(event = {}) {
   };
 }
 
+/**
+ * Renders a Velocity Template Language (VTL) string using a simulated API Gateway context.
+ * @param {string} templateString - VTL template to render
+ * @param {ApiGatewayProxyEvent} [event={}] - API Gateway-like event structure
+ * @param {object} [options={}] - Additional options
+ * @param {boolean} [options.throwOnError=false] - Whether to throw on render error
+ * @returns {string} Rendered output or error message
+ */
 function renderVTL(templateString, event = {}, options = {}) {
   try {
     const ctx = buildContext(event);
