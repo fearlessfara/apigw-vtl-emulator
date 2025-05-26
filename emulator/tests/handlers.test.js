@@ -410,7 +410,7 @@ describe('VTL Custom Handler Test Suite - Comprehensive Coverage', () => {
     it('returns standard context properties', () => {
       const tpl = '$context.accountId $context.requestId $context.stage';
       const event = {
-        context: {
+        requestContext: {
           accountId: 'acc123',
           requestId: 'req999',
           stage: 'prod'
@@ -440,7 +440,7 @@ describe('VTL Custom Handler Test Suite - Comprehensive Coverage', () => {
 
       contextProps.forEach(prop => {
         const tpl = `$context.${prop}`;
-        const event = {context: contextData};
+        const event = {requestContext: contextData};
         expect(renderVTL(tpl, event)).to.equal(`${prop}-value`);
       });
     });
@@ -523,7 +523,7 @@ describe('VTL Custom Handler Test Suite - Comprehensive Coverage', () => {
         queryStringParameters: {filter: 'active'},
         headers: {'Authorization': 'Bearer token123'},
         body: JSON.stringify({action: 'update', data: {name: 'John'}}),
-        context: {stage: 'development'}
+        requestContext: {stage: 'development'}
       };
 
       const result = renderVTL(tpl, event);
@@ -575,7 +575,7 @@ describe('VTL Custom Handler Test Suite - Comprehensive Coverage', () => {
         queryStringParameters: {include: 'profile'},
         headers: {'Content-Type': 'application/json'},
         body: '{"hello":"world"}',
-        context: {
+        requestContext: {
           accountId: 'account123',
           requestId: 'request456',
           stage: 'prod',
