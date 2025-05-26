@@ -1,0 +1,32 @@
+# Ignore source and test files
+src/
+tests/
+test/
+*.test.js
+*.spec.js
+
+# Ignore config and build tools
+rollup.config.js
+tsconfig.json
+.eslintrc*
+.prettierrc*
+*.log
+
+# Ignore dotfiles and IDE/editor metadata
+.gitignore
+.vscode/
+.idea/
+
+# Ignore local npm/pnpm files
+.pnpm-debug.log
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Ignore GitHub CI and docs
+.github/
+coverage/
+docs/
+
+# Only keep dist/, package.json, README.md, LICENSE etc.
