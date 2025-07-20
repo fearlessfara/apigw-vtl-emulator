@@ -17,7 +17,9 @@ replay_pid*
 target/
 !emulator/target/
 !emulator/target/vtl-processor.jar
-!assets/vtl-processor.jar
+
+# Generated assets (built by CI)
+assets/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
