@@ -13,7 +13,7 @@ class CheerpJIntegration {
     }
     if (!lib) {
       console.log('Loading JAR library...');
-      lib = await cheerpjRunLibrary('/app/emulator/target/vtl-processor.jar');
+      lib = await cheerpjRunLibrary('/app/assets/vtl-processor.jar');
       console.log('JAR library loaded:', lib);
     }
     if (!VTLProcessorClass) {
