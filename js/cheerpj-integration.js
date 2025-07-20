@@ -13,7 +13,12 @@ class CheerpJIntegration {
     }
     if (!lib) {
       console.log('Loading JAR library...');
-      lib = await cheerpjRunLibrary('/app/assets/vtl-processor.jar');
+      // Use the correct path for GitHub Pages deployment
+      const jarPath = window.location.hostname === 'fearlessfara.github.io' 
+        ? '/app/apigw-vtl-emulator/assets/vtl-processor.jar' 
+        : '/app/assets/vtl-processor.jar';
+      console.log('Using JAR path:', jarPath);
+      lib = await cheerpjRunLibrary(jarPath);
       console.log('JAR library loaded:', lib);
     }
     if (!VTLProcessorClass) {
