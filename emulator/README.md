@@ -1,114 +1,167 @@
-# apigw-vtl-emulator
+# VTL Processor (Java)
 
-**apigw-vtl-emulator** is a JavaScript library for evaluating [Apache Velocity Template Language (VTL)](https://velocity.apache.org/engine/1.7/user-guide.html) templates, simulating AWS API Gateway's integration request/response mapping behavior.
+A Java-based Apache Velocity Template Language (VTL) processor for AWS API Gateway mapping templates.
 
-It uses `velocityjs` under the hood with custom method handlers to emulate `$input`, `$context`, and `$util` — matching AWS's behavior as closely as possible.
+## Overview
 
----
+This project provides a Java implementation of VTL processing that can be used to test and validate AWS API Gateway mapping templates. It supports all the standard VTL functions and context variables that are available in AWS API Gateway.
 
-## 📦 Installation
+## Features
+
+- **VTL Template Processing**: Parse and execute VTL templates with full AWS API Gateway compatibility
+- **Input Functions**: Support for `$input.json()`, `$input.params()`, `$input.body`, `$input.path()`
+- **Context Functions**: Access to `$context` variables including request metadata, identity, and authorizer claims
+- **Utility Functions**: Complete implementation of `$util` functions for string manipulation, encoding, and JSON processing
+- **CheerpJ Integration**: Can be compiled to WebAssembly for browser-based execution
+
+## Project Structure
+
+```
+emulator/
+├── src/
+│   ├── main/
+│   │   └── java/
+│   │       └── com/
+│   │           └── example/
+│   │               ├── VTLProcessor.java      # Main VTL processing engine
+│   │               ├── ContextFunctions.java  # Context variable handling
+│   │               ├── InputFunctions.java    # Input data processing
+│   │               └── UtilFunctions.java     # Utility functions
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── example/
+│                   └── [Test files]
+├── target/
+│   └── vtl-processor.jar                      # Compiled JAR file
+├── pom.xml                                    # Maven configuration
+└── README.md                                  # This file
+```
+
+## Building
+
+### Prerequisites
+
+- Java 11 or higher
+- Maven 3.6 or higher
+
+### Build Commands
 
 ```bash
-npm install apigw-vtl-emulator
-# or
-pnpm add apigw-vtl-emulator
+# Compile the project
+mvn compile
+
+# Run tests
+mvn test
+
+# Package into JAR
+mvn package
+
+# Clean build
+mvn clean package
 ```
 
-CDN (ESM module):
+The compiled JAR file will be available at `target/vtl-processor.jar`.
 
-```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/apigw-vtl-emulator@1.0.3/dist/index.mjs"></script>
+## Usage
+
+### Java API
+
+```java
+import com.example.VTLProcessor;
+
+VTLProcessor processor = new VTLProcessor();
+
+// Process a VTL template
+String template = "$input.json('$.name')";
+String input = "{\"name\": \"John Doe\"}";
+String context = "{\"requestId\": \"123\"}";
+
+String result = processor.process(template, input, context);
+System.out.println(result); // Output: John Doe
 ```
 
----
+### CheerpJ Integration
 
-## 🧪 Usage
+The JAR file can be loaded in a web browser using CheerpJ:
 
-```js
-import { renderVTL } from 'apigw-vtl-emulator';
+```javascript
+// Initialize CheerpJ
+await cheerpjInit({version: 17});
 
-const template = `
-{
-  "message": "Hello, $input.path('$.name')",
-  "isAdult": #if($input.json('$.age') >= 18) true #else false #end
-}
-`;
+// Load the JAR
+const lib = await cheerpjRunLibrary('/emulator/target/vtl-processor.jar');
 
-const event = {
-  pathParameters: { name: "Alice" },
-  body: JSON.stringify({ age: 22 }),
-};
+// Get the VTLProcessor class
+const VTLProcessorClass = await lib.com.example.VTLProcessor;
 
-const output = renderVTL(template, event);
-console.log(output);
+// Create an instance
+const processor = await new VTLProcessorClass();
+
+// Process templates
+const result = await processor.process(template, input, context);
 ```
 
-Output:
+## Supported VTL Features
 
-```json
-{
-  "message": "Hello, Alice",
-  "isAdult": true
-}
-```
+### Input Functions
+- `$input.json(path)` - Parse JSON from input body using JSONPath
+- `$input.params(name)` - Get parameter from request (query, path, header)
+- `$input.body` - Raw request body as string
+- `$input.path(path)` - Get path parameter
 
----
+### Context Variables
+- `$context.requestId` - Unique request identifier
+- `$context.accountId` - AWS account ID
+- `$context.apiId` - API Gateway ID
+- `$context.stage` - API Gateway stage
+- `$context.requestTime` - Request timestamp
+- `$context.requestTimeEpoch` - Request timestamp in epoch format
+- `$context.httpMethod` - HTTP method
+- `$context.resourcePath` - Resource path
+- `$context.authorizer.claims` - Cognito JWT claims
+- `$context.identity.sourceIp` - Client source IP
+- `$context.identity.userAgent` - Client user agent
 
-## ⚙️ Features
+### Utility Functions
+- `$util.escapeJavaScript(string)` - Escape string for JavaScript
+- `$util.urlEncode(string)` - URL encode string
+- `$util.urlDecode(string)` - URL decode string
+- `$util.base64Encode(string)` - Base64 encode string
+- `$util.base64Decode(string)` - Base64 decode string
+- `$util.parseJson(jsonString)` - Parse JSON string
+- `$util.toJson(object)` - Convert object to JSON string
 
-- Emulates AWS API Gateway VTL behavior (`$input`, `$util`, `$context`)
-- Supports conditionals, loops, JSONPath, encoding, and more
-- Runs in **Node.js** and **modern browsers**
-- Zero backend dependency — excellent for portability and privacy
-- Ships with:
-    - **ESM**: `dist/index.mjs`
-    - **UMD**: `dist/index.umd.js` (global: `VTL`)
+### Control Structures
+- `#if(condition)` - Conditional blocks
+- `#elseif(condition)` - Else if conditions
+- `#else` - Else blocks
+- `#foreach(item in collection)` - Loop over collections
+- `#set($variable = value)` - Set variables
+- `#end` - End blocks
+- `#break` - Break from loops
+- `#stop` - Stop template processing
 
----
+## Testing
 
-## 🛠 API
-
-### `renderVTL(template: string, event: object): string`
-
-- **template**: VTL template string
-- **event**: Mock API Gateway request-style object
-
-Returns: Rendered string output
-
----
-
-## 📁 Project Structure
-
-- `src/engine.js` — Main entry that parses and renders templates
-- `src/handlers.js` — Implements method mappings for AWS-style `$input`, `$util`, `$context`
-- `tests/` — Unit tests verifying handler correctness and output matching
-
----
-
-## 🧪 Tests
-
-To run tests:
+Run the test suite to verify functionality:
 
 ```bash
-npm test
+mvn test
 ```
 
-Tests use Mocha plus Chai and live in the `tests/` directory.
+Tests cover:
+- Basic VTL syntax
+- Input function processing
+- Context variable access
+- Utility function operations
+- Conditional and loop structures
+- Error handling
 
----
+## Integration
 
-## 🤝 Contributing
+This VTL processor is designed to be integrated into web applications using CheerpJ, providing a complete VTL testing environment in the browser. It's used by the main VTL Emulator application to provide accurate VTL processing capabilities.
 
-Contributions are welcome!
+## License
 
-- Code lives in `src/`
-- Tests go in `tests/`
-- Please use real-world API Gateway payloads for input where possible
-
-All PRs must include tests to be accepted.
-
----
-
-## 📝 License
-
-MIT — © 2025 [Christian Gennaro Faraone](https://github.com/fearlessfara)
+This project is part of the VTL Emulator suite and follows the same licensing terms.

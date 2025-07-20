@@ -12,6 +12,7 @@ on:
 
 jobs:
   test:
+    name: Test Java VTL Processor
     runs-on: ubuntu-latest
 
     defaults:
@@ -20,15 +21,32 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
-          node-version: '20'
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
       - name: Run tests
-        run: npm test
+        run: mvn clean test
+
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: emulator/target/surefire-reports/
+          retention-days: 30
