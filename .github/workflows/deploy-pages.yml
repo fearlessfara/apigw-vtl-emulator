@@ -29,20 +29,60 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
-      - name: Build JAR file
+      - name: Build complete library
         run: |
           cd emulator
+          echo "Building complete VTL library with all dependencies..."
+          echo "Current directory: $(pwd)"
+          echo "Maven version: $(mvn --version)"
+          
+          # Clean and build with all dependencies
           mvn clean package -DskipTests
           
-      - name: Copy JAR to assets
+          echo "Build completed. Checking output:"
+          ls -lh target/
+          
+          # Verify the fat JAR was created
+          if [ -f "target/vtl-processor.jar" ]; then
+            echo "✅ Fat JAR created successfully"
+            echo "JAR size: $(ls -lh target/vtl-processor.jar | awk '{print $5}')"
+          else
+            echo "❌ Fat JAR not found!"
+            exit 1
+          fi
+          
+      - name: Copy library to assets
         run: |
+          echo "Copying library to assets directory..."
+          echo "Current directory: $(pwd)"
+          echo "Repository root contents:"
+          ls -la
+          
+          # Create assets directory in repository root
           mkdir -p assets
-          cp emulator/target/vtl-processor.jar assets/
+          echo "Assets directory created:"
           ls -la assets/
+          
+          # Copy JAR from emulator/target to assets
+          cp emulator/target/vtl-processor.jar assets/
+          echo "Copy result: $?"
+          
+          echo "Final assets directory contents:"
+          ls -lh assets/
+          echo "✅ Library copied successfully"
           
       - name: Create .nojekyll file
         run: |
           touch .nojekyll
+          
+      - name: Verify deployment structure
+        run: |
+          echo "Final repository structure before deployment:"
+          ls -la
+          echo "Assets directory contents:"
+          ls -lh assets/
+          echo "Total size of assets:"
+          du -sh assets/
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
