@@ -31,16 +31,7 @@ public class UtilFunctions {
                   .replace("\t", "\\t");
     }
 
-    public String escapeJavaScript(InputFunctions.JsonWrapper input) {
-    if (input == null) return "";
-    String jsonStr = input.toString();
-    return jsonStr.replace("\\", "\\\\")
-                  .replace("'", "\\'")
-                  .replace("\"", "\\\"")
-                  .replace("\n", "\\n")
-                  .replace("\r", "\\r")
-                  .replace("\t", "\\t");
-}
+
 
     public String base64Encode(String input) {
         if (input == null) return "";
