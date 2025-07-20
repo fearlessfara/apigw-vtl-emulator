@@ -15,7 +15,6 @@ replay_pid*
 
 # Maven
 target/
-!emulator/target/
 !emulator/target/vtl-processor.jar
 
 # Generated assets (built by CI)

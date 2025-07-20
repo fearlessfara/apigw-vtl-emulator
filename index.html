@@ -33,6 +33,24 @@
             </div>
         </div>
     </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5>Initializing VTL Engine</h5>
+            <p class="text-muted">Loading Java runtime and VTL processor...</p>
+            <div class="loading-progress">
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Toolbar -->
     <div class="toolbar">
         <button class="btn btn-primary" id="renderBtn">
@@ -364,13 +382,7 @@
         </div>
     </div>
 </div>
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay" style="display: none;">
-    <div class="text-center">
-        <div class="spinner-border text-primary mb-2" role="status"></div>
-        <div>Processing template...</div>
-    </div>
-</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 <script src="https://cjrtnc.leaningtech.com/4.2/loader.js"></script>

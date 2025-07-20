@@ -93,9 +93,14 @@ class VTLEmulator {
 
   async render() {
     const startTime = performance.now();
+    let showedLoading = false;
 
     try {
-      UIUtils.showLoading(true);
+      // Only show loading if CheerpJ hasn't been initialized yet
+      if (!window.cheerpjInitialized) {
+        UIUtils.showLoading(true);
+        showedLoading = true;
+      }
       UIUtils.clearErrors();
       
       // Get template and input data
@@ -151,7 +156,10 @@ class VTLEmulator {
       UIUtils.showError('Render Error', error.message);
       console.error('VTL Render Error:', error);
     } finally {
-      UIUtils.showLoading(false);
+      // Only hide loading if we showed it
+      if (showedLoading) {
+        UIUtils.showLoading(false);
+      }
     }
   }
 
