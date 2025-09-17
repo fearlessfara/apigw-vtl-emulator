@@ -1,8 +1,14 @@
 class UIUtils {
-  static showLoading(show) {
+  static showLoading(show, message = 'Loading...') {
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) {
       overlay.style.display = show ? 'flex' : 'none';
+      if (show) {
+        const messageElement = overlay.querySelector('p');
+        if (messageElement) {
+          messageElement.textContent = message;
+        }
+      }
     }
   }
 
