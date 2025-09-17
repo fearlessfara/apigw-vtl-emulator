@@ -7,6 +7,14 @@ class VTLEmulator {
     this.autoRenderTimeout = null;
     this.debugMode = false;
     this.debugSteps = [];
+    
+    // Engine management
+    this.engines = {};
+    this.currentEngine = 'cheerpj';
+    this.engineAdapters = {
+      cheerpj: CheerpJAdapter,
+      vela: VelaAdapter
+    };
 
     this.init();
   }
@@ -18,14 +26,17 @@ class VTLEmulator {
     // Initialize Monaco editor
     await this.initMonaco();
     
-    // Initialize CheerpJ
-    await CheerpJIntegration.init();
+    // Initialize current engine
+    await this.initializeEngine(this.currentEngine);
     
     // Initialize UI components
     this.initEventListeners();
     this.initTheme();
     SnippetManager.initSnippets();
     this.updatePerformanceStats();
+    
+    // Make sure loading overlay is hidden after initialization
+    UIUtils.showLoading(false);
   }
 
   async initMonaco() {
@@ -37,6 +48,79 @@ class VTLEmulator {
         resolve();
       });
     });
+  }
+
+  async initializeEngine(engineType) {
+    if (!this.engines[engineType]) {
+      const AdapterClass = this.engineAdapters[engineType];
+      if (!AdapterClass) {
+        throw new Error(`Unknown engine type: ${engineType}`);
+      }
+      
+      // Show loading overlay for engine initialization
+        UIUtils.showLoading(true, 'Loading Java runtime and VTL processor...');
+      
+      try {
+        this.engines[engineType] = new AdapterClass();
+        await this.engines[engineType].init();
+        
+        // Update UI if this is the current engine
+          if (engineType === this.currentEngine) {
+            this.updateEngineInfo();
+          }
+        
+        // Hide loading overlay after successful initialization
+        UIUtils.showLoading(false);
+        
+      } catch (error) {
+        // Hide loading overlay on error
+        UIUtils.showLoading(false);
+        throw error;
+      }
+    }
+    return this.engines[engineType];
+  }
+
+  async switchEngine(engineType) {
+    if (engineType === this.currentEngine) {
+      return;
+    }
+
+    try {
+      // Initialize the new engine if not already done
+      await this.initializeEngine(engineType);
+      
+      // Update current engine
+      this.currentEngine = engineType;
+      
+      // Update UI
+      document.getElementById('engineSelect').value = engineType;
+      this.updateEngineInfo();
+      
+      UIUtils.showSuccess(`Switched to ${this.engines[engineType].getDisplayName()} engine`);
+      
+    } catch (error) {
+      UIUtils.showError('Engine Switch Error', error.message);
+      console.error('Engine switch error:', error);
+    }
+  }
+
+  getCurrentEngine() {
+    return this.engines[this.currentEngine];
+  }
+
+  updateEngineInfo() {
+    const engine = this.getCurrentEngine();
+    if (engine) {
+      const capabilities = engine.getCapabilities();
+      let displayName = engine.getDisplayName();
+      
+      if (capabilities.experimental) {
+        displayName += ' <span class="badge bg-warning text-dark ms-1">Experimental</span>';
+      }
+      
+      document.getElementById('engineInfo').innerHTML = displayName;
+    }
   }
 
   createEditors() {
@@ -96,9 +180,15 @@ class VTLEmulator {
     let showedLoading = false;
 
     try {
-      // Only show loading if CheerpJ hasn't been initialized yet
-      if (!window.cheerpjInitialized) {
-        UIUtils.showLoading(true);
+      // Get current engine
+      const engine = this.getCurrentEngine();
+      if (!engine) {
+        throw new Error('No VTL engine selected');
+      }
+
+      // Only show loading if engine hasn't been initialized yet
+      if (!engine.isReady()) {
+        UIUtils.showLoading(true, 'Loading Java runtime and VTL processor...');
         showedLoading = true;
       }
       UIUtils.clearErrors();
@@ -132,11 +222,12 @@ class VTLEmulator {
       if (this.debugMode) {
         this.debugSteps = [];
         this.addDebugStep('Starting VTL rendering');
+        this.addDebugStep(`Engine: ${engine.getDisplayName()}`);
         this.addDebugStep('Template: ' + template.substring(0, 100) + '...');
       }
 
-      // Use the CheerpJ VTL processor
-      const result = await CheerpJIntegration.processTemplate(template, body, contextData);
+      // Use the current VTL engine
+      const result = await engine.processTemplate(template, body, contextData);
 
       // Update result
       UIUtils.setResult(result);
@@ -146,11 +237,11 @@ class VTLEmulator {
       UIUtils.updateRenderTime(renderTime);
 
       if (this.debugMode) {
-        this.addDebugStep(`Rendering completed in ${renderTime}ms`);
+        this.addDebugStep(`Rendering completed in ${renderTime}ms using ${engine.getDisplayName()}`);
         this.updateDebugPanel();
       }
 
-      UIUtils.showSuccess('Template rendered successfully!');
+      UIUtils.showSuccess(`Template rendered successfully using ${engine.getDisplayName()}!`);
 
     } catch (error) {
       UIUtils.showError('Render Error', error.message);
@@ -216,6 +307,11 @@ class VTLEmulator {
     document.getElementById('debugToggle').addEventListener('click', () => this.toggleDebug());
     document.getElementById('compareBtn').addEventListener('click', () => this.openComparison());
     document.getElementById('addTemplateTab').addEventListener('click', () => this.addTemplate());
+
+    // Engine selector
+    document.getElementById('engineSelect').addEventListener('change', (e) => {
+      this.switchEngine(e.target.value);
+    });
 
     // Variable management
     document.getElementById('addVariable').addEventListener('click', () => this.addVariable());

@@ -15,6 +15,7 @@ This tool lets you:
 - Render and debug request/response flows
 - Manage variables for headers, query params, stage variables, and paths
 - Quickly test conditional blocks, loops, and transformations
+- **Choose between multiple VTL engines** (CheerpJ Java engine or Vela JavaScript engine)
 
 ---
 
@@ -24,6 +25,28 @@ This tool lets you:
 
 ⚠️ **No data is ever sent to any backend.** Everything runs 100% in your browser. Perfect for privacy-sensitive
 workflows.
+
+---
+
+## 🚀 Engine Selection
+
+The VTL Emulator now supports multiple underlying engines for processing VTL templates:
+
+### CheerpJ (Java) Engine
+- **Type**: Java-based VTL processor running in browser via CheerpJ
+- **Performance**: Medium
+- **Size**: Large
+- **Features**: Full Java compatibility, AWS API Gateway functions, JSONPath support
+- **Best for**: Maximum compatibility with AWS API Gateway VTL behavior
+
+### Vela (JavaScript) Engine  
+- **Type**: Pure JavaScript VTL processor
+- **Performance**: Fast
+- **Size**: Small
+- **Features**: Pure JavaScript, Fast execution, Small bundle size, Modern ES6+
+- **Best for**: Fast development and testing
+
+You can switch between engines using the dropdown in the toolbar. The engine selection is preserved across sessions.
 
 ---
 
