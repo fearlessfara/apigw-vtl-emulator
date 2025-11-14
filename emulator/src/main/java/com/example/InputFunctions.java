@@ -187,9 +187,28 @@ public class InputFunctions {
     }
 
     public String params(String paramName) {
+        if (paramName == null || paramName.isEmpty()) {
+            return null;
+        }
+        
         Map<String, Object> allParams = params();
-        Object value = allParams.get(paramName);
-        return value != null ? value.toString() : null;
+        
+        // AWS API Gateway behavior: search in order - path, querystring, header
+        // According to AWS docs: "Returns the value of a method request parameter from the path, 
+        // query string, or header value (searched in that order)"
+        String[] groups = {"path", "querystring", "header"};
+        for (String group : groups) {
+            Object groupParams = allParams.get(group);
+            if (groupParams instanceof Map) {
+                Map<?, ?> groupMap = (Map<?, ?>) groupParams;
+                Object groupValue = groupMap.get(paramName);
+                if (groupValue != null) {
+                    return groupValue.toString();
+                }
+            }
+        }
+        
+        return null;
     }
 
     public String headers(String headerName) {

@@ -218,6 +218,20 @@ class VTLEmulator {
         throw new Error('Invalid body JSON: ' + error.message);
       }
 
+      // Collect and merge variables into context
+      // Variables structure matches AWS API Gateway format: { querystring: {...}, path: {...}, header: {...}, stage: {...} }
+      const variables = this.collectVariables();
+      
+      if (!context.params) {
+        context.params = {};
+      }
+      
+      // Merge variables directly into params (names match AWS format)
+      Object.assign(context.params, variables);
+
+      // Convert context back to JSON string with merged variables
+      const contextWithVariables = JSON.stringify(context);
+
       // Debug mode
       if (this.debugMode) {
         this.debugSteps = [];
@@ -226,8 +240,8 @@ class VTLEmulator {
         this.addDebugStep('Template: ' + template.substring(0, 100) + '...');
       }
 
-      // Use the current VTL engine
-      const result = await engine.processTemplate(template, body, contextData);
+      // Use the current VTL engine with merged context
+      const result = await engine.processTemplate(template, body, contextWithVariables);
 
       // Update result
       UIUtils.setResult(result);
@@ -472,7 +486,7 @@ class VTLEmulator {
   }
 
   addVariable() {
-    this.addVariableToGroup('query');
+    this.addVariableToGroup('querystring');
     this.switchTab('variables');
   }
 
@@ -528,13 +542,13 @@ class VTLEmulator {
 
   collectVariables() {
     const variables = {
-      query: {},
+      querystring: {},
       path: {},
       header: {},
       stage: {}
     };
 
-    ['query', 'path', 'header', 'stage'].forEach(group => {
+    ['querystring', 'path', 'header', 'stage'].forEach(group => {
       const container = document.getElementById(`${group}Variables`);
       if (container) {
         container.querySelectorAll('.variable-row').forEach(row => {
@@ -724,7 +738,7 @@ class VTLEmulator {
 
   clearVariables() {
     if (confirm('Are you sure you want to clear all variables?')) {
-      ['query', 'path', 'header', 'stage'].forEach(group => {
+      ['querystring', 'path', 'header', 'stage'].forEach(group => {
         document.getElementById(`${group}Variables`).innerHTML = '';
       });
     }
@@ -811,16 +825,18 @@ class VTLEmulator {
 
   loadVariables(variables) {
     // Clear existing variables
-    ['query', 'path', 'header', 'stage'].forEach(group => {
+    ['querystring', 'path', 'header', 'stage'].forEach(group => {
       document.getElementById(`${group}Variables`).innerHTML = '';
     });
 
     // Load new variables
     Object.keys(variables).forEach(group => {
-      const container = document.getElementById(`${group}Variables`);
+      // Handle backward compatibility: migrate 'query' to 'querystring'
+      const targetGroup = group === 'query' ? 'querystring' : group;
+      const container = document.getElementById(`${targetGroup}Variables`);
       if (container && variables[group]) {
         Object.keys(variables[group]).forEach(key => {
-          this.createVariableRow(container, group, key, variables[group][key]);
+          this.createVariableRow(container, targetGroup, key, variables[group][key]);
         });
       }
     });
