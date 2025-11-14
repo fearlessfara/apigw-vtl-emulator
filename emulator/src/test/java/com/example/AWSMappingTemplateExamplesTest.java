@@ -131,8 +131,9 @@ public class AWSMappingTemplateExamplesTest {
             "    \"Age\": \"6\"\n" +
             "}";
         
-        // Add params to the context
-        String contextJson = "{\"params\":{\"name\":\"Bella\",\"type\":\"dog\"}}";
+        // Add params to the context using AWS-compliant structure
+        // 'name' is a query parameter, 'type' is also a query parameter
+        String contextJson = "{\"params\":{\"querystring\":{\"name\":\"Bella\",\"type\":\"dog\"}}}";
         
         String result = processor.process(template, input, contextJson);
         
@@ -155,12 +156,8 @@ public class AWSMappingTemplateExamplesTest {
             "    \"Age\": \"6\"\n" +
             "}";
         
-        Map<String, Object> context = new HashMap<>();
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "Bella");
-        context.put("params", params);
-        
-        String contextJson = "{\"params\":{\"name\":\"Bella\"}}";
+        // Use AWS-compliant params structure
+        String contextJson = "{\"params\":{\"querystring\":{\"name\":\"Bella\"}}}";
         
         String result = processor.process(template, input, contextJson);
         
@@ -182,13 +179,8 @@ public class AWSMappingTemplateExamplesTest {
             "    \"Age\": \"6\"\n" +
             "}";
         
-        Map<String, Object> context = new HashMap<>();
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "Bella");
-        params.put("type", "dog");
-        context.put("params", params);
-        
-        String contextJson = "{\"params\":{\"name\":\"Bella\",\"type\":\"dog\"}}";
+        // Use AWS-compliant params structure
+        String contextJson = "{\"params\":{\"querystring\":{\"name\":\"Bella\",\"type\":\"dog\"}}}";
         
         String result = processor.process(template, input, contextJson);
         
@@ -212,12 +204,8 @@ public class AWSMappingTemplateExamplesTest {
             "    \"Age\": \"6\"\n" +
             "}";
         
-        Map<String, Object> context = new HashMap<>();
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "Bella");
-        context.put("params", params);
-        
-        String contextJson = "{\"params\":{\"name\":\"Bella\"}}";
+        // Use AWS-compliant params structure
+        String contextJson = "{\"params\":{\"querystring\":{\"name\":\"Bella\"}}}";
         
         String result = processor.process(template, input, contextJson);
         
@@ -243,7 +231,8 @@ public class AWSMappingTemplateExamplesTest {
             "      }\n" +
             "}";
         
-        String contextJson = "{\"params\":{\"id\":\"123\"}}";
+        // Use AWS-compliant params structure - 'id' is a path parameter
+        String contextJson = "{\"params\":{\"path\":{\"id\":\"123\"}}}";
         
         String result = processor.process(template, input, contextJson);
         
@@ -270,12 +259,8 @@ public class AWSMappingTemplateExamplesTest {
             "      }\n" +
             "}";
         
-        Map<String, Object> context = new HashMap<>();
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", "123");
-        context.put("params", params);
-        
-        String contextJson = "{\"params\":{\"id\":\"123\"}}";
+        // Use AWS-compliant params structure - 'id' is a path parameter
+        String contextJson = "{\"params\":{\"path\":{\"id\":\"123\"}}}";
         
         String result = processor.process(template, input, contextJson);
         
