@@ -7,7 +7,12 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
       <div className="custom-container-fluid" style={{maxWidth: '1600px', padding: '0 1.5rem'}}>
         <div className="d-flex justify-content-between align-items-center">
           <h1 style={{margin: 0}} className="d-flex align-items-center">
-            <i className="bi bi-code-square header-icon"></i>
+            <img 
+              src="/favicon.ico" 
+              alt="VTL Emulator" 
+              className="header-icon"
+              style={{width: '1.5rem', height: '1.5rem', marginRight: '0.5rem', borderRadius: '0.375rem'}}
+            />
             VTL Emulator
           </h1>
           <div className="d-flex gap-1 align-items-center">
