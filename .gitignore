@@ -220,6 +220,7 @@ out/
 
 # Package manager files
 package-lock.json
+!frontend/package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
