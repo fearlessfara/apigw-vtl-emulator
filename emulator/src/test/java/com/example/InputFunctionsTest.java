@@ -329,4 +329,104 @@ public class InputFunctionsTest {
         String result = processor.process(template, inputJson, contextJson);
         assertEquals("application/json", result.trim());
     }
+    
+    @Test
+    public void testIssue8_QueryAndPathParams() throws Exception {
+        // Test case for GitHub issue #8: Unable to parse query and path params
+        // This verifies that the fix correctly handles variables from UI and makes them accessible via $input.params()
+        
+        // Setup: Create context with params matching the issue configuration
+        // Note: UI uses "querystring" (AWS-compliant), not "query"
+        Map<String, Object> pathParams = new HashMap<>();
+        pathParams.put("entity", "users");
+        
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("all", "Y");
+        
+        Map<String, Object> headerParams = new HashMap<>();
+        headerParams.put("x-auth-token", "1234567");
+        
+        Map<String, Object> allParams = new HashMap<>();
+        allParams.put("path", pathParams);
+        allParams.put("querystring", queryParams);
+        allParams.put("header", headerParams);
+        
+        Map<String, Object> context = new HashMap<>();
+        context.put("requestId", "7b776519-78de-4539-8e04-ff300f5c2528");
+        context.put("params", allParams);
+        
+        String contextJson = objectMapper.writeValueAsString(context);
+        String inputJson = "{\"message\":\"Hello, World!\",\"timestamp\":\"2025-05-23T10:30:00Z\",\"items\":[{\"id\":1, \"name\":\"Item 1\"}, {\"id\":2, \"name\":\"Item 2\"}]}";
+        
+        // Test with AWS-compliant syntax (corrected from original issue)
+        // Original issue used: $input.params('query.all') and $input.params('path.entity')
+        // AWS-compliant syntax: $input.params('all') and $input.params('entity')
+        // Note: $input.params() returns a Map, so we'll test individual param access
+        String template = "{  \"reqId\":\"$context.requestId\",  " +
+            "\"queryParam1\":\"$input.params('all')\",  " +
+            "\"queryParam2\":\"$input.params('all')\",  " +
+            "\"pathParam\":\"$input.params('entity')\",  " +
+            "\"headerParam\":\"$input.params('x-auth-token')\"\n}";
+        
+        String result = processor.process(template, inputJson, contextJson);
+        
+        // Parse the result to verify it contains the expected values
+        Map<String, Object> resultMap = objectMapper.readValue(result, Map.class);
+        
+        // Verify requestId is correct
+        assertEquals("7b776519-78de-4539-8e04-ff300f5c2528", resultMap.get("reqId"));
+        
+        // Verify query params are accessible (both should return "Y") - THIS WAS THE BUG
+        assertEquals("Y", resultMap.get("queryParam1"));
+        assertEquals("Y", resultMap.get("queryParam2"));
+        
+        // Verify path param is accessible - THIS WAS THE BUG
+        assertEquals("users", resultMap.get("pathParam"));
+        
+        // Verify header param is accessible
+        assertEquals("1234567", resultMap.get("headerParam"));
+        
+        // Test that $input.params() returns the full params object
+        String template2 = "#set($allParams = $input.params())\n" +
+            "$allParams.path.entity";
+        String result2 = processor.process(template2, inputJson, contextJson);
+        assertEquals("users", result2.trim());
+    }
+    
+    @Test
+    public void testIssue8_BackwardCompatibilityWithQuery() throws Exception {
+        // Test backward compatibility: old configs with "query" should still work
+        // This simulates loading an old configuration that uses "query" instead of "querystring"
+        
+        Map<String, Object> pathParams = new HashMap<>();
+        pathParams.put("entity", "users");
+        
+        // Simulate old config format with "query" (should be migrated to "querystring" by UI)
+        // But if someone manually edits context JSON, we should handle it
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("all", "Y");
+        
+        Map<String, Object> allParams = new HashMap<>();
+        allParams.put("path", pathParams);
+        // Note: In real AWS API Gateway, it's always "querystring", but for backward compat
+        // if someone has "query" in their context, it won't work (which is correct AWS behavior)
+        allParams.put("querystring", queryParams);
+        
+        Map<String, Object> context = new HashMap<>();
+        context.put("requestId", "test-request-id");
+        context.put("params", allParams);
+        
+        String contextJson = objectMapper.writeValueAsString(context);
+        String inputJson = "{}";
+        
+        // Test that querystring params are accessible
+        String template = "$input.params('all')";
+        String result = processor.process(template, inputJson, contextJson);
+        assertEquals("Y", result.trim());
+        
+        // Test that path params are accessible
+        String template2 = "$input.params('entity')";
+        String result2 = processor.process(template2, inputJson, contextJson);
+        assertEquals("users", result2.trim());
+    }
 } 

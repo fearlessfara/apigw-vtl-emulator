@@ -226,8 +226,17 @@ class VTLEmulator {
         context.params = {};
       }
       
-      // Merge variables directly into params (names match AWS format)
-      Object.assign(context.params, variables);
+      // Deep merge variables into params to preserve manually-entered values
+      // This ensures UI variables don't overwrite existing params with different keys
+      ['querystring', 'path', 'header', 'stage'].forEach(group => {
+        if (variables[group] && Object.keys(variables[group]).length > 0) {
+          if (!context.params[group]) {
+            context.params[group] = {};
+          }
+          // Merge UI variables into existing params (preserves manually-entered values)
+          Object.assign(context.params[group], variables[group]);
+        }
+      });
 
       // Convert context back to JSON string with merged variables
       const contextWithVariables = JSON.stringify(context);
@@ -831,12 +840,10 @@ class VTLEmulator {
 
     // Load new variables
     Object.keys(variables).forEach(group => {
-      // Handle backward compatibility: migrate 'query' to 'querystring'
-      const targetGroup = group === 'query' ? 'querystring' : group;
-      const container = document.getElementById(`${targetGroup}Variables`);
+      const container = document.getElementById(`${group}Variables`);
       if (container && variables[group]) {
         Object.keys(variables[group]).forEach(key => {
-          this.createVariableRow(container, targetGroup, key, variables[group][key]);
+          this.createVariableRow(container, group, key, variables[group][key]);
         });
       }
     });
