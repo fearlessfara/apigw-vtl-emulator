@@ -1,0 +1,105 @@
+.custom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+}
+
+.custom-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.custom-btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.custom-btn-md {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.custom-btn-lg {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* Variants */
+.custom-btn-primary {
+  background: var(--aws-orange);
+  color: white;
+  border: none;
+}
+
+.custom-btn-primary:hover:not(:disabled) {
+  background: var(--aws-orange-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.custom-btn-success {
+  background: var(--success);
+  color: white;
+  border: none;
+}
+
+.custom-btn-success:hover:not(:disabled) {
+  background: var(--aws-green);
+  opacity: 0.9;
+}
+
+.custom-btn-outline-success {
+  border: 1px solid var(--success);
+  color: var(--success);
+  background: transparent;
+}
+
+.custom-btn-outline-success:hover:not(:disabled) {
+  background: var(--success);
+  color: white;
+}
+
+.custom-btn-outline-secondary {
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.custom-btn-outline-secondary:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.custom-btn-outline-info {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+.custom-btn-outline-info:hover:not(:disabled),
+.custom-btn-outline-info.active {
+  background: var(--primary);
+  color: white;
+}
+
+.custom-btn-outline-danger {
+  border: 1px solid var(--error);
+  color: var(--error);
+  background: transparent;
+}
+
+.custom-btn-outline-danger:hover:not(:disabled) {
+  background: var(--error);
+  color: white;
+}
+
