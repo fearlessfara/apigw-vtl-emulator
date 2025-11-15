@@ -248,4 +248,5 @@ coverage/
 
 # Application specific
 # Keep the compiled JAR for the web application to use
-!emulator/target/vtl-processor.jar 
+!emulator/target/vtl-processor.jar
+!frontend/public/vtl-processor.jar 
