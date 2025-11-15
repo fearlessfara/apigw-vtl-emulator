@@ -1,0 +1,29 @@
+version: 1
+applications:
+  - appRoot: frontend
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+          - 'favicon.ico'
+      cache:
+        paths:
+          - node_modules/**/*
+      customHeaders:
+        - pattern: '**/*'
+          headers:
+            - key: 'X-Content-Type-Options'
+              value: 'nosniff'
+            - key: 'X-Frame-Options'
+              value: 'DENY'
+            - key: 'X-XSS-Protection'
+              value: '1; mode=block'
+

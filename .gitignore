@@ -152,6 +152,7 @@ dist
 # Gatsby files
 .cache/
 public
+!frontend/public/
 
 # Vuepress build output
 .vuepress/dist
@@ -220,6 +221,7 @@ out/
 
 # Package manager files
 package-lock.json
+!frontend/package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
@@ -246,4 +248,5 @@ coverage/
 
 # Application specific
 # Keep the compiled JAR for the web application to use
-!emulator/target/vtl-processor.jar 
+!emulator/target/vtl-processor.jar
+!frontend/public/vtl-processor.jar 

@@ -12,7 +12,7 @@ This repo contains two main parts:
 | Folder        | Description                                |
 |---------------|--------------------------------------------|
 | `/emulator/`  | Core VTL engine (published on NPM)         |
-| `/` (root)    | The web UI (hosted via GitHub Pages)       |
+| `/frontend/`   | React-based frontend application            |
 
 ---
 
