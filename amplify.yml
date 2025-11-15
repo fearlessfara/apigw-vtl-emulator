@@ -9,10 +9,12 @@ applications:
         build:
           commands:
             - npm run build
+            - ls -la dist/favicon.ico || echo "WARNING: favicon.ico not found in dist"
       artifacts:
         baseDirectory: dist
         files:
           - '**/*'
+          - 'favicon.ico'
       cache:
         paths:
           - node_modules/**/*
@@ -25,8 +27,4 @@ applications:
               value: 'DENY'
             - key: 'X-XSS-Protection'
               value: '1; mode=block'
-      redirects:
-        - source: '/*'
-          target: '/index.html'
-          status: '200'
 
