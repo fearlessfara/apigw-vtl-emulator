@@ -1,0 +1,8 @@
+{
+  "endpoint": "/input-json-root",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

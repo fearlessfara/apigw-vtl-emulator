@@ -6,6 +6,7 @@ import org.apache.velocity.app.event.ReferenceInsertionEventHandler;
 import org.apache.velocity.context.Context;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class VTLProcessor {
@@ -13,10 +14,14 @@ public class VTLProcessor {
     private final ObjectMapper objectMapper;
 
     public VTLProcessor() {
-        velocityEngine = new VelocityEngine();
-        velocityEngine.setProperty("eventhandler.referenceinsertion.class", NullToEmptyEventHandler.class.getName());
-        velocityEngine.init();
         objectMapper = new ObjectMapper();
+        // Set ObjectMapper in handler before Velocity initialization
+        // Velocity will create its own instance, so we use a static setter
+        JsonSerializationEventHandler.setObjectMapper(objectMapper);
+        
+        velocityEngine = new VelocityEngine();
+        velocityEngine.setProperty("eventhandler.referenceinsertion.class", JsonSerializationEventHandler.class.getName());
+        velocityEngine.init();
     }
 
     public String process(String template, String contextJson) {
@@ -68,10 +73,48 @@ public class VTLProcessor {
         velocityContext.put("context", new ContextFunctions(context));
     }
 
-    public static class NullToEmptyEventHandler implements ReferenceInsertionEventHandler {
+    /**
+     * Event handler that:
+     * 1. Converts null values to empty strings (AWS API Gateway behavior)
+     * 2. Automatically serializes Map/List objects to JSON (AWS API Gateway behavior)
+     * 
+     * This matches AWS API Gateway's behavior where Map/List objects are automatically
+     * serialized to JSON when output in templates, rather than using Java's toString().
+     */
+    public static class JsonSerializationEventHandler implements ReferenceInsertionEventHandler {
+        private static ObjectMapper objectMapper;
+        
+        public static void setObjectMapper(ObjectMapper mapper) {
+            objectMapper = mapper;
+        }
+        
         @Override
         public Object referenceInsert(Context context, String reference, Object value) {
-            return value == null ? "" : value;
+            // Handle null values - return empty string (AWS API Gateway behavior)
+            if (value == null) {
+                return "";
+            }
+            
+            // Automatically serialize Map/List objects to JSON (AWS API Gateway behavior)
+            // This ensures that when you output $data or $list in a template,
+            // they are serialized as valid JSON rather than using Java's toString()
+            if (value instanceof Map || value instanceof List) {
+                if (objectMapper != null) {
+                    try {
+                        return objectMapper.writeValueAsString(value);
+                    } catch (Exception e) {
+                        // If serialization fails, fall back to toString()
+                        // This shouldn't happen with valid Map/List objects, but handle gracefully
+                        return value.toString();
+                    }
+                } else {
+                    // ObjectMapper not set yet, fall back to toString()
+                    return value.toString();
+                }
+            }
+            
+            // For other types, return as-is (Velocity will handle conversion to string)
+            return value;
         }
     }
 } 

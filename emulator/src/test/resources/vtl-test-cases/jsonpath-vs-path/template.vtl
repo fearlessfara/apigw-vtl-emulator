@@ -1,0 +1,23 @@
+#set($pathRoot = $input.path('$'))
+#set($jsonString = $input.json('$'))
+#set($jsonRoot = $util.parseJson($jsonString))
+#set($itemsJson = $util.parseJson($input.json('$.items')))
+#set($firstItemJson = $util.parseJson($input.json('$.items[0]')))
+{
+  "usingPath": {
+    "name": "$pathRoot.name",
+    "age": $pathRoot.age,
+    "itemsCount": $pathRoot.items.size(),
+    "firstItem": $pathRoot.items[0]
+  },
+  "usingJson": {
+    "items": $itemsJson,
+    "firstItem": $firstItemJson
+  },
+  "comparison": {
+    "pathName": "$pathRoot.name",
+    "pathAge": $pathRoot.age,
+    "jsonString": $jsonString
+  }
+}
+

@@ -1,0 +1,8 @@
+{
+  "endpoint": "/array-access",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

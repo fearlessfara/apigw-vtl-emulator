@@ -1,0 +1,14 @@
+{
+  "endpoint": "/params-priority/{pathParam}",
+  "method": "GET",
+  "pathParams": {
+    "pathParam": "path-value"
+  },
+  "queryParams": {
+    "queryParam": "query-value"
+  },
+  "headers": {
+    "headerParam": "header-value"
+  }
+}
+

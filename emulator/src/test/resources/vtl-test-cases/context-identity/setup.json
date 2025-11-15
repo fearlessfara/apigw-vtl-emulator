@@ -1,0 +1,8 @@
+{
+  "endpoint": "/context-identity",
+  "method": "GET",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

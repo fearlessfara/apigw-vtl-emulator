@@ -1,0 +1,8 @@
+{
+  "endpoint": "/jsonpath-vs-path",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

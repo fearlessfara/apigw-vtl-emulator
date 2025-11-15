@@ -1,0 +1,16 @@
+#set($data = $input.path('$'))
+#set($lastIndex = $data.items.size() - 1)
+#set($firstItem = $util.parseJson($input.json('$.items[0]')))
+#set($lastItem = $util.parseJson($input.json('$.items[' + $lastIndex + ']')))
+#set($middleItem = $util.parseJson($input.json('$.items[1]')))
+#set($allItems = $util.parseJson($input.json('$.items')))
+{
+  "firstItem": $firstItem,
+  "lastItem": $lastItem,
+  "middleItem": $middleItem,
+  "firstItemPath": $input.path('$.items[0]'),
+  "itemCount": $data.items.size(),
+  "firstItemName": "$data.items[0].name",
+  "allItems": $allItems
+}
+

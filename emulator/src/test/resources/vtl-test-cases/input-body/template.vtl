@@ -1,0 +1,7 @@
+#set($parsedBody = $util.parseJson($input.json('$')))
+{
+  "rawBody": "$input.body",
+  "parsedBody": $parsedBody,
+  "preservesFloat": "$input.body"
+}
+

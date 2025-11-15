@@ -1,0 +1,14 @@
+{
+  "params": {
+    "path": {
+      "pathParam": "path-value"
+    },
+    "querystring": {
+      "queryParam": "query-value"
+    },
+    "header": {
+      "headerParam": "header-value"
+    }
+  }
+}
+

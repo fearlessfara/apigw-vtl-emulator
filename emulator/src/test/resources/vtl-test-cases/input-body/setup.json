@@ -1,0 +1,8 @@
+{
+  "endpoint": "/input-body",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

@@ -38,7 +38,7 @@
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
-     "ZipFile": "import json\ndef handler(event, context):\n    # For non-proxy Lambda integrations, return the event wrapped in the expected format\n    # The event contains the transformed request from API Gateway\n    return {\n        'statusCode': 200,\n        'body': json.dumps(event),\n        'headers': {'Content-Type': 'application/json'}\n    }\n"
+     "ZipFile": "import json\ndef handler(event, context):\n    # For non-proxy Lambda integrations, the function output is returned as 200 OK\n    # The integration response template can access it via $input.path('$') or $input.json('$')\n    # Return the event as a JSON string so the response template can process it\n    return json.dumps(event)\n"
     },
     "Handler": "index.handler",
     "MemorySize": 256,
@@ -56,6 +56,71 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VtlComparisonStack/EchoFunction/Resource"
+   }
+  },
+  "ApiGatewayLambdaRoleB2D45F12": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/ApiGatewayLambdaRole/Resource"
+   }
+  },
+  "ApiGatewayLambdaRoleDefaultPolicy0C28D615": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "EchoFunction7EBBA557",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ApiGatewayLambdaRoleDefaultPolicy0C28D615",
+    "Roles": [
+     {
+      "Ref": "ApiGatewayLambdaRoleB2D45F12"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/ApiGatewayLambdaRole/DefaultPolicy/Resource"
    }
   },
   "VtlTestApiD53FEF73": {
@@ -123,7 +188,7 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Account"
    }
   },
-  "VtlTestApiDeployment3E645A6B8f2329c11a3cb2726af0befc3916814a": {
+  "VtlTestApiDeployment3E645A6B1eb1d05853b06bd9cdc0a6d8438a900a": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "API Gateway for testing VTL template compatibility",
@@ -135,6 +200,8 @@
     "VtlTestApiallparamspathParamGETFBA8848B",
     "VtlTestApiallparamspathParamB4790A3E",
     "VtlTestApiallparams51DA8BB0",
+    "VtlTestApiarrayaccessPOST78C30C4E",
+    "VtlTestApiarrayaccess88543422",
     "VtlTestApiarrayoperationsPOST3CE9BE42",
     "VtlTestApiarrayoperations17A93839",
     "VtlTestApiauthorizercontextGETBB72BCE3",
@@ -143,23 +210,44 @@
     "VtlTestApicomplexforeach84437AC3",
     "VtlTestApiconditionallogicPOST8A02FDA5",
     "VtlTestApiconditionallogic28D65AF8",
+    "VtlTestApicontextidentityGETF43DF7C4",
+    "VtlTestApicontextidentity057FCFDC",
+    "VtlTestApicontextrequesttimeGET29874FD2",
+    "VtlTestApicontextrequesttimeBEA6331C",
     "VtlTestApicontextvarsGET60F625F1",
     "VtlTestApicontextvarsE538363F",
+    "VtlTestApiemptyarraysPOST0F6EC9E5",
+    "VtlTestApiemptyarrays2F9BCA9B",
     "VtlTestApiemptynullhandlingPOST81717ECE",
     "VtlTestApiemptynullhandlingCA165D89",
+    "VtlTestApiforeachedgecasesPOST31842846",
+    "VtlTestApiforeachedgecasesEEE9DB9B",
+    "VtlTestApiinputbodyPOST3AF08FDA",
+    "VtlTestApiinputbodyAA4B15E4",
+    "VtlTestApiinputjsonrootPOSTD52ADE89",
+    "VtlTestApiinputjsonroot00D767AE",
     "VtlTestApijsonpathsizeidPOSTE771F942",
     "VtlTestApijsonpathsizeid4A27CA74",
     "VtlTestApijsonpathsizeB192BB3B",
+    "VtlTestApijsonpathvspathPOST5F8E18EE",
+    "VtlTestApijsonpathvspath573AE52B",
     "VtlTestApijsonpathPOSTBF1830CC",
     "VtlTestApijsonpathBEBF483C",
+    "VtlTestApinestedconditionalsPOSTA962B99F",
+    "VtlTestApinestedconditionals3CF2C4A8",
     "VtlTestApinestedjsonpathPOST4D585D3A",
     "VtlTestApinestedjsonpath177B752C",
+    "VtlTestApiparamsprioritypathParamGET5095D56A",
+    "VtlTestApiparamsprioritypathParam81FC0ADD",
+    "VtlTestApiparamspriority5445BEAA",
     "VtlTestApiphotoalbumPOST04C8DC10",
     "VtlTestApiphotoalbum72EEDBA3",
     "VtlTestApistringconcatenationPOST090E8277",
     "VtlTestApistringconcatenationB03AA6C6",
     "VtlTestApisubsectionPOST38CE5118",
     "VtlTestApisubsection3F0AECCC",
+    "VtlTestApiutilchainedPOST5364F92B",
+    "VtlTestApiutilchainedB46C40C5",
     "VtlTestApiutilfunctionsPOST6AEC3BAB",
     "VtlTestApiutilfunctions75E862A7",
     "VtlTestApiutilparsejsonPOSTC7EEC2A7",
@@ -173,7 +261,7 @@
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
     "DeploymentId": {
-     "Ref": "VtlTestApiDeployment3E645A6B8f2329c11a3cb2726af0befc3916814a"
+     "Ref": "VtlTestApiDeployment3E645A6B1eb1d05853b06bd9cdc0a6d8438a900a"
     },
     "RestApiId": {
      "Ref": "VtlTestApiD53FEF73"
@@ -185,6 +273,81 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "VtlTestApiutilchainedB46C40C5": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "util-chained",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-chained/Resource"
+   }
+  },
+  "VtlTestApiutilchainedPOST5364F92B": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($dataString = $input.json('$'))\n#set($data = $util.parseJson($dataString))\n#set($jsonString = $util.escapeJavaScript($dataString))\n#set($encoded = $util.base64Encode($jsonString))\n#set($decoded = $util.base64Decode($encoded))\n#set($urlEncoded = $util.urlEncode($jsonString))\n#set($urlDecoded = $util.urlDecode($urlEncoded))\n{\n  \"original\": $data,\n  \"escaped\": \"$jsonString\",\n  \"base64Encoded\": \"$encoded\",\n  \"base64Decoded\": \"$decoded\",\n  \"urlEncoded\": \"$urlEncoded\",\n  \"urlDecoded\": \"$urlDecoded\",\n  \"roundTrip\": $util.parseJson($decoded)\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApiutilchainedB46C40C5"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-chained/POST/Resource"
    }
   },
   "VtlTestApiemptynullhandlingCA165D89": {
@@ -205,77 +368,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/empty-null-handling/Resource"
    }
   },
-  "VtlTestApiemptynullhandlingPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTemptynullhandling6A0D326F": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/empty-null-handling"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/empty-null-handling/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..empty-null-handling"
-   }
-  },
-  "VtlTestApiemptynullhandlingPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTemptynullhandling0C95F35D": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/empty-null-handling"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/empty-null-handling/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..empty-null-handling"
-   }
-  },
   "VtlTestApiemptynullhandlingPOST81717ECE": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -316,6 +425,81 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/empty-null-handling/POST/Resource"
    }
   },
+  "VtlTestApiarrayaccess88543422": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "array-access",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/array-access/Resource"
+   }
+  },
+  "VtlTestApiarrayaccessPOST78C30C4E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($data = $input.path('$'))\n#set($lastIndex = $data.items.size() - 1)\n#set($firstItem = $util.parseJson($input.json('$.items[0]')))\n#set($lastItem = $util.parseJson($input.json('$.items[' + $lastIndex + ']')))\n#set($middleItem = $util.parseJson($input.json('$.items[1]')))\n#set($allItems = $util.parseJson($input.json('$.items')))\n{\n  \"firstItem\": $firstItem,\n  \"lastItem\": $lastItem,\n  \"middleItem\": $middleItem,\n  \"firstItemPath\": $input.path('$.items[0]'),\n  \"itemCount\": $data.items.size(),\n  \"firstItemName\": \"$data.items[0].name\",\n  \"allItems\": $allItems\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApiarrayaccess88543422"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/array-access/POST/Resource"
+   }
+  },
   "VtlTestApiallparams51DA8BB0": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -349,77 +533,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/all-params/{pathParam}/Resource"
    }
   },
-  "VtlTestApiallparamspathParamGETApiPermissionVtlComparisonStackVtlTestApiDFB47B5BGETallparamspathParam47AB7D4D": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/GET/all-params/*"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/all-params/{pathParam}/GET/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.GET..all-params.{pathParam}"
-   }
-  },
-  "VtlTestApiallparamspathParamGETApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BGETallparamspathParamFC95B1A8": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/GET/all-params/*"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/all-params/{pathParam}/GET/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.GET..all-params.{pathParam}"
-   }
-  },
   "VtlTestApiallparamspathParamGETFBA8848B": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "GET",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -483,77 +613,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath/Resource"
    }
   },
-  "VtlTestApijsonpathPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTjsonpathC4964330": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/jsonpath"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..jsonpath"
-   }
-  },
-  "VtlTestApijsonpathPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTjsonpath5BA2A1B8": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/jsonpath"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..jsonpath"
-   }
-  },
   "VtlTestApijsonpathPOSTBF1830CC": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -615,77 +691,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/subsection/Resource"
    }
   },
-  "VtlTestApisubsectionPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTsubsectionB62B0070": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/subsection"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/subsection/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..subsection"
-   }
-  },
-  "VtlTestApisubsectionPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTsubsection71331D1C": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/subsection"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/subsection/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..subsection"
-   }
-  },
   "VtlTestApisubsectionPOST38CE5118": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -729,6 +751,81 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/subsection/POST/Resource"
    }
   },
+  "VtlTestApiforeachedgecasesEEE9DB9B": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "foreach-edge-cases",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/foreach-edge-cases/Resource"
+   }
+  },
+  "VtlTestApiforeachedgecasesPOST31842846": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($data = $input.path('$'))\n{\n  \"emptyArray\": [\n    #foreach($item in $data.emptyArray)\n    \"$item\"#if($foreach.hasNext),#end\n    #end\n  ],\n  \"singleItem\": [\n    #foreach($item in $data.singleItem)\n    {\n      \"value\": \"$item\",\n      \"index\": $foreach.index,\n      \"count\": $foreach.count,\n      \"first\": $foreach.first,\n      \"last\": $foreach.last,\n      \"hasNext\": $foreach.hasNext\n    }#if($foreach.hasNext),#end\n    #end\n  ],\n  \"multipleItems\": [\n    #foreach($item in $data.multipleItems)\n    {\n      \"value\": \"$item\",\n      \"index\": $foreach.index,\n      \"count\": $foreach.count,\n      \"first\": $foreach.first,\n      \"last\": $foreach.last\n    }#if($foreach.hasNext),#end\n    #end\n  ],\n  \"emptyArraySize\": #if($data.emptyArray)$data.emptyArray.size()#else 0#end,\n  \"singleItemSize\": #if($data.singleItem)$data.singleItem.size()#else 0#end,\n  \"multipleItemsSize\": #if($data.multipleItems)$data.multipleItems.size()#else 0#end\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApiforeachedgecasesEEE9DB9B"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/foreach-edge-cases/POST/Resource"
+   }
+  },
   "VtlTestApiutilfunctions75E862A7": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -747,77 +844,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-functions/Resource"
    }
   },
-  "VtlTestApiutilfunctionsPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTutilfunctionsA4F200FE": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/util-functions"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-functions/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..util-functions"
-   }
-  },
-  "VtlTestApiutilfunctionsPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTutilfunctions70675CD7": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/util-functions"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-functions/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..util-functions"
-   }
-  },
   "VtlTestApiutilfunctionsPOST6AEC3BAB": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -891,77 +934,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath-size/{id}/Resource"
    }
   },
-  "VtlTestApijsonpathsizeidPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTjsonpathsizeid41715ACC": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/jsonpath-size/*"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath-size/{id}/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..jsonpath-size.{id}"
-   }
-  },
-  "VtlTestApijsonpathsizeidPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTjsonpathsizeidD2AF562F": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/jsonpath-size/*"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath-size/{id}/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..jsonpath-size.{id}"
-   }
-  },
   "VtlTestApijsonpathsizeidPOSTE771F942": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1005,6 +994,81 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath-size/{id}/POST/Resource"
    }
   },
+  "VtlTestApicontextidentity057FCFDC": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "context-identity",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-identity/Resource"
+   }
+  },
+  "VtlTestApicontextidentityGETF43DF7C4": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\n  \"identity\": {\n    \"sourceIp\": \"$context.identity.sourceIp\",\n    \"userAgent\": \"$context.identity.userAgent\",\n    \"accountId\": \"$context.identity.accountId\",\n    \"apiKey\": \"$context.identity.apiKey\",\n    \"apiKeyId\": \"$context.identity.apiKeyId\",\n    \"caller\": \"$context.identity.caller\",\n    \"user\": \"$context.identity.user\",\n    \"userArn\": \"$context.identity.userArn\"\n  },\n  \"request\": {\n    \"requestId\": \"$context.requestId\",\n    \"requestTime\": \"$context.requestTime\",\n    \"requestTimeEpoch\": $context.requestTimeEpoch,\n    \"httpMethod\": \"$context.httpMethod\",\n    \"stage\": \"$context.stage\"\n  }\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApicontextidentity057FCFDC"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-identity/GET/Resource"
+   }
+  },
   "VtlTestApinestedjsonpath177B752C": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -1023,77 +1087,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/nested-jsonpath/Resource"
    }
   },
-  "VtlTestApinestedjsonpathPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTnestedjsonpath22FFAA2D": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/nested-jsonpath"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/nested-jsonpath/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..nested-jsonpath"
-   }
-  },
-  "VtlTestApinestedjsonpathPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTnestedjsonpath222D164C": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/nested-jsonpath"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/nested-jsonpath/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..nested-jsonpath"
-   }
-  },
   "VtlTestApinestedjsonpathPOST4D585D3A": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1152,77 +1162,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/string-concatenation/Resource"
    }
   },
-  "VtlTestApistringconcatenationPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTstringconcatenation5BC3EE4E": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/string-concatenation"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/string-concatenation/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..string-concatenation"
-   }
-  },
-  "VtlTestApistringconcatenationPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTstringconcatenation3CB7B89A": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/string-concatenation"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/string-concatenation/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..string-concatenation"
-   }
-  },
   "VtlTestApistringconcatenationPOST090E8277": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1263,6 +1219,156 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/string-concatenation/POST/Resource"
    }
   },
+  "VtlTestApiinputbodyAA4B15E4": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "input-body",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/input-body/Resource"
+   }
+  },
+  "VtlTestApiinputbodyPOST3AF08FDA": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($parsedBody = $util.parseJson($input.json('$')))\n{\n  \"rawBody\": \"$input.body\",\n  \"parsedBody\": $parsedBody,\n  \"preservesFloat\": \"$input.body\"\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApiinputbodyAA4B15E4"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/input-body/POST/Resource"
+   }
+  },
+  "VtlTestApinestedconditionals3CF2C4A8": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "nested-conditionals",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/nested-conditionals/Resource"
+   }
+  },
+  "VtlTestApinestedconditionalsPOSTA962B99F": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($user = $input.path('$.user'))\n#set($age = $user.age)\n#set($role = $user.role)\n#if($age >= 18)\n  #if($role == \"admin\")\n  {\n    \"status\": \"adult-admin\",\n    \"access\": \"full\",\n    \"age\": $age\n  }\n  #elseif($role == \"user\")\n  {\n    \"status\": \"adult-user\",\n    \"access\": \"limited\",\n    \"age\": $age\n  }\n  #else\n  {\n    \"status\": \"adult-guest\",\n    \"access\": \"readonly\",\n    \"age\": $age\n  }\n  #end\n#else\n{\n  \"status\": \"minor\",\n  \"access\": \"denied\",\n  \"age\": $age\n}\n#end\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApinestedconditionals3CF2C4A8"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/nested-conditionals/POST/Resource"
+   }
+  },
   "VtlTestApicomplexforeach84437AC3": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -1281,77 +1387,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/complex-foreach/Resource"
    }
   },
-  "VtlTestApicomplexforeachPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTcomplexforeach856B6124": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/complex-foreach"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/complex-foreach/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..complex-foreach"
-   }
-  },
-  "VtlTestApicomplexforeachPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTcomplexforeachE5DAE502": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/complex-foreach"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/complex-foreach/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..complex-foreach"
-   }
-  },
   "VtlTestApicomplexforeachPOST8DD2CFAF": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1392,6 +1444,156 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/complex-foreach/POST/Resource"
    }
   },
+  "VtlTestApicontextrequesttimeBEA6331C": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "context-request-time",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-request-time/Resource"
+   }
+  },
+  "VtlTestApicontextrequesttimeGET29874FD2": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\n  \"requestTime\": \"$context.requestTime\",\n  \"requestTimeEpoch\": $context.requestTimeEpoch,\n  \"requestId\": \"$context.requestId\",\n  \"extendedRequestId\": \"$context.extendedRequestId\",\n  \"awsEndpointRequestId\": \"$context.awsEndpointRequestId\",\n  \"apiId\": \"$context.apiId\",\n  \"resourcePath\": \"$context.resourcePath\",\n  \"resourceId\": \"$context.resourceId\",\n  \"stage\": \"$context.stage\",\n  \"deploymentId\": \"$context.deploymentId\"\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApicontextrequesttimeBEA6331C"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-request-time/GET/Resource"
+   }
+  },
+  "VtlTestApiinputjsonroot00D767AE": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "input-json-root",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/input-json-root/Resource"
+   }
+  },
+  "VtlTestApiinputjsonrootPOSTD52ADE89": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($rootJsonString = $input.json('$'))\n#set($rootJson = $util.parseJson($rootJsonString))\n{\n  \"rootJson\": $rootJson,\n  \"rootPath\": $input.path('$'),\n  \"usingParseJson\": $rootJson,\n  \"nameFromJson\": \"$rootJson.name\",\n  \"nameFromPath\": \"$input.path('$.name')\",\n  \"ageFromJson\": $rootJson.age,\n  \"ageFromPath\": $input.path('$.age')\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApiinputjsonroot00D767AE"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/input-json-root/POST/Resource"
+   }
+  },
   "VtlTestApiconditionallogic28D65AF8": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -1410,77 +1612,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/conditional-logic/Resource"
    }
   },
-  "VtlTestApiconditionallogicPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTconditionallogic7597628A": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/conditional-logic"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/conditional-logic/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..conditional-logic"
-   }
-  },
-  "VtlTestApiconditionallogicPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTconditionallogic7E443B81": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/conditional-logic"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/conditional-logic/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..conditional-logic"
-   }
-  },
   "VtlTestApiconditionallogicPOST8A02FDA5": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1539,77 +1687,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-vars/Resource"
    }
   },
-  "VtlTestApicontextvarsGETApiPermissionVtlComparisonStackVtlTestApiDFB47B5BGETcontextvars0419CCAE": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/GET/context-vars"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-vars/GET/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.GET..context-vars"
-   }
-  },
-  "VtlTestApicontextvarsGETApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BGETcontextvarsA6944EB1": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/GET/context-vars"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/context-vars/GET/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.GET..context-vars"
-   }
-  },
   "VtlTestApicontextvarsGET60F625F1": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "GET",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1668,77 +1762,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/authorizer-context/Resource"
    }
   },
-  "VtlTestApiauthorizercontextGETApiPermissionVtlComparisonStackVtlTestApiDFB47B5BGETauthorizercontext6A8D0674": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/GET/authorizer-context"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/authorizer-context/GET/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.GET..authorizer-context"
-   }
-  },
-  "VtlTestApiauthorizercontextGETApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BGETauthorizercontextE7164A82": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/GET/authorizer-context"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/authorizer-context/GET/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.GET..authorizer-context"
-   }
-  },
   "VtlTestApiauthorizercontextGETBB72BCE3": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "GET",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1797,77 +1837,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-parsejson/Resource"
    }
   },
-  "VtlTestApiutilparsejsonPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTutilparsejsonCA46E3E6": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/util-parsejson"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-parsejson/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..util-parsejson"
-   }
-  },
-  "VtlTestApiutilparsejsonPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTutilparsejson17FACD95": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/util-parsejson"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-parsejson/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..util-parsejson"
-   }
-  },
   "VtlTestApiutilparsejsonPOSTC7EEC2A7": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -1908,6 +1894,101 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/util-parsejson/POST/Resource"
    }
   },
+  "VtlTestApiparamspriority5445BEAA": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "params-priority",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/params-priority/Resource"
+   }
+  },
+  "VtlTestApiparamsprioritypathParam81FC0ADD": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "VtlTestApiparamspriority5445BEAA"
+    },
+    "PathPart": "{pathParam}",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/params-priority/{pathParam}/Resource"
+   }
+  },
+  "VtlTestApiparamsprioritypathParamGET5095D56A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($allParams = $input.params())\n{\n  \"pathParam\": \"$input.params('pathParam')\",\n  \"queryParam\": \"$input.params('queryParam')\",\n  \"headerParam\": \"$input.params('headerParam')\",\n  \"allParams\": {\n    #foreach($type in $allParams.keySet())\n    #set($params = $allParams.get($type))\n    \"$type\": {\n      #foreach($name in $params.keySet())\n      \"$name\": \"$util.escapeJavaScript($params.get($name))\"#if($foreach.hasNext),#end\n      #end\n    }#if($foreach.hasNext),#end\n    #end\n  }\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "RequestParameters": {
+     "method.request.path.pathParam": true,
+     "method.request.querystring.queryParam": false,
+     "method.request.header.headerParam": false
+    },
+    "ResourceId": {
+     "Ref": "VtlTestApiparamsprioritypathParam81FC0ADD"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/params-priority/{pathParam}/GET/Resource"
+   }
+  },
   "VtlTestApiphotoalbum72EEDBA3": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -1926,77 +2007,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/photo-album/Resource"
    }
   },
-  "VtlTestApiphotoalbumPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTphotoalbum691FA574": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/photo-album"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/photo-album/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..photo-album"
-   }
-  },
-  "VtlTestApiphotoalbumPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTphotoalbumD435E5AE": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/photo-album"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/photo-album/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..photo-album"
-   }
-  },
   "VtlTestApiphotoalbumPOST04C8DC10": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -2037,6 +2064,156 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/photo-album/POST/Resource"
    }
   },
+  "VtlTestApiemptyarrays2F9BCA9B": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "empty-arrays",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/empty-arrays/Resource"
+   }
+  },
+  "VtlTestApiemptyarraysPOST0F6EC9E5": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($data = $input.path('$'))\n{\n  \"emptyArray\": $input.json('$.emptyArray'),\n  \"emptyArraySize\": #if($data.emptyArray)$data.emptyArray.size()#else 0#end,\n  \"nonEmptyArray\": $input.json('$.nonEmptyArray'),\n  \"nonEmptyArraySize\": #if($data.nonEmptyArray)$data.nonEmptyArray.size()#else 0#end,\n  \"emptyObject\": $input.json('$.emptyObject'),\n  \"emptyObjectSize\": #if($data.emptyObject)$data.emptyObject.size()#else 0#end,\n  \"hasItems\": #if($data.nonEmptyArray && $data.nonEmptyArray.size() > 0)true#else false#end\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApiemptyarrays2F9BCA9B"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/empty-arrays/POST/Resource"
+   }
+  },
+  "VtlTestApijsonpathvspath573AE52B": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "VtlTestApiD53FEF73",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "jsonpath-vs-path",
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath-vs-path/Resource"
+   }
+  },
+  "VtlTestApijsonpathvspathPOST5F8E18EE": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "$input.json('$')"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "#set($pathRoot = $input.path('$'))\n#set($jsonString = $input.json('$'))\n#set($jsonRoot = $util.parseJson($jsonString))\n#set($itemsJson = $util.parseJson($input.json('$.items')))\n#set($firstItemJson = $util.parseJson($input.json('$.items[0]')))\n{\n  \"usingPath\": {\n    \"name\": \"$pathRoot.name\",\n    \"age\": $pathRoot.age,\n    \"itemsCount\": $pathRoot.items.size(),\n    \"firstItem\": $pathRoot.items[0]\n  },\n  \"usingJson\": {\n    \"items\": $itemsJson,\n    \"firstItem\": $firstItemJson\n  },\n  \"comparison\": {\n    \"pathName\": \"$pathRoot.name\",\n    \"pathAge\": $pathRoot.age,\n    \"jsonString\": $jsonString\n  }\n}\n\n"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "EchoFunction7EBBA557",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "VtlTestApijsonpathvspath573AE52B"
+    },
+    "RestApiId": {
+     "Ref": "VtlTestApiD53FEF73"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/jsonpath-vs-path/POST/Resource"
+   }
+  },
   "VtlTestApiarrayoperations17A93839": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -2055,77 +2232,23 @@
     "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/array-operations/Resource"
    }
   },
-  "VtlTestApiarrayoperationsPOSTApiPermissionVtlComparisonStackVtlTestApiDFB47B5BPOSTarrayoperations7B8C3F3B": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/",
-       {
-        "Ref": "VtlTestApiDeploymentStageprodEE6AD6CB"
-       },
-       "/POST/array-operations"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/array-operations/POST/ApiPermission.VtlComparisonStackVtlTestApiDFB47B5B.POST..array-operations"
-   }
-  },
-  "VtlTestApiarrayoperationsPOSTApiPermissionTestVtlComparisonStackVtlTestApiDFB47B5BPOSTarrayoperationsBC26A8C8": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "EchoFunction7EBBA557",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:aws:execute-api:eu-west-1:840181656986:",
-       {
-        "Ref": "VtlTestApiD53FEF73"
-       },
-       "/test-invoke-stage/POST/array-operations"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "VtlComparisonStack/VtlTestApi/Default/array-operations/POST/ApiPermission.Test.VtlComparisonStackVtlTestApiDFB47B5B.POST..array-operations"
-   }
-  },
   "VtlTestApiarrayoperationsPOST3CE9BE42": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "NONE",
     "HttpMethod": "POST",
     "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "ApiGatewayLambdaRoleB2D45F12",
+       "Arn"
+      ]
+     },
      "IntegrationHttpMethod": "POST",
      "IntegrationResponses": [
       {
        "ResponseTemplates": {
-        "application/json": "$input.json('$.body')"
+        "application/json": "$input.json('$')"
        },
        "StatusCode": "200"
       }
@@ -2169,7 +2292,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WMzQrCMBCEn8V7urZePPuDB0GU+gCypquuNklpNhYJeXepFayn+WZmd2ZQzHLIJ9j5TFePrOYzxKOgfijs/CnWaM4VQtwEq4WdVauLHfOBWsPes7NJMRqIpaupL3pNChu+olCHL4gleVk0/Cl/uNDaBStqTU3tXoas9OnIHQWvn8UBSvIutJqW6H/muznwjuTmqj4aKKW/u32QJsj4I6ktPnFazCGHYj65e+asDVbYEJSDvgEzX4PgJwEAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WNzY7CMAyEn4V7alounPkRB6TVrsoDrExqwJAmFXG2qqK8+6oNCDjNN6OxZwHVooRyhr0vdHMrDB8hHgT1TWHvf6PB9tggxF2wWthZtTnZJyfF2EKsnaExnvTHGdbDaDMlhR2fUajHAWJNXlYdT+0XrrR2wYraUmfc0JKVMX1zB8HzNJGhJu/CXdMa/cs8fmb+Irm4ZowypfTR+w7SBXm/SGqPfzivllBCtZxdPXNxD1a4Jaiz/gN2qOWmKgEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "VtlComparisonStack/CDKMetadata/Default"

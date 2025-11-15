@@ -1,0 +1,6 @@
+{
+  "emptyArray": [],
+  "singleItem": ["only"],
+  "multipleItems": ["first", "second", "third"]
+}
+

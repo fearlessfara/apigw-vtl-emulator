@@ -1,0 +1,8 @@
+{
+  "endpoint": "/nested-conditionals",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

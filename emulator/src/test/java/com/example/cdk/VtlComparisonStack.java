@@ -6,10 +6,12 @@ import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.apigateway.*;
-import software.amazon.awscdk.services.lambda.Code;
-import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.Fn;
+import software.amazon.awscdk.services.iam.*;
+import software.amazon.awscdk.services.lambda.*;
+import software.amazon.awscdk.services.lambda.CfnFunction;
 import software.constructs.Construct;
+import software.amazon.awscdk.services.apigateway.CfnMethod;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,22 +37,28 @@ public class VtlComparisonStack extends Stack {
         // This allows us to test request mapping templates
         // The Lambda receives the transformed request from API Gateway and returns it as-is
         Function echoFunction = Function.Builder.create(this, "EchoFunction")
-                .runtime(Runtime.PYTHON_3_11)
+                .runtime(software.amazon.awscdk.services.lambda.Runtime.PYTHON_3_11)
                 .handler("index.handler")
                 .code(Code.fromInline("""
                     import json
                     def handler(event, context):
-                        # For non-proxy Lambda integrations, return the event wrapped in the expected format
-                        # The event contains the transformed request from API Gateway
-                        return {
-                            'statusCode': 200,
-                            'body': json.dumps(event),
-                            'headers': {'Content-Type': 'application/json'}
-                        }
+                        # For non-proxy Lambda integrations, the function output is returned as 200 OK
+                        # The integration response template can access it via $input.path('$') or $input.json('$')
+                        # Return the event as a JSON string so the response template can process it
+                        return json.dumps(event)
                     """))
                 .timeout(Duration.seconds(30))
                 .memorySize(256)
                 .build();
+
+        // Create an IAM role for API Gateway to invoke Lambda
+        // This avoids the 20KB policy size limit by using IAM role instead of resource-based permissions
+        Role apiGatewayRole = Role.Builder.create(this, "ApiGatewayLambdaRole")
+                .assumedBy(ServicePrincipal.Builder.create("apigateway.amazonaws.com").build())
+                .build();
+        
+        // Grant the role permission to invoke the Lambda function
+        echoFunction.grantInvoke(apiGatewayRole);
 
         // Create REST API
         RestApi api = RestApi.Builder.create(this, "VtlTestApi")
@@ -59,7 +67,8 @@ public class VtlComparisonStack extends Stack {
                 .build();
 
         // Load test cases from file system and create endpoints dynamically
-        createEndpointsFromTestCases(api, echoFunction);
+        // Use AwsIntegration with IAM role to avoid resource-based permission limits
+        createEndpointsFromTestCases(api, echoFunction, apiGatewayRole);
 
         // Output the API URL
         CfnOutput.Builder.create(this, "ApiUrl")
@@ -72,7 +81,7 @@ public class VtlComparisonStack extends Stack {
      * Dynamically create API Gateway endpoints from test case configuration files.
      * Reads setup.json and template.vtl from each test case folder.
      */
-    private void createEndpointsFromTestCases(RestApi api, Function echoFunction) {
+    private void createEndpointsFromTestCases(RestApi api, Function echoFunction, Role apiGatewayRole) {
         String testCasesDir = "src/test/resources/vtl-test-cases";
         Path testCasesPath = Paths.get(testCasesDir);
         
@@ -103,8 +112,8 @@ public class VtlComparisonStack extends Stack {
                          // Read template.vtl
                          String template = Files.readString(templatePath);
                          
-                         // Create endpoint
-                         createEndpointFromConfig(api, echoFunction, testCaseDir.getFileName().toString(), setup, template);
+                        // Create endpoint
+                        createEndpointFromConfig(api, echoFunction, apiGatewayRole, testCaseDir.getFileName().toString(), setup, template);
                          
                      } catch (Exception e) {
                          System.err.println("Error processing test case: " + testCaseDir.getFileName() + " - " + e.getMessage());
@@ -120,8 +129,8 @@ public class VtlComparisonStack extends Stack {
     /**
      * Create an API Gateway endpoint from configuration.
      */
-    private void createEndpointFromConfig(RestApi api, Function echoFunction, String testCaseName, 
-                                         Map<String, Object> setup, String template) {
+    private void createEndpointFromConfig(RestApi api, Function echoFunction, Role apiGatewayRole, 
+                                         String testCaseName, Map<String, Object> setup, String template) {
         String endpoint = (String) setup.get("endpoint");
         String method = (String) setup.get("method");
         
@@ -144,20 +153,25 @@ public class VtlComparisonStack extends Stack {
             }
         }
         
-        // Create Lambda integration
-        LambdaIntegration integration = LambdaIntegration.Builder.create(echoFunction)
-                .proxy(false)
-                .requestTemplates(java.util.Map.of(
-                    "application/json", template
-                ))
-                .integrationResponses(java.util.List.of(
-                    IntegrationResponse.builder()
-                        .statusCode("200")
-                        .responseTemplates(java.util.Map.of(
-                            "application/json", "$input.json('$.body')"
-                        ))
-                        .build()
-                ))
+        // Create Lambda integration using AwsIntegration with IAM role credentials
+        // This avoids creating resource-based permissions that hit the 20KB limit
+        AwsIntegration integration = AwsIntegration.Builder.create()
+                .service("lambda")
+                .action("Invoke")
+                .options(IntegrationOptions.builder()
+                    .credentialsRole(apiGatewayRole)
+                    .integrationResponses(java.util.List.of(
+                        IntegrationResponse.builder()
+                            .statusCode("200")
+                            .responseTemplates(java.util.Map.of(
+                                "application/json", "$input.json('$')"
+                            ))
+                            .build()
+                    ))
+                    .requestTemplates(java.util.Map.of(
+                        "application/json", template
+                    ))
+                    .build())
                 .build();
         
         // Build method options
@@ -203,7 +217,23 @@ public class VtlComparisonStack extends Stack {
         }
         
         // Add method to resource
-        currentResource.addMethod(method, integration, methodOptionsBuilder.build());
+        Method apiMethod = currentResource.addMethod(method, integration, methodOptionsBuilder.build());
+        
+        // Set the integration URI manually since AwsIntegration doesn't set it automatically
+        CfnMethod cfnMethod = (CfnMethod) apiMethod.getNode().getDefaultChild();
+        if (cfnMethod != null) {
+            String methodRegion = this.getRegion() != null ? this.getRegion() : "us-east-1";
+            Object uriToken = Fn.join("", java.util.List.of(
+                "arn:aws:apigateway:",
+                methodRegion,
+                ":lambda:path/2015-03-31/functions/",
+                echoFunction.getFunctionArn(),
+                "/invocations"
+            ));
+            cfnMethod.addPropertyOverride("Integration.Uri", uriToken);
+            cfnMethod.addPropertyOverride("Integration.Type", "AWS");
+            cfnMethod.addPropertyOverride("Integration.IntegrationHttpMethod", "POST");
+        }
         
         System.out.println("Created endpoint: " + method + " " + endpoint + " (from " + testCaseName + ")");
     }
