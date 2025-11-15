@@ -1,0 +1,9 @@
+{
+  "original": "$util.escapeJavaScript($input.body)",
+  "encoded": "$util.base64Encode($input.body)",
+  "decoded": "$util.escapeJavaScript($util.base64Decode($util.base64Encode($input.body)))",
+  "urlEncoded": "$util.urlEncode($input.body)",
+  "urlDecoded": "$util.escapeJavaScript($util.urlDecode($util.urlEncode($input.body)))",
+  "escaped": "$util.escapeJavaScript($input.json('$'))"
+}
+

@@ -99,8 +99,8 @@ export class CheerpJAdapter extends VTLProcessorAdapter {
             globalCheerpjLib = await cheerpjRunLibrary(jarPath);
             console.log(`Successfully loaded JAR from ${jarPath}`);
             
-            // Get the VTLProcessor class (as in old code)
-            globalVTLProcessorClass = await globalCheerpjLib.com.example.VTLProcessor;
+            // Get the VTLProcessor class
+            globalVTLProcessorClass = await globalCheerpjLib.dev.vtlemulator.engine.VTLProcessor;
           })();
         } else {
           cheerpjLibraryPromise = Promise.resolve();

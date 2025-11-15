@@ -1,0 +1,8 @@
+{
+  "endpoint": "/authorizer-context",
+  "method": "GET",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

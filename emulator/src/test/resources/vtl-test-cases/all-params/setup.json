@@ -1,0 +1,14 @@
+{
+  "endpoint": "/all-params/{pathParam}",
+  "method": "GET",
+  "pathParams": {
+    "pathParam": "test-path-value"
+  },
+  "queryParams": {
+    "queryParam": "test-query-value"
+  },
+  "headers": {
+    "Custom-Header": "test-header-value"
+  }
+}
+

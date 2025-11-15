@@ -249,4 +249,22 @@ coverage/
 # Application specific
 # Keep the compiled JAR for the web application to use
 !emulator/target/vtl-processor.jar
-!frontend/public/vtl-processor.jar 
+!frontend/public/vtl-processor.jar
+
+# AWS CDK
+# CDK output directory contains account IDs, IAM roles, and other sensitive information
+cdk.out/
+*.cdk.out
+
+# Test output and reports (may contain sensitive test data)
+**/surefire-reports/
+**/failsafe-reports/
+**/test-output/
+*.dump
+*.dumpstream
+
+# AWS CLI and credentials
+.aws/
+.aws-vault/
+*credentials*
+*secrets* 

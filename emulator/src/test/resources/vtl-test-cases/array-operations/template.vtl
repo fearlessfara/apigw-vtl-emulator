@@ -1,0 +1,18 @@
+#set($items = $input.path('$.items'))
+{
+  "total": $items.size(),
+  "items": [
+    #foreach($item in $items)
+    {
+      "id": "$item.id",
+      "name": "$item.name",
+      "price": $item.price,
+      "index": $foreach.index,
+      "count": $foreach.count,
+      "first": $foreach.first,
+      "last": $foreach.last
+    }#if($foreach.hasNext),#end
+    #end
+  ]
+}
+

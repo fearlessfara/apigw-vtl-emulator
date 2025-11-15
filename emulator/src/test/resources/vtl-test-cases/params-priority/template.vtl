@@ -1,0 +1,17 @@
+#set($allParams = $input.params())
+{
+  "pathParam": "$input.params('pathParam')",
+  "queryParam": "$input.params('queryParam')",
+  "headerParam": "$input.params('headerParam')",
+  "allParams": {
+    #foreach($type in $allParams.keySet())
+    #set($params = $allParams.get($type))
+    "$type": {
+      #foreach($name in $params.keySet())
+      "$name": "$util.escapeJavaScript($params.get($name))"#if($foreach.hasNext),#end
+      #end
+    }#if($foreach.hasNext),#end
+    #end
+  }
+}
+
