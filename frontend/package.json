@@ -1,5 +1,18 @@
 {
   "name": "vtl-emulator-frontend",
+  "description": "Browser-based VTL (Velocity Template Language) emulator for AWS API Gateway - Test, debug, and preview VTL templates with real-time rendering",
+  "keywords": [
+    "vtl",
+    "velocity-template-language",
+    "aws-api-gateway",
+    "vtl-emulator",
+    "vtl-tester",
+    "vtl-editor",
+    "api-gateway-templates",
+    "request-transformation",
+    "response-transformation",
+    "aws-lambda"
+  ],
   "private": true,
   "version": "1.0.0",
   "type": "module",
