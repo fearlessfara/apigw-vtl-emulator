@@ -5,8 +5,8 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
-    <artifactId>example</artifactId>
+    <groupId>dev.vtlemulator</groupId>
+    <artifactId>vtl-engine</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -85,6 +85,7 @@
                         <configuration>
                             <finalName>vtl-processor</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -104,7 +105,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.example.VTLProcessor</mainClass>
+                                    <mainClass>dev.vtlemulator.engine.VTLProcessor</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>

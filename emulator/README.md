@@ -68,7 +68,7 @@ The compiled JAR file will be available at `target/vtl-processor.jar`.
 ### Java API
 
 ```java
-import com.example.VTLProcessor;
+import dev.vtlemulator.engine.VTLProcessor;
 
 VTLProcessor processor = new VTLProcessor();
 
@@ -93,7 +93,7 @@ await cheerpjInit({version: 17});
 const lib = await cheerpjRunLibrary('/emulator/target/vtl-processor.jar');
 
 // Get the VTLProcessor class
-const VTLProcessorClass = await lib.com.example.VTLProcessor;
+const VTLProcessorClass = await lib.dev.vtlemulator.engine.VTLProcessor;
 
 // Create an instance
 const processor = await new VTLProcessorClass();

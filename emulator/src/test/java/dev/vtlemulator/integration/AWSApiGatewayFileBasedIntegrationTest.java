@@ -1,5 +1,6 @@
-package com.example;
+package dev.vtlemulator.integration;
 
+import dev.vtlemulator.engine.VTLProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.junit.After;

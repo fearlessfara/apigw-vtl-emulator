@@ -1,4 +1,4 @@
-package com.example;
+package dev.vtlemulator.engine;
 
 import org.junit.Test;
 

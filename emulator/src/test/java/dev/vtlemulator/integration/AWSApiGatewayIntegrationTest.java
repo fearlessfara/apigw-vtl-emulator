@@ -1,6 +1,7 @@
-package com.example;
+package dev.vtlemulator.integration;
 
-import com.example.cdk.VtlComparisonStack;
+import dev.vtlemulator.engine.VTLProcessor;
+import dev.vtlemulator.cdk.VtlComparisonStack;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.junit.*;

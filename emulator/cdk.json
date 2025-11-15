@@ -1,5 +1,5 @@
 {
-  "app": "java -cp target/test-classes:target/classes:$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout -q) com.example.AWSApiGatewayIntegrationTest",
+  "app": "mvn -e -q compile exec:java -Dexec.mainClass='dev.vtlemulator.cdk.VtlComparisonStackApp' -Dexec.classpathScope=test",
   "context": {
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,

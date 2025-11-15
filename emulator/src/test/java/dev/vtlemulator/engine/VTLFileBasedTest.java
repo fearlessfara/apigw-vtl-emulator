@@ -1,4 +1,4 @@
-package com.example;
+package dev.vtlemulator.engine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;

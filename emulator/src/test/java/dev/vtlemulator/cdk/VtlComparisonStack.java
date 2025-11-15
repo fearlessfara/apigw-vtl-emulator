@@ -1,4 +1,4 @@
-package com.example.cdk;
+package dev.vtlemulator.cdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awscdk.CfnOutput;
