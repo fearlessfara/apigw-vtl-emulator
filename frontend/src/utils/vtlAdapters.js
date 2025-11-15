@@ -36,60 +36,82 @@ export class VTLProcessorAdapter {
   }
 }
 
+// Global CheerpJ state to prevent multiple initializations
+let cheerpjInitPromise = null;
+let cheerpjLibraryPromise = null;
+let globalCheerpjLib = null;
+let globalVTLProcessorClass = null;
+
 // CheerpJ Adapter
 export class CheerpJAdapter extends VTLProcessorAdapter {
   constructor() {
     super();
     this.vtlProcessor = null;
-    this.VTLProcessorClass = null;
-    this.lib = null;
   }
 
   async init() {
+    if (this.ready) {
+      return;
+    }
+    
     if (this.initializing) {
+      // Wait for existing initialization to complete
+      await new Promise((resolve) => {
+        const checkReady = () => {
+          if (this.ready || !this.initializing) {
+            resolve();
+          } else {
+            setTimeout(checkReady, 50);
+          }
+        };
+        checkReady();
+      });
       return;
     }
     
     this.initializing = true;
     
     try {
-      if (!window.cheerpjInitialized) {
-        console.log('Initializing CheerpJ Java runtime...');
-        await cheerpjInit({version: 17});
-        window.cheerpjInitialized = true;
-      }
-      
-      if (!this.lib) {
-        // Try different paths for different deployment scenarios
-        const possiblePaths = [
-          '/vtl-processor.jar',
-          '/assets/vtl-processor.jar',
-          '/app/emulator/target/vtl-processor.jar'
-        ];
-        
-        let lib = null;
-        for (const jarPath of possiblePaths) {
-          try {
-            lib = await cheerpjRunLibrary(jarPath);
-            break;
-          } catch (error) {
-            console.warn(`Failed to load JAR from ${jarPath}:`, error);
-          }
+      // Use a global promise to ensure cheerpjInit is only called once
+      if (!cheerpjInitPromise) {
+        if (!window.cheerpjInitialized) {
+          console.log('Initializing CheerpJ Java runtime...');
+          cheerpjInitPromise = cheerpjInit({version: 17}).then(() => {
+            window.cheerpjInitialized = true;
+          }).catch((error) => {
+            cheerpjInitPromise = null;
+            throw error;
+          });
+        } else {
+          cheerpjInitPromise = Promise.resolve();
         }
-        
-        if (!lib) {
-          throw new Error('Could not load vtl-processor.jar from any known location');
+      }
+      
+      await cheerpjInitPromise;
+      
+      // Load library if not already loaded (as in old code)
+      // Use promise to prevent concurrent loading
+      if (!cheerpjLibraryPromise) {
+        if (!globalCheerpjLib) {
+          cheerpjLibraryPromise = (async () => {
+            // CheerpJ internally rewrites /app/ so we use /app/vtl-processor.jar
+            const jarPath = '/app/vtl-processor.jar';
+            globalCheerpjLib = await cheerpjRunLibrary(jarPath);
+            console.log(`Successfully loaded JAR from ${jarPath}`);
+            
+            // Get the VTLProcessor class (as in old code)
+            globalVTLProcessorClass = await globalCheerpjLib.com.example.VTLProcessor;
+          })();
+        } else {
+          cheerpjLibraryPromise = Promise.resolve();
         }
-        
-        this.lib = lib;
       }
       
-      if (!this.VTLProcessorClass) {
-        this.VTLProcessorClass = await this.lib.com.example.VTLProcessor;
-      }
+      await cheerpjLibraryPromise;
       
+      // Create a new processor instance for this adapter
       if (!this.vtlProcessor) {
-        this.vtlProcessor = await new this.VTLProcessorClass();
+        this.vtlProcessor = await new globalVTLProcessorClass();
       }
       
       this.ready = true;
