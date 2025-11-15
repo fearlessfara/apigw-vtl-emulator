@@ -1,0 +1,8 @@
+{
+  "endpoint": "/nested-jsonpath",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

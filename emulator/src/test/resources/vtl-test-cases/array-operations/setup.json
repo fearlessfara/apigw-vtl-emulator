@@ -1,0 +1,8 @@
+{
+  "endpoint": "/array-operations",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

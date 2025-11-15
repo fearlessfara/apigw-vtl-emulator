@@ -336,4 +336,255 @@ public class AWSMappingTemplateExamplesTest {
         assertTrue(result.contains("\"api_version\":\"prod-api-123\""));
         assertFalse(result.contains("development"));
     }
+    
+    @Test
+    public void testPhotoAlbumAPI_RequestTransformation() {
+        // Photo Album API example from AWS docs - Request transformation
+        // This example transforms the payload to match the format required by the integration endpoint
+        String template = "#set($inputRoot = $input.path('$'))\n" +
+            "{\n" +
+            "  \"photos\": [\n" +
+            "#foreach($elem in $inputRoot.photos.photo)\n" +
+            "    {\n" +
+            "      \"id\": \"$elem.id\",\n" +
+            "      \"photographedBy\": \"$elem.photographer_first_name $elem.photographer_last_name\",\n" +
+            "      \"title\": \"$elem.title\",\n" +
+            "      \"ispublic\": $elem.ispublic,\n" +
+            "      \"isfriend\": $elem.isfriend,\n" +
+            "      \"isfamily\": $elem.isfamily\n" +
+            "    }#if($foreach.hasNext),#end\n" +
+            "\n" +
+            "#end\n" +
+            "  ]\n" +
+            "}";
+        
+        String input = "{\n" +
+            "  \"photos\": {\n" +
+            "    \"page\": 1,\n" +
+            "    \"pages\": \"1234\",\n" +
+            "    \"perpage\": 100,\n" +
+            "    \"total\": \"123398\",\n" +
+            "    \"photo\": [\n" +
+            "      {\n" +
+            "        \"id\": \"12345678901\",\n" +
+            "        \"owner\": \"23456789@A12\",\n" +
+            "        \"photographer_first_name\": \"Saanvi\",\n" +
+            "        \"photographer_last_name\": \"Sarkar\",\n" +
+            "        \"secret\": \"abc123d456\",\n" +
+            "        \"server\": \"1234\",\n" +
+            "        \"farm\": 1,\n" +
+            "        \"title\": \"Sample photo 1\",\n" +
+            "        \"ispublic\": true,\n" +
+            "        \"isfriend\": false,\n" +
+            "        \"isfamily\": false\n" +
+            "      },\n" +
+            "      {\n" +
+            "        \"id\": \"23456789012\",\n" +
+            "        \"owner\": \"34567890@B23\",\n" +
+            "        \"photographer_first_name\": \"Richard\",\n" +
+            "        \"photographer_last_name\": \"Roe\",\n" +
+            "        \"secret\": \"bcd234e567\",\n" +
+            "        \"server\": \"2345\",\n" +
+            "        \"farm\": 2,\n" +
+            "        \"title\": \"Sample photo 2\",\n" +
+            "        \"ispublic\": true,\n" +
+            "        \"isfriend\": false,\n" +
+            "        \"isfamily\": false\n" +
+            "      }\n" +
+            "    ]\n" +
+            "  }\n" +
+            "}";
+        
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: Photo Album result: '" + result + "'");
+        
+        // Verify the transformation worked correctly
+        assertTrue(result.contains("\"photos\":["));
+        assertTrue(result.contains("\"id\":\"12345678901\""));
+        assertTrue(result.contains("\"id\":\"23456789012\""));
+        assertTrue(result.contains("\"photographedBy\":\"Saanvi Sarkar\""));
+        assertTrue(result.contains("\"photographedBy\":\"Richard Roe\""));
+        assertTrue(result.contains("\"title\":\"Sample photo 1\""));
+        assertTrue(result.contains("\"title\":\"Sample photo 2\""));
+        assertTrue(result.contains("\"ispublic\":true"));
+        assertTrue(result.contains("\"isfriend\":false"));
+        assertTrue(result.contains("\"isfamily\":false"));
+        // Should not include original fields like owner, secret, server, farm
+        assertFalse(result.contains("\"owner\""));
+        assertFalse(result.contains("\"secret\""));
+        assertFalse(result.contains("\"server\""));
+        assertFalse(result.contains("\"farm\""));
+    }
+    
+    @Test
+    public void testPhotoAlbumAPI_ResponseTransformation() {
+        // Photo Album API example from AWS docs - Response transformation
+        // This transforms integration response data into the format expected by the method response
+        String template = "#set($inputRoot = $input.path('$'))\n" +
+            "{\n" +
+            "  \"photos\": [\n" +
+            "#foreach($elem in $inputRoot.photos)\n" +
+            "    {\n" +
+            "      \"id\": \"$elem.id\",\n" +
+            "      \"photographedBy\": \"$elem.photographedBy\",\n" +
+            "      \"title\": \"$elem.title\",\n" +
+            "      \"ispublic\": $elem.public,\n" +
+            "      \"isfriend\": $elem.friend,\n" +
+            "      \"isfamily\": $elem.family\n" +
+            "    }#if($foreach.hasNext),#end\n" +
+            "\n" +
+            "#end\n" +
+            "  ]\n" +
+            "}";
+        
+        // Integration response format (different field names)
+        String input = "{\n" +
+            "  \"photos\": [\n" +
+            "    {\n" +
+            "      \"id\": \"12345678901\",\n" +
+            "      \"photographedBy\": \"Saanvi Sarkar\",\n" +
+            "      \"title\": \"Sample photo 1\",\n" +
+            "      \"description\": \"My sample photo 1\",\n" +
+            "      \"public\": true,\n" +
+            "      \"friend\": false,\n" +
+            "      \"family\": false\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"id\": \"23456789012\",\n" +
+            "      \"photographedBy\": \"Richard Roe\",\n" +
+            "      \"title\": \"Sample photo 2\",\n" +
+            "      \"description\": \"My sample photo 1\",\n" +
+            "      \"public\": true,\n" +
+            "      \"friend\": false,\n" +
+            "      \"family\": false\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
+        
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: Photo Album Response result: '" + result + "'");
+        
+        // Verify the transformation worked correctly
+        assertTrue(result.contains("\"photos\":["));
+        assertTrue(result.contains("\"id\":\"12345678901\""));
+        assertTrue(result.contains("\"id\":\"23456789012\""));
+        assertTrue(result.contains("\"photographedBy\":\"Saanvi Sarkar\""));
+        assertTrue(result.contains("\"photographedBy\":\"Richard Roe\""));
+        assertTrue(result.contains("\"title\":\"Sample photo 1\""));
+        assertTrue(result.contains("\"title\":\"Sample photo 2\""));
+        // Verify field name transformation: public -> ispublic, friend -> isfriend, family -> isfamily
+        assertTrue(result.contains("\"ispublic\":true"));
+        assertTrue(result.contains("\"isfriend\":false"));
+        assertTrue(result.contains("\"isfamily\":false"));
+        // Should not include description field
+        assertFalse(result.contains("\"description\""));
+    }
+    
+    @Test
+    public void testRequestTemplatesExample_JSON() {
+        // Example from requestTemplates documentation - JSON mapping
+        String template = "#set ($root=$input.path('$')) { \"stage\": \"$root.name\", \"user-id\": \"$root.key\" }";
+        
+        String input = "{\n" +
+            "  \"name\": \"prod\",\n" +
+            "  \"key\": \"user123\"\n" +
+            "}";
+        
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: RequestTemplates JSON result: '" + result + "'");
+        
+        // Verify the transformation
+        assertTrue(result.contains("\"stage\":\"prod\""));
+        assertTrue(result.contains("\"user-id\":\"user123\""));
+    }
+    
+    @Test
+    public void testRequestTemplatesExample_XML() {
+        // Example from requestTemplates documentation - XML mapping (simplified to test VTL)
+        // Note: We're testing the VTL part, not XML generation
+        String template = "#set ($root=$input.path('$')) <stage>$root.name</stage>";
+        
+        String input = "{\n" +
+            "  \"name\": \"prod\"\n" +
+            "}";
+        
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: RequestTemplates XML result: '" + result + "'");
+        
+        // Verify the transformation
+        assertTrue(result.contains("<stage>"));
+        assertTrue(result.contains("prod"));
+        assertTrue(result.contains("</stage>"));
+    }
+    
+    @Test
+    public void testUtilParseJsonExample() {
+        // Test $util.parseJson() as shown in AWS documentation
+        // Example: Parse nested JSON from errorMessage
+        String template = "#set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage'))) {\n" +
+            "  \"errorMessageObjKey2ArrVal\": $errorMessageObj.key2.arr[0]\n" +
+            "}";
+        
+        String input = "{\n" +
+            "  \"errorMessage\": \"{\\\"key1\\\":\\\"var1\\\",\\\"key2\\\":{\\\"arr\\\":[1,2,3]}}\"\n" +
+            "}";
+        
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: ParseJson result: '" + result + "'");
+        
+        // Verify the parsed JSON was accessed correctly
+        assertTrue(result.contains("\"errorMessageObjKey2ArrVal\":1"));
+    }
+    
+    @Test
+    public void testUtilBase64EncodeDecode() {
+        // Test base64 encoding and decoding
+        String template = "{\n" +
+            "  \"original\": \"$input.body\",\n" +
+            "  \"encoded\": \"$util.base64Encode($input.body)\",\n" +
+            "  \"decoded\": \"$util.base64Decode($util.base64Encode($input.body))\"\n" +
+            "}";
+        
+        String input = "Hello World";
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: Base64 result: '" + result + "'");
+        
+        // Verify encoding/decoding works
+        assertTrue(result.contains("\"original\":\"Hello World\""));
+        assertTrue(result.contains("\"encoded\":\"SGVsbG8gV29ybGQ=\""));
+        assertTrue(result.contains("\"decoded\":\"Hello World\""));
+    }
+    
+    @Test
+    public void testUtilUrlEncodeDecode() {
+        // Test URL encoding and decoding
+        String template = "{\n" +
+            "  \"original\": \"$input.body\",\n" +
+            "  \"encoded\": \"$util.urlEncode($input.body)\",\n" +
+            "  \"decoded\": \"$util.urlDecode($util.urlEncode($input.body))\"\n" +
+            "}";
+        
+        String input = "Hello World & More";
+        String contextJson = "{}";
+        String result = processor.process(template, input, contextJson);
+        
+        System.out.println("DEBUG: URL Encode result: '" + result + "'");
+        
+        // Verify encoding/decoding works
+        assertTrue(result.contains("\"original\":\"Hello World & More\""));
+        assertTrue(result.contains("\"encoded\":\"Hello+World+%26+More\""));
+        assertTrue(result.contains("\"decoded\":\"Hello World & More\""));
+    }
 } 

@@ -29,6 +29,10 @@ public class ContextFunctions {
         return context.containsKey("extendedRequestId") ? context.get("extendedRequestId").toString() : "test-extended-request-id-" + System.currentTimeMillis();
     }
     
+    public String getAwsEndpointRequestId() {
+        return context.containsKey("awsEndpointRequestId") ? context.get("awsEndpointRequestId").toString() : context.containsKey("extendedRequestId") ? context.get("extendedRequestId").toString() : "test-aws-endpoint-request-id-" + System.currentTimeMillis();
+    }
+    
     public String getHttpMethod() {
         return context.containsKey("httpMethod") ? context.get("httpMethod").toString() : "GET";
     }

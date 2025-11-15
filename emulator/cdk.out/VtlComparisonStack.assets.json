@@ -1,0 +1,20 @@
+{
+  "version": "36.0.0",
+  "files": {
+    "d1a2f5f320ab8ed563d99db5ab8b19d0490599ea46efc4167a7ac72b7563d4c4": {
+      "source": {
+        "path": "VtlComparisonStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "840181656986-eu-west-1": {
+          "bucketName": "cdk-hnb659fds-assets-840181656986-eu-west-1",
+          "objectKey": "d1a2f5f320ab8ed563d99db5ab8b19d0490599ea46efc4167a7ac72b7563d4c4.json",
+          "region": "eu-west-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::840181656986:role/cdk-hnb659fds-file-publishing-role-840181656986-eu-west-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

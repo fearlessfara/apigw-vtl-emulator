@@ -1,0 +1,9 @@
+{
+  "params": {
+    "querystring": {
+      "name": "Bella",
+      "type": "dog"
+    }
+  }
+}
+

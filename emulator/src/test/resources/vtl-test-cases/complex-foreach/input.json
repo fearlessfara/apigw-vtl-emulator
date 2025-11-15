@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Alice",
+      "roles": ["admin", "user"],
+      "permissions": {"read": true, "write": true}
+    },
+    {
+      "id": "2",
+      "name": "Bob",
+      "roles": ["user"],
+      "permissions": {"read": true, "write": false}
+    }
+  ]
+}
+

@@ -1,0 +1,18 @@
+{
+  "stage": "test",
+  "requestId": "test-request-id",
+  "apiId": "test-api-id",
+  "resourcePath": "/context-vars",
+  "resourceId": "test-resource-id",
+  "httpMethod": "GET",
+  "identity": {
+    "sourceIp": "192.0.2.1",
+    "userAgent": "test-agent",
+    "accountId": "123456789012",
+    "apiKey": "test-key",
+    "caller": "test-caller",
+    "user": "test-user",
+    "userArn": "arn:aws:iam::123456789012:user/test"
+  }
+}
+
