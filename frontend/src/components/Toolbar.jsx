@@ -33,12 +33,13 @@ function Toolbar({
       <div className="vr"></div>
       <div className="modern-engine-selector">
         <label htmlFor="engineSelect">Engine:</label>
-        <select 
-          id="engineSelect" 
+        <select
+          id="engineSelect"
           value={currentEngine}
           onChange={(e) => onEngineChange(e.target.value)}
         >
           <option value="cheerpj">CheerpJ (Java)</option>
+          <option value="wasm">WebAssembly (GraalVM)</option>
           <option value="vela">Vela (JavaScript) - Experimental</option>
         </select>
       </div>

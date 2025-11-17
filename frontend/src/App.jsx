@@ -8,7 +8,7 @@ import LoadingOverlay from './components/LoadingOverlay';
 import HelpModal from './components/HelpModal';
 import SettingsModal from './components/SettingsModal';
 import { loadSettings, saveSettings } from './utils/settings';
-import { CheerpJAdapter, VelaAdapter } from './utils/vtlAdapters';
+import { CheerpJAdapter, VelaAdapter, WasmAdapter } from './utils/vtlAdapters';
 import { setupVelocityLanguage, getEditorOptions } from './utils/monacoConfig';
 import { loader } from '@monaco-editor/react';
 
@@ -107,13 +107,28 @@ function App() {
     }
 
     setLoading(true);
-    setLoadingMessage(`Loading ${engineType === 'cheerpj' ? 'CheerpJ (Java)' : 'Vela (JavaScript)'} engine...`);
+    const engineNames = {
+      'cheerpj': 'CheerpJ (Java)',
+      'vela': 'Vela (JavaScript)',
+      'wasm': 'WebAssembly (GraalVM)'
+    };
+    setLoadingMessage(`Loading ${engineNames[engineType] || engineType} engine...`);
 
     try {
-      const AdapterClass = engineType === 'cheerpj' ? CheerpJAdapter : VelaAdapter;
+      let AdapterClass;
+      if (engineType === 'cheerpj') {
+        AdapterClass = CheerpJAdapter;
+      } else if (engineType === 'vela') {
+        AdapterClass = VelaAdapter;
+      } else if (engineType === 'wasm') {
+        AdapterClass = WasmAdapter;
+      } else {
+        throw new Error(`Unknown engine type: ${engineType}`);
+      }
+
       const engine = new AdapterClass();
       await engine.init();
-      
+
       setEngines(prev => ({ ...prev, [engineType]: engine }));
       return engine;
     } catch (error) {
