@@ -1,0 +1,30 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": ".*\\.properties$"
+      },
+      {
+        "pattern": ".*\\.json$"
+      }
+    ],
+    "excludes": [
+      {
+        "pattern": ".*/sun/.*"
+      },
+      {
+        "pattern": ".*/com/sun/.*"
+      },
+      {
+        "pattern": ".*/META-INF/maven/.*"
+      },
+      {
+        "pattern": ".*/META-INF/LICENSE.*"
+      },
+      {
+        "pattern": ".*/META-INF/NOTICE.*"
+      }
+    ]
+  }
+}
+

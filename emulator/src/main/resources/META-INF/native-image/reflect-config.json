@@ -1,0 +1,78 @@
+[
+  {
+    "name": "org.apache.velocity.app.VelocityEngine",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.apache.velocity.runtime.resource.ResourceManagerImpl",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.apache.velocity.runtime.RuntimeInstance",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.apache.velocity.runtime.resource.loader.StringResourceLoader",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.apache.velocity.runtime.resource.util.StringResourceRepositoryImpl",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.apache.velocity.runtime.resource.ResourceCacheImpl",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ObjectMapper",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "dev.vtlemulator.engine.VTLProcessor",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "dev.vtlemulator.engine.JsonSerializationEventHandler",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  }
+]
+

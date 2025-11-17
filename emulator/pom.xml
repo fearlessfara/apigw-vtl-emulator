@@ -27,6 +27,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
+        <!-- SLF4J NOP implementation to silence warnings in WASM -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.30</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -112,6 +118,45 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
                             </transformers>
                             <minimizeJar>false</minimizeJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- GraalVM Native Image for WASM compilation (2025) -->
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>0.10.2</version>
+                <extensions>true</extensions>
+                <executions>
+                    <!-- WebAssembly build using tool:svm-wasm (2025) -->
+                    <execution>
+                        <id>native-image-wasm</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>compile-no-fork</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>dev.vtlemulator.engine.VTLProcessor</mainClass>
+                            <imageName>vtl-processor</imageName>
+                            <outputDirectory>${project.build.directory}/graalvm-wasm</outputDirectory>
+                            <buildArgs>
+                                <buildArg>--tool:svm-wasm</buildArg>
+                                <buildArg>--no-fallback</buildArg>
+                                <!-- Size optimization: optimize for smaller binary (includes dead code elimination) -->
+                                <buildArg>-Os</buildArg>
+                                <!-- Enable more aggressive optimizations -->
+                                <buildArg>-H:+RemoveSaturatedTypeFlows</buildArg>
+                                <!-- Use resource configuration file for selective resource inclusion -->
+                                <buildArg>-H:ResourceConfigurationFiles=${project.basedir}/src/main/resources/META-INF/native-image/resource-config.json</buildArg>
+                                <!-- Also allow properties and json files (fallback) -->
+                                <buildArg>-H:IncludeResources=.*\\.properties</buildArg>
+                                <buildArg>-H:IncludeResources=.*\\.json</buildArg>
+                                <!-- Use auto-generated reflection config from tracing agent -->
+                                <buildArg>-H:ConfigurationFileDirectories=${project.build.directory}/native-image-config</buildArg>
+                                <!-- Also include manual config as fallback -->
+                                <buildArg>-H:ReflectionConfigurationFiles=${project.basedir}/src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                            </buildArgs>
                         </configuration>
                     </execution>
                 </executions>

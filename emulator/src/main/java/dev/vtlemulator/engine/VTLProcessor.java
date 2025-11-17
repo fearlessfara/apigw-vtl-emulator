@@ -21,6 +21,9 @@ public class VTLProcessor {
         
         velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("eventhandler.referenceinsertion.class", JsonSerializationEventHandler.class.getName());
+        // Use string resource loader for WASM (no file system access)
+        velocityEngine.setProperty("resource.loader", "string");
+        velocityEngine.setProperty("string.resource.loader.class", "org.apache.velocity.runtime.resource.loader.StringResourceLoader");
         velocityEngine.init();
     }
 
@@ -71,6 +74,41 @@ public class VTLProcessor {
         velocityContext.put("input", new InputFunctions(context, input, inputString));
         velocityContext.put("util", new UtilFunctions());
         velocityContext.put("context", new ContextFunctions(context));
+    }
+
+    /**
+     * Main method for GraalVM WASM compilation.
+     * This method is called when the WASM module is executed, but the class
+     * is primarily used by instantiating it and calling the process() method.
+     */
+    public static void main(String[] args) {
+        // Test VTLProcessor functionality when compiled to WASM
+        try {
+            System.out.println("VTLProcessor WASM Test Starting...");
+            
+            VTLProcessor processor = new VTLProcessor();
+            System.out.println("✓ VTLProcessor instantiated successfully");
+            
+            // Simple test template
+            String template = "Hello, $context.name!";
+            String contextJson = "{\"name\": \"World\"}";
+            
+            String result = processor.process(template, contextJson);
+            System.out.println("✓ Template processed successfully");
+            System.out.println("  Template: " + template);
+            System.out.println("  Context: " + contextJson);
+            System.out.println("  Result: " + result);
+            
+            // Verify result
+            if (result.contains("Hello") && result.contains("World")) {
+                System.out.println("✅ VTLProcessor test PASSED!");
+            } else {
+                System.out.println("⚠ VTLProcessor test completed but result unexpected");
+            }
+        } catch (Exception e) {
+            System.err.println("✗ VTLProcessor test FAILED: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
