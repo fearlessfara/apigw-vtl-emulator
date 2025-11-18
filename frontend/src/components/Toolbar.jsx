@@ -40,7 +40,6 @@ function Toolbar({
         >
           <option value="velocits">Velocits (TypeScript) ⚡ Recommended</option>
           <option value="cheerpj">CheerpJ (Java)</option>
-          <option value="vela">Vela (JavaScript) - Experimental</option>
         </select>
       </div>
       <div className="vr"></div>

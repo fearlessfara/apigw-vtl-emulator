@@ -202,11 +202,10 @@ cd typescript && npm test
 
 ## Frontend Integration
 
-The frontend automatically detects and uses both implementations:
+The frontend supports both implementations:
 
 1. **Velocits (TypeScript)** - Default, recommended
-2. **CheerpJ (Java)** - Available as fallback
-3. **Vela (JavaScript)** - Experimental alternative
+2. **CheerpJ (Java)** - Available as alternative
 
 Users can switch between engines in the UI dropdown.
 

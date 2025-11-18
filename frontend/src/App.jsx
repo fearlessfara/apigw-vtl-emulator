@@ -8,7 +8,7 @@ import LoadingOverlay from './components/LoadingOverlay';
 import HelpModal from './components/HelpModal';
 import SettingsModal from './components/SettingsModal';
 import { loadSettings, saveSettings } from './utils/settings';
-import { CheerpJAdapter, VelaAdapter, VelocitsAdapter } from './utils/vtlAdapters';
+import { CheerpJAdapter, VelocitsAdapter } from './utils/vtlAdapters';
 import { setupVelocityLanguage, getEditorOptions } from './utils/monacoConfig';
 import { loader } from '@monaco-editor/react';
 
@@ -109,8 +109,7 @@ function App() {
     setLoading(true);
     const engineNames = {
       'cheerpj': 'CheerpJ (Java)',
-      'velocits': 'Velocits (TypeScript)',
-      'vela': 'Vela (JavaScript)'
+      'velocits': 'Velocits (TypeScript)'
     };
     setLoadingMessage(`Loading ${engineNames[engineType] || engineType} engine...`);
 
@@ -122,9 +121,6 @@ function App() {
           break;
         case 'velocits':
           AdapterClass = VelocitsAdapter;
-          break;
-        case 'vela':
-          AdapterClass = VelaAdapter;
           break;
         default:
           throw new Error(`Unknown engine type: ${engineType}`);
