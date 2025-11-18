@@ -1,0 +1,10 @@
+{
+  "endpoint": "/subsection",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {
+    "name": "Bella"
+  },
+  "headers": {}
+}
+

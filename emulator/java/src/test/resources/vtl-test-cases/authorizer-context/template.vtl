@@ -1,0 +1,21 @@
+#if($context.authorizer && $context.authorizer.principalId)
+#set($claims = $context.authorizer.claims)
+#set($principalId = $context.authorizer.principalId)
+#set($latency = $context.authorizer.integrationLatency)
+#else
+#set($claims = {})
+#set($principalId = "")
+#set($latency = 0)
+#end
+{
+  "user": "$principalId",
+  "claims": {
+    "sub": #if($claims && $claims.sub)"$claims.sub"#else""#end,
+    "email": #if($claims && $claims.email)"$claims.email"#else""#end
+  },
+  "authorizer": {
+    "principalId": "$principalId",
+    "integrationLatency": #if($latency && $latency != "")$latency#else 0#end
+  }
+}
+

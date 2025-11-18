@@ -1,0 +1,15 @@
+#set($root = $input.path('$'))
+{
+  "user": {
+    "name": "$root.user.profile.name",
+    "email": "$root.user.profile.email",
+    "address": {
+      "street": "$root.user.profile.address.street",
+      "city": "$root.user.profile.address.city",
+      "zip": "$root.user.profile.address.zip"
+    }
+  },
+  "orders": $input.json('$.user.orders'),
+  "totalOrders": $input.path('$.user.orders').size()
+}
+

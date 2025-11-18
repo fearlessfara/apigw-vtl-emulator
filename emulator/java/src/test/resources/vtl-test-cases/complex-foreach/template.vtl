@@ -1,0 +1,24 @@
+#set($data = $input.path('$'))
+#set($roleCount = 0)
+#foreach($user in $data.users)
+  #set($roleCount = $roleCount + $user.roles.size())
+#end
+{
+  "users": [
+    #foreach($user in $data.users)
+    {
+      "id": "$user.id",
+      "name": "$user.name",
+      "roles": [
+        #foreach($role in $user.roles)
+        "$role"#if($foreach.hasNext),#end
+        #end
+      ],
+      "permissions": $user.permissions.size()
+    }#if($foreach.hasNext),#end
+    #end
+  ],
+  "totalUsers": $data.users.size(),
+  "totalRoles": $roleCount
+}
+

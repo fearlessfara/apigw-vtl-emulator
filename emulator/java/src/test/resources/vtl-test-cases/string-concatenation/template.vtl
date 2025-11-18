@@ -1,0 +1,14 @@
+#set($firstName = $input.path('$.firstName'))
+#set($lastName = $input.path('$.lastName'))
+#set($fullName = "$firstName $lastName")
+#set($emailBase = "$firstName.$lastName")
+#set($email = $emailBase + "@example.com")
+{
+  "firstName": "$firstName",
+  "lastName": "$lastName",
+  "fullName": "$fullName",
+  "greeting": "Hello, $fullName!",
+  "email": "$util.escapeJavaScript($email)",
+  "combined": "$firstName$lastName"
+}
+

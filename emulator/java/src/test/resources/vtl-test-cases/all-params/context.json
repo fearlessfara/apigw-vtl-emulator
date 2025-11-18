@@ -1,0 +1,14 @@
+{
+  "params": {
+    "path": {
+      "pathParam": "test-path-value"
+    },
+    "querystring": {
+      "queryParam": "test-query-value"
+    },
+    "header": {
+      "Custom-Header": "test-header-value"
+    }
+  }
+}
+

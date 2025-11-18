@@ -1,0 +1,20 @@
+{
+  "identity": {
+    "sourceIp": "$context.identity.sourceIp",
+    "userAgent": "$context.identity.userAgent",
+    "accountId": "$context.identity.accountId",
+    "apiKey": "$context.identity.apiKey",
+    "apiKeyId": "$context.identity.apiKeyId",
+    "caller": "$context.identity.caller",
+    "user": "$context.identity.user",
+    "userArn": "$context.identity.userArn"
+  },
+  "request": {
+    "requestId": "$context.requestId",
+    "requestTime": "$context.requestTime",
+    "requestTimeEpoch": $context.requestTimeEpoch,
+    "httpMethod": "$context.httpMethod",
+    "stage": "$context.stage"
+  }
+}
+
