@@ -16,7 +16,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "npm run build:esm && npm run build:cjs",
@@ -63,8 +64,13 @@
     "@fearlessfara/velocits": "^1.0.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/npm": "^11.0.3",
     "@types/node": "^20.0.0",
     "@vitest/ui": "^1.0.0",
+    "semantic-release": "^23.1.1",
     "typescript": "^5.3.0",
     "vitest": "^1.0.0"
   }
