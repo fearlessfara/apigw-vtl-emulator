@@ -1,10 +1,10 @@
-# @fearlessfara/apigw-vtl-emulator
+# apigw-vtl-emulator
 
 > TypeScript/JavaScript implementation of AWS API Gateway VTL (Velocity Template Language) Emulator
 
 A complete, fully-tested implementation of AWS API Gateway's VTL processor that works in both Node.js and browser environments. Built on top of [`@fearlessfara/velocits`](https://github.com/fearlessfara/velocits), a TypeScript port of Apache Velocity.
 
-[![npm version](https://badge.fury.io/js/@fearlessfara%2Fapigw-vtl-emulator.svg)](https://www.npmjs.com/package/@fearlessfara/apigw-vtl-emulator)
+[![npm version](https://badge.fury.io/js/apigw-vtl-emulator.svg)](https://www.npmjs.com/package/apigw-vtl-emulator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -29,7 +29,7 @@ A complete, fully-tested implementation of AWS API Gateway's VTL processor that 
 ## Installation
 
 ```bash
-npm install @fearlessfara/apigw-vtl-emulator
+npm install apigw-vtl-emulator
 ```
 
 ## Quick Start
@@ -37,7 +37,7 @@ npm install @fearlessfara/apigw-vtl-emulator
 ### Basic Usage
 
 ```typescript
-import { VTLProcessor } from '@fearlessfara/apigw-vtl-emulator';
+import { VTLProcessor } from 'apigw-vtl-emulator';
 
 const processor = new VTLProcessor();
 
@@ -71,7 +71,7 @@ console.log(result);
 ### Node.js Example
 
 ```javascript
-const { VTLProcessor } = require('@fearlessfara/apigw-vtl-emulator');
+const { VTLProcessor } = require('apigw-vtl-emulator');
 
 const processor = new VTLProcessor();
 const result = processor.process(
@@ -85,7 +85,7 @@ console.log(result); // {"name":"John"}
 ### Browser Example (React)
 
 ```tsx
-import { VTLProcessor } from '@fearlessfara/apigw-vtl-emulator';
+import { VTLProcessor } from 'apigw-vtl-emulator';
 import { useState } from 'react';
 
 function VTLEditor() {
@@ -244,7 +244,7 @@ import {
   InputFunctions,
   ContextFunctions,
   UtilFunctions
-} from '@fearlessfara/apigw-vtl-emulator';
+} from 'apigw-vtl-emulator';
 
 const processor: VTLProcessor = new VTLProcessor();
 ```

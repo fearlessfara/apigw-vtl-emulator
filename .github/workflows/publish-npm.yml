@@ -13,11 +13,11 @@ on:
 
 jobs:
   release:
-    name: Release @fearlessfara/apigw-vtl-emulator
+    name: Release apigw-vtl-emulator
     runs-on: ubuntu-latest
     environment:
       name: npm-production
-      url: https://www.npmjs.com/package/@fearlessfara/apigw-vtl-emulator
+      url: https://www.npmjs.com/package/apigw-vtl-emulator
     permissions:
       contents: write
       issues: write
