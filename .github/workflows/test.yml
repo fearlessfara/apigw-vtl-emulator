@@ -4,11 +4,11 @@ name: Test VTL Engine
 on:
   push:
     paths:
-      - 'emulator/**'
+      - 'emulator/java/**'
       - '.github/workflows/test.yml'
   pull_request:
     paths:
-      - 'emulator/**'
+      - 'emulator/java/**'
 
 jobs:
   test:
@@ -17,7 +17,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: emulator
+        working-directory: emulator/java
 
     steps:
       - name: Checkout repository
@@ -48,5 +48,5 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: emulator/target/surefire-reports/
+          path: emulator/java/target/surefire-reports/
           retention-days: 30

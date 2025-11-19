@@ -1,0 +1,10 @@
+{
+  "endpoint": "/jsonpath",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {
+    "name": "Bella"
+  },
+  "headers": {}
+}
+

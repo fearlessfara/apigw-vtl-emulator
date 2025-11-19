@@ -159,131 +159,86 @@ export class CheerpJAdapter extends VTLProcessorAdapter {
   }
 }
 
-// Vela Adapter
-export class VelaAdapter extends VTLProcessorAdapter {
+// Velocits Adapter (TypeScript/JavaScript implementation)
+export class VelocitsAdapter extends VTLProcessorAdapter {
   constructor() {
     super();
-    this.renderTemplate = null;
-    this.usingFallback = false;
+    this.processor = null;
   }
 
   async init() {
-    if (this.initializing) {
+    if (this.ready) {
       return;
     }
-    
-    this.initializing = true;
-    
-    try {
-      let velaModule;
-      
-      if (typeof window !== 'undefined' && window.Vela) {
-        velaModule = window.Vela;
-      } else {
-        velaModule = this.createFallbackVTL();
-        this.usingFallback = true;
-      }
 
-      if (velaModule && (velaModule.VtlEngine || velaModule.renderTemplate)) {
-        if (velaModule.VtlEngine) {
-          this.VtlEngine = velaModule.VtlEngine;
-        } else {
-          this.renderTemplate = velaModule.renderTemplate;
-        }
-      } else {
-        velaModule = this.createFallbackVTL();
-        this.renderTemplate = velaModule.renderTemplate;
-        this.usingFallback = true;
-      }
-      
+    if (this.initializing) {
+      // Wait for existing initialization to complete
+      await new Promise((resolve) => {
+        const checkReady = () => {
+          if (this.ready || !this.initializing) {
+            resolve();
+          } else {
+            setTimeout(checkReady, 50);
+          }
+        };
+        checkReady();
+      });
+      return;
+    }
+
+    this.initializing = true;
+
+    try {
+      // Dynamically import the TypeScript VTL processor
+      const { VTLProcessor } = await import('@fearlessfara/apigw-vtl-emulator');
+      this.processor = new VTLProcessor();
       this.ready = true;
-      
+      console.log('Velocits VTL Adapter initialized successfully');
     } catch (error) {
-      const fallback = this.createFallbackVTL();
-      this.renderTemplate = fallback.renderTemplate;
-      this.usingFallback = true;
-      this.ready = true;
+      console.error('Error initializing Velocits Adapter:', error);
+      this.ready = false;
+      throw error;
     } finally {
       this.initializing = false;
     }
-  }
-
-  createFallbackVTL() {
-    return {
-      renderTemplate: (template, context) => {
-        // Simple fallback - just return template as-is
-        console.warn('Using fallback VTL processor');
-        return template;
-      }
-    };
   }
 
   async processTemplate(template, body, context) {
     if (!this.ready) {
       await this.init();
     }
-    
-    let contextObj = {};
-    let bodyObj = {};
-    
-    try {
-      if (context && context.trim()) {
-        contextObj = JSON.parse(context);
-      }
-    } catch (error) {
-      // Ignore
-    }
-    
-    try {
-      if (body && body.trim()) {
-        bodyObj = JSON.parse(body);
-      }
-    } catch (error) {
-      // Ignore
+
+    if (!this.processor) {
+      throw new Error('Velocits VTL processor not initialized');
     }
 
     try {
-      if (this.renderTemplate && !this.usingFallback) {
-        const apiGatewayEvent = {
-          requestContext: {
-            requestId: contextObj.requestId || 'test-request-id',
-            stage: contextObj.stage || 'dev',
-            ...contextObj
-          },
-          body: body,
-          headers: contextObj.headers || {},
-          pathParameters: contextObj.pathParameters || {},
-          queryStringParameters: contextObj.queryStringParameters || {},
-          stageVariables: contextObj.stageVariables || {}
-        };
-        
-        const result = await this.renderTemplate(template, apiGatewayEvent);
-        return result;
-      } else {
-        return this.renderTemplate(template, {});
-      }
+      // The TypeScript processor expects: template, inputString, contextJson
+      const result = this.processor.process(template, body, context);
+      return result;
     } catch (error) {
-      throw new Error(`Vela processing error: ${error.message}`);
+      throw new Error(`Velocits processing error: ${error.message}`);
     }
   }
 
   getBackendType() {
-    return 'vela';
+    return 'velocits';
   }
 
   getDisplayName() {
-    return 'Vela (JavaScript)';
+    return 'Velocits (TypeScript)';
   }
 
   getCapabilities() {
     return {
-      supportsComplexJsonPath: false,
+      supportsComplexJsonPath: true,
       supportsVelocityDirectives: true,
-      supportsApiGatewayFunctions: false,
+      supportsApiGatewayFunctions: true,
       performance: 'fast',
-      size: 'small',
-      experimental: true
+      size: 'medium',
+      experimental: false
     };
   }
 }
+
 

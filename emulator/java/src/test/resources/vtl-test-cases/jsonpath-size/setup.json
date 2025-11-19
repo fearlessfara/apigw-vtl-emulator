@@ -1,0 +1,10 @@
+{
+  "endpoint": "/jsonpath-size/{id}",
+  "method": "POST",
+  "pathParams": {
+    "id": "123"
+  },
+  "queryParams": {},
+  "headers": {}
+}
+

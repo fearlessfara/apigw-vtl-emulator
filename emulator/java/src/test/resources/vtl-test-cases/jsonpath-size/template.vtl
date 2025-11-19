@@ -1,0 +1,6 @@
+{
+    "id" : "$input.params('id')",
+    "count" : $input.path('$.things').size(),
+    "things" : $input.json('$.things')
+}
+

@@ -1,0 +1,12 @@
+{
+  "authorizer": {
+    "principalId": "user123",
+    "integrationLatency": 50,
+    "claims": {
+      "sub": "user123",
+      "email": "user@example.com",
+      "custom:role": "admin"
+    }
+  }
+}
+

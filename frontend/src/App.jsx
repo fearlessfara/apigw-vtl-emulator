@@ -8,7 +8,7 @@ import LoadingOverlay from './components/LoadingOverlay';
 import HelpModal from './components/HelpModal';
 import SettingsModal from './components/SettingsModal';
 import { loadSettings, saveSettings } from './utils/settings';
-import { CheerpJAdapter, VelaAdapter } from './utils/vtlAdapters';
+import { CheerpJAdapter, VelocitsAdapter } from './utils/vtlAdapters';
 import { setupVelocityLanguage, getEditorOptions } from './utils/monacoConfig';
 import { loader } from '@monaco-editor/react';
 
@@ -30,7 +30,7 @@ function App() {
   const [autoRenderTimeout, setAutoRenderTimeout] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
   const [debugSteps, setDebugSteps] = useState([]);
-  const [currentEngine, setCurrentEngine] = useState('cheerpj');
+  const [currentEngine, setCurrentEngine] = useState('velocits');
   const [engines, setEngines] = useState({});
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
@@ -51,8 +51,8 @@ function App() {
         monacoInstanceRef.current = monaco;
         setupVelocityLanguage(monaco);
         
-        // Initialize default engine
-        await initializeEngine('cheerpj');
+        // Initialize default engine (Velocits is faster and lighter)
+        await initializeEngine('velocits');
       } catch (error) {
         console.error('Initialization error:', error);
         setError(error.message);
@@ -107,13 +107,28 @@ function App() {
     }
 
     setLoading(true);
-    setLoadingMessage(`Loading ${engineType === 'cheerpj' ? 'CheerpJ (Java)' : 'Vela (JavaScript)'} engine...`);
+    const engineNames = {
+      'cheerpj': 'CheerpJ (Java)',
+      'velocits': 'Velocits (TypeScript)'
+    };
+    setLoadingMessage(`Loading ${engineNames[engineType] || engineType} engine...`);
 
     try {
-      const AdapterClass = engineType === 'cheerpj' ? CheerpJAdapter : VelaAdapter;
+      let AdapterClass;
+      switch (engineType) {
+        case 'cheerpj':
+          AdapterClass = CheerpJAdapter;
+          break;
+        case 'velocits':
+          AdapterClass = VelocitsAdapter;
+          break;
+        default:
+          throw new Error(`Unknown engine type: ${engineType}`);
+      }
+
       const engine = new AdapterClass();
       await engine.init();
-      
+
       setEngines(prev => ({ ...prev, [engineType]: engine }));
       return engine;
     } catch (error) {

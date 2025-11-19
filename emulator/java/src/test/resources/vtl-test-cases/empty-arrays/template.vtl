@@ -1,0 +1,11 @@
+#set($data = $input.path('$'))
+{
+  "emptyArray": $input.json('$.emptyArray'),
+  "emptyArraySize": #if($data.emptyArray)$data.emptyArray.size()#else 0#end,
+  "nonEmptyArray": $input.json('$.nonEmptyArray'),
+  "nonEmptyArraySize": #if($data.nonEmptyArray)$data.nonEmptyArray.size()#else 0#end,
+  "emptyObject": $input.json('$.emptyObject'),
+  "emptyObjectSize": #if($data.emptyObject)$data.emptyObject.size()#else 0#end,
+  "hasItems": #if($data.nonEmptyArray && $data.nonEmptyArray.size() > 0)true#else false#end
+}
+

@@ -1,0 +1,57 @@
+name: Test TypeScript Package
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'emulator/typescript/**'
+      - '.github/workflows/test-ts-package.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'emulator/typescript/**'
+      - '.github/workflows/test-ts-package.yml'
+
+jobs:
+  test:
+    name: Test on Node ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: emulator/typescript/package-lock.json
+
+      - name: Install dependencies
+        working-directory: emulator/typescript
+        run: npm ci
+
+      - name: Run type check
+        working-directory: emulator/typescript
+        run: npm run type-check
+
+      - name: Run tests
+        working-directory: emulator/typescript
+        run: npm test
+
+      - name: Build package
+        working-directory: emulator/typescript
+        run: npm run build
+
+      - name: Upload build artifacts
+        if: matrix.node-version == 20
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: emulator/typescript/dist/
+          retention-days: 7

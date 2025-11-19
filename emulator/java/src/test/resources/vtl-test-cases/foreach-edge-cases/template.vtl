@@ -1,0 +1,35 @@
+#set($data = $input.path('$'))
+{
+  "emptyArray": [
+    #foreach($item in $data.emptyArray)
+    "$item"#if($foreach.hasNext),#end
+    #end
+  ],
+  "singleItem": [
+    #foreach($item in $data.singleItem)
+    {
+      "value": "$item",
+      "index": $foreach.index,
+      "count": $foreach.count,
+      "first": $foreach.first,
+      "last": $foreach.last,
+      "hasNext": $foreach.hasNext
+    }#if($foreach.hasNext),#end
+    #end
+  ],
+  "multipleItems": [
+    #foreach($item in $data.multipleItems)
+    {
+      "value": "$item",
+      "index": $foreach.index,
+      "count": $foreach.count,
+      "first": $foreach.first,
+      "last": $foreach.last
+    }#if($foreach.hasNext),#end
+    #end
+  ],
+  "emptyArraySize": #if($data.emptyArray)$data.emptyArray.size()#else 0#end,
+  "singleItemSize": #if($data.singleItem)$data.singleItem.size()#else 0#end,
+  "multipleItemsSize": #if($data.multipleItems)$data.multipleItems.size()#else 0#end
+}
+

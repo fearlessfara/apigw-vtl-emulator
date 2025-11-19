@@ -1,0 +1,8 @@
+{
+  "endpoint": "/foreach-edge-cases",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

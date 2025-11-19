@@ -1,0 +1,18 @@
+{
+  "requestId": "test-request-id-123",
+  "requestTime": "23/May/2024:12:34:56 +0000",
+  "requestTimeEpoch": 1716470096,
+  "httpMethod": "GET",
+  "stage": "prod",
+  "identity": {
+    "sourceIp": "203.0.113.1",
+    "userAgent": "Mozilla/5.0",
+    "accountId": "123456789012",
+    "apiKey": "test-api-key-123",
+    "apiKeyId": "key-id-456",
+    "caller": "arn:aws:iam::123456789012:user/test-user",
+    "user": "test-user",
+    "userArn": "arn:aws:iam::123456789012:user/test-user"
+  }
+}
+

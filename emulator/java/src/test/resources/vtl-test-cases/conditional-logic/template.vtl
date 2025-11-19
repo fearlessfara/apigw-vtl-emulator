@@ -1,0 +1,15 @@
+#set($age = $input.path('$.age'))
+#if($age >= 18)
+{
+  "status": "adult",
+  "message": "Access granted",
+  "age": $age
+}
+#else
+{
+  "status": "minor",
+  "message": "Access denied",
+  "age": $age
+}
+#end
+

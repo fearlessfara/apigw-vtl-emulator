@@ -1,0 +1,8 @@
+{
+  "endpoint": "/empty-arrays",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

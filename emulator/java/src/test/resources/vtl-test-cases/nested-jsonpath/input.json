@@ -1,0 +1,18 @@
+{
+  "user": {
+    "profile": {
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "zip": "10001"
+      }
+    },
+    "orders": [
+      {"id": "order1", "total": 99.99},
+      {"id": "order2", "total": 149.50}
+    ]
+  }
+}
+

@@ -1,114 +1,176 @@
-# VTL Processor (Java)
+# VTL Processor Implementations
 
-A Java-based Apache Velocity Template Language (VTL) processor for AWS API Gateway mapping templates.
+This directory contains two implementations of AWS API Gateway VTL (Velocity Template Language) processor:
 
-## Overview
+1. **Java Implementation** - The original CheerpJ-based processor
+2. **TypeScript Implementation** - A new velocits-based processor
 
-This project provides a Java implementation of VTL processing that can be used to test and validate AWS API Gateway mapping templates. It supports all the standard VTL functions and context variables that are available in AWS API Gateway.
-
-## Features
-
-- **VTL Template Processing**: Parse and execute VTL templates with full AWS API Gateway compatibility
-- **Input Functions**: Support for `$input.json()`, `$input.params()`, `$input.body`, `$input.path()`
-- **Context Functions**: Access to `$context` variables including request metadata, identity, and authorizer claims
-- **Utility Functions**: Complete implementation of `$util` functions for string manipulation, encoding, and JSON processing
-- **CheerpJ Integration**: Can be compiled to WebAssembly for browser-based execution
-
-## Project Structure
+## Directory Structure
 
 ```
 emulator/
-├── src/
-│   ├── main/
-│   │   └── java/
-│   │       └── com/
-│   │           └── example/
-│   │               ├── VTLProcessor.java      # Main VTL processing engine
-│   │               ├── ContextFunctions.java  # Context variable handling
-│   │               ├── InputFunctions.java    # Input data processing
-│   │               └── UtilFunctions.java     # Utility functions
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── example/
-│                   └── [Test files]
-├── target/
-│   └── vtl-processor.jar                      # Compiled JAR file
-├── pom.xml                                    # Maven configuration
-└── README.md                                  # This file
+├── java/                           # Java implementation (CheerpJ)
+│   ├── src/
+│   │   ├── main/java/dev/vtlemulator/engine/
+│   │   │   ├── VTLProcessor.java
+│   │   │   ├── InputFunctions.java
+│   │   │   ├── ContextFunctions.java
+│   │   │   └── UtilFunctions.java
+│   │   └── test/
+│   │       ├── java/               # Unit tests
+│   │       └── resources/vtl-test-cases/  # File-based test cases
+│   ├── target/
+│   │   └── vtl-processor.jar
+│   └── pom.xml
+│
+└── typescript/                     # TypeScript implementation (Velocits)
+    ├── src/
+    │   ├── engine/
+    │   │   ├── VTLProcessor.ts
+    │   │   ├── InputFunctions.ts
+    │   │   ├── ContextFunctions.ts
+    │   │   └── UtilFunctions.ts
+    │   └── index.ts
+    ├── tests/
+    │   ├── unit/                   # Unit tests
+    │   └── vtl-test-cases/         # File-based test cases (shared)
+    ├── dist/                       # Built output
+    ├── package.json
+    └── tsconfig.json
 ```
 
-## Building
+## Overview
+
+Both implementations provide complete AWS API Gateway VTL compatibility, including:
+
+- **VTL Template Processing**: Parse and execute VTL templates
+- **Input Functions**: `$input.json()`, `$input.params()`, `$input.body`, `$input.path()`
+- **Context Functions**: `$context` variables (request metadata, identity, authorizer claims)
+- **Utility Functions**: `$util` functions (string manipulation, encoding, JSON processing)
+
+## Java Implementation
 
 ### Prerequisites
 
-- Java 11 or higher
+- Java 17 or higher
 - Maven 3.6 or higher
 
-### Build Commands
+### Building
 
 ```bash
-# Compile the project
-mvn compile
-
-# Run tests
-mvn test
-
-# Package into JAR
-mvn package
-
-# Clean build
+cd java
 mvn clean package
 ```
 
-The compiled JAR file will be available at `target/vtl-processor.jar`.
+### Running Tests
 
-## Usage
+```bash
+mvn test
+```
 
-### Java API
+### Usage
+
+#### Java API
 
 ```java
 import dev.vtlemulator.engine.VTLProcessor;
 
 VTLProcessor processor = new VTLProcessor();
-
-// Process a VTL template
-String template = "$input.json('$.name')";
-String input = "{\"name\": \"John Doe\"}";
-String context = "{\"requestId\": \"123\"}";
-
 String result = processor.process(template, input, context);
-System.out.println(result); // Output: John Doe
 ```
 
-### CheerpJ Integration
-
-The JAR file can be loaded in a web browser using CheerpJ:
+#### CheerpJ Integration
 
 ```javascript
-// Initialize CheerpJ
 await cheerpjInit({version: 17});
-
-// Load the JAR
-const lib = await cheerpjRunLibrary('/emulator/target/vtl-processor.jar');
-
-// Get the VTLProcessor class
+const lib = await cheerpjRunLibrary('/app/vtl-processor.jar');
 const VTLProcessorClass = await lib.dev.vtlemulator.engine.VTLProcessor;
-
-// Create an instance
 const processor = await new VTLProcessorClass();
-
-// Process templates
 const result = await processor.process(template, input, context);
+```
+
+## TypeScript Implementation
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn
+
+### Building
+
+```bash
+cd typescript
+npm install
+npm run build
+```
+
+### Running Tests
+
+```bash
+npm test
+```
+
+### Usage
+
+#### TypeScript/JavaScript API
+
+```typescript
+import { VTLProcessor } from '@apigw-vtl-emulator/typescript';
+
+const processor = new VTLProcessor();
+const result = processor.process(template, inputBody, contextJson);
+```
+
+#### Browser Usage
+
+The TypeScript implementation can be imported directly in the frontend via Vite:
+
+```javascript
+import { VTLProcessor } from '@apigw-vtl-emulator/typescript';
+
+const processor = new VTLProcessor();
+const result = processor.process(template, body, context);
+```
+
+## Comparison
+
+| Feature | Java (CheerpJ) | TypeScript (Velocits) |
+|---------|----------------|----------------------|
+| **Performance** | Medium (WebAssembly overhead) | Fast (native JavaScript) |
+| **Bundle Size** | Large (~10MB) | Medium (~500KB) |
+| **AWS Compatibility** | ✅ Full | ✅ Full |
+| **Browser Support** | ✅ All modern browsers | ✅ All modern browsers |
+| **Load Time** | ~2-5 seconds | ~100ms |
+| **Recommended** | Legacy support | ⚡ **Yes** |
+
+## Test Suite
+
+Both implementations share the same comprehensive test suite located in `java/src/test/resources/vtl-test-cases/`:
+
+- 21+ file-based test cases
+- Unit tests for all custom functions
+- AWS API Gateway integration tests
+- Edge case testing
+
+### Running Tests Against Both Implementations
+
+```bash
+# Java tests
+cd java && mvn test
+
+# TypeScript tests (uses same test cases)
+cd typescript && npm test
 ```
 
 ## Supported VTL Features
 
 ### Input Functions
 - `$input.json(path)` - Parse JSON from input body using JSONPath
-- `$input.params(name)` - Get parameter from request (query, path, header)
+- `$input.params(name)` - Get parameter from request (path, query, header)
 - `$input.body` - Raw request body as string
-- `$input.path(path)` - Get path parameter
+- `$input.path(path)` - Navigate input data structure
+- `$input.headers(name)` - Get request header
+- `$input.size()` - Get size of input array/object
 
 ### Context Variables
 - `$context.requestId` - Unique request identifier
@@ -119,9 +181,8 @@ const result = await processor.process(template, input, context);
 - `$context.requestTimeEpoch` - Request timestamp in epoch format
 - `$context.httpMethod` - HTTP method
 - `$context.resourcePath` - Resource path
-- `$context.authorizer.claims` - Cognito JWT claims
-- `$context.identity.sourceIp` - Client source IP
-- `$context.identity.userAgent` - Client user agent
+- `$context.identity.*` - Identity information (sourceIp, userAgent, etc.)
+- `$context.authorizer.*` - Authorizer claims
 
 ### Utility Functions
 - `$util.escapeJavaScript(string)` - Escape string for JavaScript
@@ -130,37 +191,40 @@ const result = await processor.process(template, input, context);
 - `$util.base64Encode(string)` - Base64 encode string
 - `$util.base64Decode(string)` - Base64 decode string
 - `$util.parseJson(jsonString)` - Parse JSON string
-- `$util.toJson(object)` - Convert object to JSON string
 
 ### Control Structures
-- `#if(condition)` - Conditional blocks
-- `#elseif(condition)` - Else if conditions
-- `#else` - Else blocks
-- `#foreach(item in collection)` - Loop over collections
+- `#if(condition)`, `#elseif(condition)`, `#else` - Conditional blocks
+- `#foreach($item in $collection)` - Loop over collections
 - `#set($variable = value)` - Set variables
-- `#end` - End blocks
 - `#break` - Break from loops
 - `#stop` - Stop template processing
+- `#end` - End blocks
 
-## Testing
+## Frontend Integration
 
-Run the test suite to verify functionality:
+The frontend supports both implementations:
 
-```bash
-mvn test
-```
+1. **Velocits (TypeScript)** - Default, recommended
+2. **CheerpJ (Java)** - Available as alternative
 
-Tests cover:
-- Basic VTL syntax
-- Input function processing
-- Context variable access
-- Utility function operations
-- Conditional and loop structures
-- Error handling
+Users can switch between engines in the UI dropdown.
 
-## Integration
+## Development
 
-This VTL processor is designed to be integrated into web applications using CheerpJ, providing a complete VTL testing environment in the browser. It's used by the main VTL Emulator application to provide accurate VTL processing capabilities.
+### Adding New Features
+
+1. Implement in both Java and TypeScript
+2. Add test cases to `java/src/test/resources/vtl-test-cases/`
+3. Run tests for both implementations
+4. Update documentation
+
+### Maintaining Compatibility
+
+Both implementations must pass the same test suite to ensure AWS API Gateway compatibility. When making changes:
+
+1. Update both implementations
+2. Run full test suite
+3. Verify frontend works with both engines
 
 ## License
 

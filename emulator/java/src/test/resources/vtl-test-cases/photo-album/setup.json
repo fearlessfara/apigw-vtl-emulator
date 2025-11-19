@@ -1,0 +1,8 @@
+{
+  "endpoint": "/photo-album",
+  "method": "POST",
+  "pathParams": {},
+  "queryParams": {},
+  "headers": {}
+}
+

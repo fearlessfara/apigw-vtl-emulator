@@ -1,0 +1,77 @@
+{
+  "name": "@fearlessfara/apigw-vtl-emulator",
+  "version": "1.1.0",
+  "description": "TypeScript/JavaScript implementation of AWS API Gateway VTL Emulator - works in Node.js and browsers",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir dist-cjs && node scripts/build-cjs.js",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "keywords": [
+    "vtl",
+    "velocity",
+    "velocity-template-language",
+    "aws",
+    "api-gateway",
+    "apigw",
+    "emulator",
+    "template",
+    "mapping-template",
+    "velocits",
+    "typescript",
+    "javascript",
+    "browser",
+    "nodejs"
+  ],
+  "author": "Christian G. Faraone <christiangenn99@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fearlessfara/apigw-vtl-emulator.git",
+    "directory": "emulator/typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/fearlessfara/apigw-vtl-emulator/issues"
+  },
+  "homepage": "https://github.com/fearlessfara/apigw-vtl-emulator#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@fearlessfara/velocits": "^1.0.0"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/npm": "^11.0.3",
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^1.0.0",
+    "semantic-release": "^23.1.1",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -1,0 +1,15 @@
+#set($value = $input.path('$.optional'))
+#if($value && $value != "")
+{
+  "hasValue": true,
+  "value": "$value",
+  "required": "$input.path('$.required')"
+}
+#else
+{
+  "hasValue": false,
+  "value": null,
+  "required": "$input.path('$.required')"
+}
+#end
+

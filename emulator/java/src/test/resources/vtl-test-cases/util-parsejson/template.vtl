@@ -1,0 +1,11 @@
+#set($inputRoot = $util.parseJson($input.json('$')))
+{
+  "parsed": {
+    "name": "$inputRoot.name",
+    "age": $inputRoot.age,
+    "active": $inputRoot.active
+  },
+  "original": $input.json('$'),
+  "combined": "$inputRoot.name is $inputRoot.age years old"
+}
+
