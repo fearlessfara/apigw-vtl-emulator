@@ -50,7 +50,21 @@ jobs:
         working-directory: emulator/typescript
         run: npm run build
 
+      - name: Check branch
+        id: check-branch
+        run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          if [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]]; then
+            echo "⚠️  Skipping release - not on main/master branch (current: $BRANCH)"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ On release branch: $BRANCH"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run semantic-release
+        if: steps.check-branch.outputs.skip != 'true'
         working-directory: emulator/typescript
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
