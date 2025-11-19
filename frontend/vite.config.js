@@ -16,11 +16,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@fearlessfara/apigw-vtl-emulator': path.resolve(__dirname, '../emulator/typescript/dist/index.js')
+      'apigw-vtl-emulator': path.resolve(__dirname, '../emulator/typescript/dist/index.js')
     }
   },
   optimizeDeps: {
-    include: ['@fearlessfara/apigw-vtl-emulator']
+    include: ['apigw-vtl-emulator']
   }
 })
 
