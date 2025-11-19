@@ -1,6 +1,6 @@
 {
   "name": "@fearlessfara/apigw-vtl-emulator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "TypeScript/JavaScript implementation of AWS API Gateway VTL Emulator - works in Node.js and browsers",
   "type": "module",
   "main": "./dist/index.js",
