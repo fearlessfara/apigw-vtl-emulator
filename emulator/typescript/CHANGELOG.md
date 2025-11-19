@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/fearlessfara/apigw-vtl-emulator/compare/v1.0.0...v1.0.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* change package name to apigw-vtl-emulator (public package) ([dc4ff47](https://github.com/fearlessfara/apigw-vtl-emulator/commit/dc4ff47cad71e8b72f808fd9a1a320c2d0d2462f))
+
 # 1.0.0 (2025-11-19)
 
 
