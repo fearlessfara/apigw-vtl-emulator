@@ -307,7 +307,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT © Christian Faraone
+MIT © Christian G. Faraone
 
 ## Support
 
