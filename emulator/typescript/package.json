@@ -1,34 +1,71 @@
 {
-  "name": "@apigw-vtl-emulator/typescript",
+  "name": "@fearlessfara/apigw-vtl-emulator",
   "version": "1.0.0",
-  "description": "TypeScript/JavaScript implementation of AWS API Gateway VTL Emulator using velocits",
+  "description": "TypeScript/JavaScript implementation of AWS API Gateway VTL Emulator - works in Node.js and browsers",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsc",
-    "test": "vitest",
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir dist-cjs && node scripts/build-cjs.js",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
-    "type-check": "tsc --noEmit"
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "keywords": [
     "vtl",
     "velocity",
+    "velocity-template-language",
     "aws",
     "api-gateway",
-    "emulator"
+    "apigw",
+    "emulator",
+    "template",
+    "mapping-template",
+    "velocits",
+    "typescript",
+    "javascript",
+    "browser",
+    "nodejs"
   ],
-  "author": "",
+  "author": "Christian Faraone <fearlessfara@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fearlessfara/apigw-vtl-emulator.git",
+    "directory": "emulator/typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/fearlessfara/apigw-vtl-emulator/issues"
+  },
+  "homepage": "https://github.com/fearlessfara/apigw-vtl-emulator#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
-    "@fearlessfara/velocits": "^1.0.0",
-    "jsonpath-plus": "^9.0.0"
+    "@fearlessfara/velocits": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@vitest/ui": "^1.0.0",
     "typescript": "^5.3.0",
-    "vitest": "^1.0.0",
-    "@vitest/ui": "^1.0.0"
+    "vitest": "^1.0.0"
   }
 }

@@ -190,7 +190,7 @@ export class VelocitsAdapter extends VTLProcessorAdapter {
 
     try {
       // Dynamically import the TypeScript VTL processor
-      const { VTLProcessor } = await import('@apigw-vtl-emulator/typescript');
+      const { VTLProcessor } = await import('@fearlessfara/apigw-vtl-emulator');
       this.processor = new VTLProcessor();
       this.ready = true;
       console.log('Velocits VTL Adapter initialized successfully');

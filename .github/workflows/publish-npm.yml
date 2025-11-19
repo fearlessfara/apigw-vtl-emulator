@@ -1,0 +1,102 @@
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version bump type (patch, minor, major) or explicit version'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+  # Or trigger via release
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish @fearlessfara/apigw-vtl-emulator
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+          cache-dependency-path: emulator/typescript/package-lock.json
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install dependencies
+        working-directory: emulator/typescript
+        run: npm ci
+
+      - name: Run tests
+        working-directory: emulator/typescript
+        run: npm test
+
+      - name: Bump version
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: emulator/typescript
+        run: |
+          npm version ${{ inputs.version }} --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Get version from release
+        if: github.event_name == 'release'
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+          cd emulator/typescript
+          npm version $VERSION --no-git-tag-version
+
+      - name: Build package
+        working-directory: emulator/typescript
+        run: npm run build
+
+      - name: Publish to npm
+        working-directory: emulator/typescript
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit version bump
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git add emulator/typescript/package.json
+          git commit -m "chore: bump @fearlessfara/apigw-vtl-emulator to v${{ env.NEW_VERSION }}"
+          git push
+
+      - name: Create GitHub Release
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: Release v${{ env.NEW_VERSION }}
+          body: |
+            Release of @fearlessfara/apigw-vtl-emulator v${{ env.NEW_VERSION }}
+
+            See [CHANGELOG](./emulator/typescript/README.md) for details.
+          draft: false
+          prerelease: false

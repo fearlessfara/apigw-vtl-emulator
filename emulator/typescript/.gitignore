@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-cjs/
 coverage/
 *.log
 .DS_Store
+*.tgz
