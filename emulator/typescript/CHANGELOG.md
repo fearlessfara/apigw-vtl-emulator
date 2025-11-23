@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/fearlessfara/apigw-vtl-emulator/compare/v1.0.1...v1.1.0) (2025-11-23)
+
+
+### Bug Fixes
+
+* sync package-lock.json with package.json ([e6a5bd5](https://github.com/fearlessfara/apigw-vtl-emulator/commit/e6a5bd5e5fcced86525efa1aa4ef16afc3ce2481))
+
+
+### Features
+
+* use npm registry version of apigw-vtl-emulator ([3b46575](https://github.com/fearlessfara/apigw-vtl-emulator/commit/3b4657569c4ab25639b75c836a9dfcf35a4ba3d5))
+
 ## [1.1.0](https://github.com/fearlessfara/apigw-vtl-emulator/compare/v1.0.1...v1.1.0) (2025-01-27)
 
 
