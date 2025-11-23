@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/fearlessfara/apigw-vtl-emulator/compare/v1.0.1...v1.1.0) (2025-01-27)
+
+
+### Chores
+
+* remove .nojekyll file ([50553a1](https://github.com/fearlessfara/apigw-vtl-emulator/commit/50553a1))
+
 ## [1.0.1](https://github.com/fearlessfara/apigw-vtl-emulator/compare/v1.0.0...v1.0.1) (2025-11-19)
 
 
