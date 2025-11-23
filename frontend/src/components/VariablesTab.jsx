@@ -1,10 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui';
 import './ui/Layout.css';
 
 function VariablesTab({ variables, onVariablesChange }) {
+  // Track stable IDs for each entry - key is the variable key, value is a unique ID
+  const entryIdMapRef = useRef({});
+  
+  // Initialize entry IDs
+  useEffect(() => {
+    Object.keys(variables).forEach(group => {
+      if (!entryIdMapRef.current[group]) {
+        entryIdMapRef.current[group] = {};
+      }
+      Object.keys(variables[group] || {}).forEach(key => {
+        if (!entryIdMapRef.current[group][key]) {
+          entryIdMapRef.current[group][key] = `id-${Date.now()}-${Math.random()}`;
+        }
+      });
+    });
+  }, []);
+
   const addVariableToGroup = (group) => {
     const newKey = `key${Date.now()}`;
+    const newId = `id-${Date.now()}-${Math.random()}`;
+    
+    if (!entryIdMapRef.current[group]) {
+      entryIdMapRef.current[group] = {};
+    }
+    entryIdMapRef.current[group][newKey] = newId;
+    
     onVariablesChange({
       ...variables,
       [group]: {
@@ -14,14 +38,26 @@ function VariablesTab({ variables, onVariablesChange }) {
     });
   };
 
-  const updateVariable = (group, oldKey, newKey, value) => {
+  const updateVariable = (group, oldKey, newKey, newValue) => {
     const newVars = { ...(variables[group] || {}) };
+    
+    // Preserve the entry ID when key changes
     if (oldKey !== newKey && oldKey in newVars) {
+      const entryId = entryIdMapRef.current[group]?.[oldKey];
+      if (entryId) {
+        if (!entryIdMapRef.current[group]) {
+          entryIdMapRef.current[group] = {};
+        }
+        entryIdMapRef.current[group][newKey] = entryId;
+        delete entryIdMapRef.current[group][oldKey];
+      }
       delete newVars[oldKey];
     }
+    
     if (newKey) {
-      newVars[newKey] = value;
+      newVars[newKey] = newValue;
     }
+    
     onVariablesChange({
       ...variables,
       [group]: newVars
@@ -31,6 +67,9 @@ function VariablesTab({ variables, onVariablesChange }) {
   const removeVariable = (group, key) => {
     const newVars = { ...variables[group] };
     delete newVars[key];
+    if (entryIdMapRef.current[group]) {
+      delete entryIdMapRef.current[group][key];
+    }
     onVariablesChange({
       ...variables,
       [group]: newVars
@@ -39,6 +78,12 @@ function VariablesTab({ variables, onVariablesChange }) {
 
   const clearAll = () => {
     if (window.confirm('Are you sure you want to clear all variables?')) {
+      entryIdMapRef.current = {
+        querystring: {},
+        path: {},
+        header: {},
+        stage: {}
+      };
       onVariablesChange({
         querystring: {},
         path: {},
@@ -90,30 +135,45 @@ function VariablesTab({ variables, onVariablesChange }) {
           </Button>
         </div>
         <div>
-          {Object.entries(groupVars).map(([key, value]) => (
-            <div key={key} className="modern-variable-row">
-              <i className="bi bi-grip-vertical drag-handle"></i>
-              <input
-                className="form-control var-key"
-                placeholder="Key"
-                value={key}
-                onChange={(e) => updateVariable(group, key, e.target.value, value)}
-              />
-              <input
-                className="form-control var-value"
-                placeholder="Value"
-                value={value}
-                onChange={(e) => updateVariable(group, key, key, e.target.value)}
-              />
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={() => removeVariable(group, key)}
-              >
-                <i className="bi bi-trash"></i>
-              </Button>
-            </div>
-          ))}
+          {Object.entries(groupVars).map(([key, value]) => {
+            // Get stable ID for this entry
+            const entryId = entryIdMapRef.current[group]?.[key] || `fallback-${group}-${key}`;
+            
+            return (
+              <div key={entryId} className="modern-variable-row">
+                <i className="bi bi-grip-vertical drag-handle"></i>
+                <input
+                  className="form-control var-key"
+                  placeholder="Key"
+                  defaultValue={key}
+                  onBlur={(e) => {
+                    const newKey = e.target.value;
+                    if (newKey !== key) {
+                      updateVariable(group, key, newKey, value);
+                    }
+                  }}
+                />
+                <input
+                  className="form-control var-value"
+                  placeholder="Value"
+                  defaultValue={value}
+                  onBlur={(e) => {
+                    const newValue = e.target.value;
+                    if (newValue !== value) {
+                      updateVariable(group, key, key, newValue);
+                    }
+                  }}
+                />
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => removeVariable(group, key)}
+                >
+                  <i className="bi bi-trash"></i>
+                </Button>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -150,4 +210,3 @@ function VariablesTab({ variables, onVariablesChange }) {
 }
 
 export default VariablesTab;
-
