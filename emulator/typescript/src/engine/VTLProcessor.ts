@@ -1,4 +1,4 @@
-import { VelocityEngine } from '@fearlessfara/velocits';
+import { VelocityEngine } from 'velocits';
 import { InputFunctions } from './InputFunctions';
 import { UtilFunctions } from './UtilFunctions';
 import { ContextFunctions } from './ContextFunctions';

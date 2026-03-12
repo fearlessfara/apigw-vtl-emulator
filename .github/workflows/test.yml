@@ -1,52 +1,62 @@
-# .github/workflows/test.yml
-name: Test VTL Engine
+name: CI
 
 on:
   push:
-    paths:
-      - 'emulator/java/**'
-      - '.github/workflows/test.yml'
+    branches:
+      - main
   pull_request:
-    paths:
-      - 'emulator/java/**'
+    branches:
+      - main
 
 jobs:
-  test:
+  test-typescript:
+    name: Test TypeScript Package
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: emulator/typescript
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: emulator/typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build package
+        run: npm run build
+
+  test-java:
     name: Test Java VTL Processor
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: emulator/java
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v6
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '21'
           cache: 'maven'
-
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
 
       - name: Run tests
         run: mvn clean test
 
       - name: Build JAR
         run: mvn clean package -DskipTests
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: emulator/java/target/surefire-reports/
-          retention-days: 30

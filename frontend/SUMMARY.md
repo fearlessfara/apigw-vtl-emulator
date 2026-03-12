@@ -22,9 +22,7 @@ A complete React + Vite frontend that replicates all functionality from the orig
 - Snippets library
 
 ✅ **VTL Engines**
-- CheerpJ (Java) engine support
-- Vela (JavaScript) engine support
-- Engine switching
+- Velocits (TypeScript) engine support
 - Engine initialization with loading states
 
 ✅ **Core Functionality**
@@ -75,7 +73,9 @@ frontend/
 │   ├── main.jsx
 │   └── index.css
 ├── public/
-│   └── vtl-processor.jar (needs to be copied here)
+│   ├── favicon.ico
+│   ├── robots.txt
+│   └── sitemap.xml
 ├── amplify.yml
 ├── package.json
 └── vite.config.js
@@ -89,17 +89,12 @@ frontend/
    npm install
    ```
 
-2. **Copy the JAR file:**
-   ```bash
-   cp ../emulator/target/vtl-processor.jar public/vtl-processor.jar
-   ```
-
-3. **Run development server:**
+2. **Run development server:**
    ```bash
    npm run dev
    ```
 
-4. **Build for production:**
+3. **Build for production:**
    ```bash
    npm run build
    ```
@@ -118,8 +113,6 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
 ## Notes
 
-- The JAR file must be in the `public` directory for CheerpJ to load it
 - Monaco Editor is loaded asynchronously
 - All settings are persisted to localStorage
 - Shared configurations are loaded from URL query parameters
-

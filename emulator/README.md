@@ -2,14 +2,14 @@
 
 This directory contains two implementations of AWS API Gateway VTL (Velocity Template Language) processor:
 
-1. **Java Implementation** - The original CheerpJ-based processor
+1. **Java Implementation** - The original legacy processor
 2. **TypeScript Implementation** - A new velocits-based processor
 
 ## Directory Structure
 
 ```
 emulator/
-├── java/                           # Java implementation (CheerpJ)
+├── java/                           # Java implementation
 │   ├── src/
 │   │   ├── main/java/dev/vtlemulator/engine/
 │   │   │   ├── VTLProcessor.java
@@ -79,16 +79,6 @@ VTLProcessor processor = new VTLProcessor();
 String result = processor.process(template, input, context);
 ```
 
-#### CheerpJ Integration
-
-```javascript
-await cheerpjInit({version: 17});
-const lib = await cheerpjRunLibrary('/app/vtl-processor.jar');
-const VTLProcessorClass = await lib.dev.vtlemulator.engine.VTLProcessor;
-const processor = await new VTLProcessorClass();
-const result = await processor.process(template, input, context);
-```
-
 ## TypeScript Implementation
 
 ### Prerequisites
@@ -134,7 +124,7 @@ const result = processor.process(template, body, context);
 
 ## Comparison
 
-| Feature | Java (CheerpJ) | TypeScript (Velocits) |
+| Feature | Java (Legacy) | TypeScript (Velocits) |
 |---------|----------------|----------------------|
 | **Performance** | Medium (WebAssembly overhead) | Fast (native JavaScript) |
 | **Bundle Size** | Large (~10MB) | Medium (~500KB) |
@@ -202,12 +192,7 @@ cd typescript && npm test
 
 ## Frontend Integration
 
-The frontend supports both implementations:
-
-1. **Velocits (TypeScript)** - Default, recommended
-2. **CheerpJ (Java)** - Available as alternative
-
-Users can switch between engines in the UI dropdown.
+The frontend uses the Velocits TypeScript implementation.
 
 ## Development
 
