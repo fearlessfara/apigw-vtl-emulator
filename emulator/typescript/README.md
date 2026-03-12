@@ -2,7 +2,7 @@
 
 > TypeScript/JavaScript implementation of AWS API Gateway VTL (Velocity Template Language) Emulator
 
-A complete, fully-tested implementation of AWS API Gateway's VTL processor that works in both Node.js and browser environments. Built on top of [`@fearlessfara/velocits`](https://github.com/fearlessfara/velocits), a TypeScript port of Apache Velocity.
+A complete, fully-tested implementation of AWS API Gateway's VTL processor that works in both Node.js and browser environments. Built on top of [`velocits`](https://github.com/fearlessfara/velocits), a TypeScript port of Apache Velocity.
 
 [![npm version](https://badge.fury.io/js/apigw-vtl-emulator.svg)](https://www.npmjs.com/package/apigw-vtl-emulator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -18,7 +18,7 @@ A complete, fully-tested implementation of AWS API Gateway's VTL processor that 
 🚀 **Universal Support**
 - Works in Node.js (≥16.0.0)
 - Works in browsers (via bundlers like Vite, Webpack, etc.)
-- Zero dependencies (except `@fearlessfara/velocits`)
+- Zero dependencies (except `velocits`)
 - TypeScript support out of the box
 
 ✅ **Fully Tested**
@@ -298,7 +298,7 @@ npm run type-check
 
 ## Related Projects
 
-- [`@fearlessfara/velocits`](https://github.com/fearlessfara/velocits) - TypeScript implementation of Apache Velocity
+- [`velocits`](https://github.com/fearlessfara/velocits) - TypeScript implementation of Apache Velocity
 - [VTL Emulator Web App](https://github.com/fearlessfara/apigw-vtl-emulator) - Browser-based VTL testing tool
 
 ## Contributing

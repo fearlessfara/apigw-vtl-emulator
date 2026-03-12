@@ -1,6 +1,6 @@
 {
   "name": "apigw-vtl-emulator",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "TypeScript/JavaScript implementation of AWS API Gateway VTL Emulator - works in Node.js and browsers",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,6 +15,7 @@
   },
   "files": [
     "dist",
+    "!dist/**/*.map",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
@@ -28,7 +29,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",
-    "prepublishOnly": "npm run test && npm run build"
+    "prepack": "npm run build"
   },
   "keywords": [
     "vtl",
@@ -61,16 +62,17 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "@fearlessfara/velocits": "^1.2.0"
+    "velocits": "^1.2.1"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^9.2.6",
-    "@semantic-release/npm": "^11.0.3",
+    "@semantic-release/github": "^11.0.0",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/node": "^20.0.0",
     "@vitest/ui": "^1.0.0",
-    "semantic-release": "^23.1.1",
+    "semantic-release": "^24.2.0",
     "typescript": "^5.3.0",
     "vitest": "^1.0.0"
   }

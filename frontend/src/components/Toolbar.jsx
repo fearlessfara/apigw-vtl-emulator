@@ -39,7 +39,6 @@ function Toolbar({
           onChange={(e) => onEngineChange(e.target.value)}
         >
           <option value="velocits">Velocits (TypeScript) ⚡ Recommended</option>
-          <option value="cheerpj">CheerpJ (Java)</option>
         </select>
       </div>
       <div className="vr"></div>
@@ -80,4 +79,3 @@ function Toolbar({
 }
 
 export default Toolbar;
-
