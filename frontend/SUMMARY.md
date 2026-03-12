@@ -23,7 +23,7 @@ A complete React + Vite frontend that replicates all functionality from the orig
 
 ✅ **VTL Engines**
 - Velocits (TypeScript) engine support
-- Engine initialization with loading states
+- Single built-in engine flow with initialization/loading states
 
 ✅ **Core Functionality**
 - Render templates

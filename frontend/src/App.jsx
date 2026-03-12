@@ -30,7 +30,7 @@ function App() {
   const [autoRenderTimeout, setAutoRenderTimeout] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
   const [debugSteps, setDebugSteps] = useState([]);
-  const [currentEngine, setCurrentEngine] = useState('velocits');
+  const currentEngine = 'velocits';
   const [engines, setEngines] = useState({});
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
@@ -127,17 +127,6 @@ function App() {
       throw error;
     } finally {
       setLoading(false);
-    }
-  };
-
-  const switchEngine = async (engineType) => {
-    if (engineType === currentEngine) return;
-
-    try {
-      await initializeEngine(engineType);
-      setCurrentEngine(engineType);
-    } catch (error) {
-      setError(`Failed to switch engine: ${error.message}`);
     }
   };
 
@@ -327,8 +316,6 @@ function App() {
               setAutoRenderTimeout(null);
             }
           }}
-          currentEngine={currentEngine}
-          onEngineChange={switchEngine}
           onImport={() => {
             const input = document.createElement('input');
             input.type = 'file';

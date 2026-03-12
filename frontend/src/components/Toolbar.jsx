@@ -4,8 +4,6 @@ function Toolbar({
   onRender,
   autoRender,
   onAutoRenderToggle,
-  currentEngine,
-  onEngineChange,
   onImport,
   onExport,
   onShare,
@@ -30,17 +28,6 @@ function Toolbar({
       >
         <i className="bi bi-arrow-repeat"></i>{autoRender ? 'Auto ON' : 'Auto'}
       </Button>
-      <div className="vr"></div>
-      <div className="modern-engine-selector">
-        <label htmlFor="engineSelect">Engine:</label>
-        <select
-          id="engineSelect"
-          value={currentEngine}
-          onChange={(e) => onEngineChange(e.target.value)}
-        >
-          <option value="velocits">Velocits (TypeScript) ⚡ Recommended</option>
-        </select>
-      </div>
       <div className="vr"></div>
       <Dropdown>
         <DropdownToggle 

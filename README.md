@@ -15,7 +15,7 @@ This tool lets you:
 - Render and debug request/response flows
 - Manage variables for headers, query params, stage variables, and paths
 - Quickly test conditional blocks, loops, and transformations
-- Use the built-in Velocits TypeScript engine for fast browser-side rendering
+- Use the built-in Velocits TypeScript engine for fast browser-side rendering without engine switching setup
 
 ---
 
@@ -30,13 +30,15 @@ workflows.
 
 ## 🚀 Engine
 
-The VTL Emulator uses the Velocits TypeScript engine for VTL processing in the browser:
+The VTL Emulator uses a single built-in Velocits TypeScript engine for VTL processing in the browser:
 
 - **Type**: Pure TypeScript VTL processor
 - **Performance**: Fast
 - **Size**: Medium
 - **Features**: AWS API Gateway helpers, JSONPath support, browser-native execution
 - **Best for**: Fast development and testing without extra runtime assets
+
+There is no runtime engine selector in the UI anymore; the frontend always uses the Velocits-powered emulator package.
 
 ---
 
