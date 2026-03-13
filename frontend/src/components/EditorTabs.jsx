@@ -24,6 +24,9 @@ function EditorTabs({
   const [templateValid, setTemplateValid] = useState(true);
   const [bodyValid, setBodyValid] = useState(true);
   const [contextValid, setContextValid] = useState(true);
+  const [templateNotice, setTemplateNotice] = useState(null);
+  const [bodyNotice, setBodyNotice] = useState(null);
+  const [contextNotice, setContextNotice] = useState(null);
   const templateEditorRef = useRef(null);
   const bodyEditorRef = useRef(null);
   const contextEditorRef = useRef(null);
@@ -45,18 +48,21 @@ function EditorTabs({
     const blockStarts = (value.match(/#(if|foreach|macro)\b/g) || []).length;
     const blockEnds = (value.match(/#end\b/g) || []).length;
     setTemplateValid(blockStarts === blockEnds);
+    setTemplateNotice(null);
   };
 
   const handleBodyChange = (value) => {
     onBodyChange(value);
     const validation = validateJSON(value);
     setBodyValid(validation.valid);
+    setBodyNotice(null);
   };
 
   const handleContextChange = (value) => {
     onContextChange(value);
     const validation = validateJSON(value);
     setContextValid(validation.valid);
+    setContextNotice(null);
   };
 
   const handleFormatTemplate = async () => {
@@ -84,9 +90,9 @@ function EditorTabs({
     }
 
     if (issues.length > 0) {
-      alert('Template Validation Issues:\n' + issues.join('\n'));
+      setTemplateNotice({ tone: 'error', message: issues.join(' ') });
     } else {
-      alert('Template validation passed!');
+      setTemplateNotice({ tone: 'success', message: 'Template structure looks valid.' });
     }
   };
 
@@ -94,8 +100,9 @@ function EditorTabs({
     try {
       const formatted = formatJSON(body);
       onBodyChange(formatted);
+      setBodyNotice({ tone: 'success', message: 'Body JSON formatted.' });
     } catch (error) {
-      alert('Invalid JSON cannot be formatted');
+      setBodyNotice({ tone: 'error', message: 'Body JSON is invalid and cannot be formatted.' });
     }
   };
 
@@ -103,8 +110,9 @@ function EditorTabs({
     try {
       const minified = minifyJSON(body);
       onBodyChange(minified);
+      setBodyNotice({ tone: 'success', message: 'Body JSON minified.' });
     } catch (error) {
-      alert('Invalid JSON cannot be minified');
+      setBodyNotice({ tone: 'error', message: 'Body JSON is invalid and cannot be minified.' });
     }
   };
 
@@ -112,13 +120,15 @@ function EditorTabs({
     try {
       const formatted = formatJSON(context);
       onContextChange(formatted);
+      setContextNotice({ tone: 'success', message: 'Context JSON formatted.' });
     } catch (error) {
-      alert('Invalid JSON cannot be formatted');
+      setContextNotice({ tone: 'error', message: 'Context JSON is invalid and cannot be formatted.' });
     }
   };
 
   const handleLoadSampleContext = () => {
     onContextChange(getDefaultContext());
+    setContextNotice({ tone: 'success', message: 'Sample context loaded.' });
   };
 
   return (
@@ -156,10 +166,10 @@ function EditorTabs({
         </Tab>
       </Tabs>
 
-      <div className="modern-tab-content" style={{flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0}}>
+      <div className="modern-tab-content editor-content-shell">
         {currentTab === 'template' && (
-          <div style={{display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0}}>
-            <div className={`modern-editor-container ${templateValid ? 'valid' : 'invalid'}`} style={{flex: 1, minHeight: 0, marginBottom: '1rem'}}>
+          <div className="tab-panel-shell">
+            <div className={`modern-editor-container ${templateValid ? 'valid' : 'invalid'}`}>
               <Editor
                 height="100%"
                 language="velocity"
@@ -171,8 +181,8 @@ function EditorTabs({
               />
               <div className={`status-indicator ${templateValid ? '' : 'error'}`}></div>
             </div>
-            <div className="d-flex justify-content-between align-items-center" style={{flexWrap: 'wrap', gap: '0.5rem', flexShrink: 0, marginTop: '0.5rem'}}>
-              <div className="d-flex gap-2">
+            <div className="editor-footer-row d-flex justify-content-between align-items-center">
+              <div className="d-flex gap-2 editor-footer-actions">
                 <Button variant="outline-secondary" size="sm" onClick={handleFormatTemplate}>
                   <i className="bi bi-code me-1"></i>Format
                 </Button>
@@ -180,20 +190,21 @@ function EditorTabs({
                   <i className="bi bi-check-circle me-1"></i>Validate
                 </Button>
               </div>
-              <div style={{fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap'}}>
-                <kbd style={{padding: '0.25rem 0.5rem', background: 'var(--bg-secondary)', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--text-primary)', border: '1px solid var(--border-color)', fontFamily: 'monospace', fontWeight: 500, display: 'inline-block'}}>Ctrl+Space</kbd>
-                <span style={{color: 'var(--text-secondary)'}}>for autocomplete</span>
-                <span style={{color: 'var(--text-secondary)'}}>|</span>
-                <kbd style={{padding: '0.25rem 0.5rem', background: 'var(--bg-secondary)', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--text-primary)', border: '1px solid var(--border-color)', fontFamily: 'monospace', fontWeight: 500, display: 'inline-block'}}>Ctrl+F</kbd>
-                <span style={{color: 'var(--text-secondary)'}}>to find</span>
+              <div className="editor-shortcuts-hint">
+                <kbd>Ctrl+Space</kbd>
+                <span>for autocomplete</span>
+                <span>|</span>
+                <kbd>Ctrl+F</kbd>
+                <span>to find</span>
               </div>
             </div>
+            {templateNotice && <div className={`editor-notice editor-notice-${templateNotice.tone}`}>{templateNotice.message}</div>}
           </div>
         )}
 
         {currentTab === 'body' && (
-          <div style={{display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0}}>
-            <div className={`modern-editor-container ${bodyValid ? 'valid' : 'invalid'}`} style={{flex: 1, minHeight: 0, marginBottom: '1rem'}}>
+          <div className="tab-panel-shell">
+            <div className={`modern-editor-container ${bodyValid ? 'valid' : 'invalid'}`}>
               <Editor
                 height="100%"
                 language="json"
@@ -205,7 +216,7 @@ function EditorTabs({
               />
               <div className={`status-indicator ${bodyValid ? '' : 'error'}`}></div>
             </div>
-            <div className="d-flex gap-2" style={{flexShrink: 0, marginTop: '0.5rem'}}>
+            <div className="d-flex gap-2 editor-footer-actions">
               <Button variant="outline-secondary" size="sm" onClick={handleFormatBody}>
                 <i className="bi bi-braces me-1"></i>Format JSON
               </Button>
@@ -213,11 +224,12 @@ function EditorTabs({
                 <i className="bi bi-dash-square me-1"></i>Minify
               </Button>
             </div>
+            {bodyNotice && <div className={`editor-notice editor-notice-${bodyNotice.tone}`}>{bodyNotice.message}</div>}
           </div>
         )}
 
         {currentTab === 'variables' && (
-          <div style={{display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'auto'}}>
+          <div className="tab-panel-shell tab-panel-scrollable">
             <VariablesTab
               variables={variables}
               onVariablesChange={onVariablesChange}
@@ -226,8 +238,8 @@ function EditorTabs({
         )}
 
         {currentTab === 'context' && (
-          <div style={{display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0}}>
-            <div className={`modern-editor-container ${contextValid ? 'valid' : 'invalid'}`} style={{flex: 1, minHeight: 0, marginBottom: '1rem'}}>
+          <div className="tab-panel-shell">
+            <div className={`modern-editor-container ${contextValid ? 'valid' : 'invalid'}`}>
               <Editor
                 height="100%"
                 language="json"
@@ -239,7 +251,7 @@ function EditorTabs({
               />
               <div className={`status-indicator ${contextValid ? '' : 'error'}`}></div>
             </div>
-            <div className="d-flex gap-2" style={{flexShrink: 0, marginTop: '0.5rem'}}>
+            <div className="d-flex gap-2 editor-footer-actions">
               <Button variant="outline-secondary" size="sm" onClick={handleLoadSampleContext}>
                 <i className="bi bi-file-code me-1"></i>Load Sample
               </Button>
@@ -247,11 +259,12 @@ function EditorTabs({
                 <i className="bi bi-braces me-1"></i>Format JSON
               </Button>
             </div>
+            {contextNotice && <div className={`editor-notice editor-notice-${contextNotice.tone}`}>{contextNotice.message}</div>}
           </div>
         )}
 
         {currentTab === 'snippets' && (
-          <div style={{display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0}}>
+          <div className="tab-panel-shell">
             <SnippetsTab onSnippetInsert={onSnippetInsert} />
           </div>
         )}
