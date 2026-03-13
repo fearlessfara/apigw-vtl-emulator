@@ -4,24 +4,23 @@ import './ui/Layout.css';
 function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
   return (
     <div className="app-header">
-      <div className="custom-container-fluid" style={{maxWidth: '1600px', padding: '0 1.5rem'}}>
-        <div className="d-flex justify-content-between align-items-center">
-          <h1 style={{margin: 0}} className="d-flex align-items-center">
+      <div className="custom-container-fluid app-shell-width header-shell">
+        <div className="header-row d-flex justify-content-between align-items-center">
+          <h1 className="header-title d-flex align-items-center">
             <img 
               src="/favicon.ico" 
               alt="VTL Emulator" 
               className="header-icon"
-              style={{width: '1.5rem', height: '1.5rem', marginRight: '0.5rem', borderRadius: '0.375rem'}}
             />
-            VTL Emulator
+            <span>VTL Emulator</span>
           </h1>
-          <div className="d-flex gap-1 align-items-center">
+          <div className="header-actions d-flex align-items-center">
             <Button 
               variant="outline-secondary" 
               size="sm" 
               onClick={onThemeToggle}
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              style={{border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', padding: '0.375rem 0.5rem'}}
+              className="header-icon-button"
             >
               <i className={`bi ${theme === 'dark' ? 'bi-sun' : 'bi-moon'}`}></i>
             </Button>
@@ -30,7 +29,7 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
               size="sm" 
               onClick={onHelpClick}
               title="Help"
-              style={{border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', padding: '0.375rem 0.5rem'}}
+              className="header-icon-button"
             >
               <i className="bi bi-question-circle"></i>
             </Button>
@@ -39,7 +38,7 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
               size="sm" 
               onClick={onSettingsClick}
               title="Settings"
-              style={{border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', padding: '0.375rem 0.5rem'}}
+              className="header-icon-button"
             >
               <i className="bi bi-gear"></i>
             </Button>
@@ -51,4 +50,3 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
 }
 
 export default Header;
-

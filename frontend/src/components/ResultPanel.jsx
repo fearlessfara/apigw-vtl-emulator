@@ -12,13 +12,13 @@ function ResultPanel({
   onErrorDismiss 
 }) {
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, gap: '1rem'}}>
-      <div style={{flexShrink: 0}}>
-        <div className="d-flex justify-content-between align-items-center">
-          <h6 style={{margin: 0, fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)'}}>
+    <div className="result-panel-shell">
+      <div className="panel-header panel-header-tight">
+        <div className="d-flex justify-content-between align-items-center panel-header-row">
+          <h6 className="panel-title">
             <i className="bi bi-terminal"></i>Output
           </h6>
-          <div className="d-flex gap-1">
+          <div className="panel-actions d-flex gap-1">
             <Button variant="outline-secondary" size="sm" onClick={onCopy} title="Copy">
               <i className="bi bi-clipboard"></i>
             </Button>
@@ -31,7 +31,7 @@ function ResultPanel({
           </div>
         </div>
       </div>
-      <div className="modern-result-panel" id="result" style={{flex: 1, minHeight: 0}}>
+      <div className="modern-result-panel" id="result">
         {result}
       </div>
       
@@ -51,10 +51,7 @@ function ResultPanel({
       {error && (
         <div className="modern-error-panel">
           <strong><i className="bi bi-exclamation-triangle"></i>Error:</strong> {error}
-          <button 
-            onClick={onErrorDismiss}
-            style={{background: 'transparent', border: 'none', color: 'inherit', float: 'right', cursor: 'pointer', padding: '0.25rem'}}
-          >
+          <button onClick={onErrorDismiss} className="error-dismiss-button">
             <i className="bi bi-x"></i>
           </button>
         </div>
@@ -64,4 +61,3 @@ function ResultPanel({
 }
 
 export default ResultPanel;
-

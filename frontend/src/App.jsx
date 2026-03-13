@@ -9,7 +9,7 @@ import HelpModal from './components/HelpModal';
 import SettingsModal from './components/SettingsModal';
 import { loadSettings, saveSettings } from './utils/settings';
 import { VelocitsAdapter } from './utils/vtlAdapters';
-import { setupVelocityLanguage, getEditorOptions } from './utils/monacoConfig';
+import { setupVelocityLanguage } from './utils/monacoConfig';
 import { loader } from '@monaco-editor/react';
 
 function App() {
@@ -291,7 +291,7 @@ function App() {
   };
 
   return (
-    <div style={{minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column'}}>
+    <div className="app-shell">
       <LoadingOverlay show={loading} message={loadingMessage} />
       
       <Header 
@@ -304,7 +304,7 @@ function App() {
         onSettingsClick={() => setShowSettings(true)}
       />
 
-      <div className="custom-container-fluid" style={{maxWidth: '1800px', flex: 1, display: 'flex', flexDirection: 'column'}}>
+      <div className="custom-container-fluid app-main-shell">
         <Toolbar
           onRender={render}
           autoRender={autoRender}
@@ -345,8 +345,8 @@ function App() {
           engineInfo={getCurrentEngineInstance()?.getDisplayName() || 'Not initialized'}
         />
 
-        <div className="custom-row" style={{flex: 1, margin: 0, alignItems: 'stretch', minHeight: 0}}>
-          <div className="custom-col custom-col-lg-8" style={{display: 'flex', flexDirection: 'column', minHeight: 0}}>
+        <div className="custom-row app-workspace-row">
+          <div className="custom-col custom-col-lg-8 workspace-column">
             <EditorTabs
               template={template}
               onTemplateChange={setTemplate}
@@ -366,7 +366,7 @@ function App() {
             />
           </div>
           
-          <div className="custom-col custom-col-lg-4" style={{display: 'flex', flexDirection: 'column', minHeight: 0}}>
+          <div className="custom-col custom-col-lg-4 workspace-column">
             <ResultPanel
               result={result}
               onCopy={() => {
