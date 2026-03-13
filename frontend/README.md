@@ -1,12 +1,19 @@
 # VTL Emulator Frontend
 
-React + Vite frontend for the VTL Emulator application.
+React 19 + Vite frontend for the VTL Emulator application.
 
 ## Development
 
 ```bash
 npm install
 npm run dev
+```
+
+## UI Smoke Tests
+
+```bash
+npx playwright install chromium
+npm run test:e2e
 ```
 
 ## Build
@@ -32,5 +39,7 @@ The build output will be in the `dist` directory, ready for deployment to AWS Am
 - Debug mode
 - Dark/Light theme
 - Responsive design
+- Keyboard shortcuts (`Ctrl/Cmd+Enter`, `Ctrl/Cmd+S`, `Ctrl/Cmd+Shift+S`, `Ctrl/Cmd+/`)
+- Playwright smoke coverage for core flows
 
-The frontend uses `apigw-vtl-emulator@^1.2.0`, which now depends on the renamed `velocits` package. There is no engine selector in the UI.
+The frontend uses `apigw-vtl-emulator@^1.2.0`, which depends on the renamed `velocits` package. There is no engine selector in the UI.

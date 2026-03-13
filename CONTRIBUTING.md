@@ -1,119 +1,80 @@
-# Contributing to VTL Emulator Pro
+# Contributing to VTL Emulator
 
-Thanks for your interest in contributing to **VTL Emulator Pro**! 🎉  
-Whether it's fixing a bug, improving the UI, adding a snippet, or extending the engine — you're very welcome.
+Thanks for contributing. This repository has two main parts:
 
----
+| Folder | Description |
+| --- | --- |
+| `frontend/` | React 19 + Vite UI for template editing and rendering |
+| `emulator/typescript/` | Published TypeScript package (`apigw-vtl-emulator`) |
+| `emulator/java/` | Legacy Java implementation and compatibility tests |
 
-## 📦 Repository Overview
+## Prerequisites
 
-This repo contains two main parts:
+- Node.js (repo uses `asdf` and pins versions in `.tool-versions`)
+- npm
+- Java 21+ for `emulator/java`
 
-| Folder        | Description                                |
-|---------------|--------------------------------------------|
-| `/emulator/`  | Core VTL engine (published on NPM)         |
-| `/frontend/`   | React-based frontend application            |
+## Local Development
 
----
+### Frontend
 
-## 🚀 Getting Started
-
-1. **Clone the repo**
-
-    ```
-    git clone https://github.com/fearlessfara/apigw-vtl-emulator.git
-    cd apigw-vtl-emulator
-    ```
-
-2. **Install dependencies**
-
-    Navigate to the engine directory and install:
-
-    ```
-    cd emulator
-    npm install
-    ```
-
-3. **Run tests**
-
-    ```
-    npm test
-    ```
-
-4. **Develop**
-
-    You can test changes by running the web UI locally. Open `index.html` in a browser or use a simple server like:
-
-    ```
-    npx live-server
-    # or
-    python3 -m http.server
-    ```
-
----
-
-## ✅ Contribution Guidelines
-
-### 🧠 Engine Contributions (`/emulator`)
-
-If you're modifying or extending the engine:
-
-- All changes must include **unit tests**
-- Use realistic `event` objects that mimic AWS API Gateway
-- Follow existing conventions and structure
-- Keep everything browser-compatible
-
-Tests go in:
-
-```
-emulator/tests/
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-Use Mocha + Chai syntax.
+Build and smoke tests:
 
----
+```bash
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
 
-### 🌐 UI Contributions (web interface)
+### TypeScript Emulator Package
 
-When working on the frontend:
+```bash
+cd emulator/typescript
+npm install
+npm test
+npm run build
+```
 
-- Keep components modular and styled using Bootstrap 5
-- Avoid introducing non-essential dependencies
-- Prefer vanilla JS unless it greatly simplifies complexity
+### Java Emulator
 
----
+```bash
+cd emulator/java
+mvn clean test
+```
 
-## ✍️ Suggested Contributions
+## UI Contribution Guidelines
 
-Some great areas to contribute:
+- Keep the UX code-first and stable (editor workflow first, no visual churn for its own sake)
+- Use the existing custom CSS system and UI primitives in `frontend/src/components/ui/`
+- Radix primitives are used for dialog/dropdown/tabs/accordion behavior; keep styling in project CSS
+- Avoid reintroducing Bootstrap runtime/components
+- Add or update Playwright tests for user-facing behavior changes
 
-- Add or improve `$input` / `$util` / `$context` handlers
-- Add snippets for common API Gateway use-cases
-- Improve Monaco editor integration
-- Add formatting or linting helpers
-- Fix bugs or improve test coverage
+## Engine Contribution Guidelines
 
----
+- Include tests with all behavior changes
+- Keep AWS API Gateway compatibility as the baseline
+- Favor deterministic, browser-compatible behavior in the TypeScript package
 
-## 💡 Code Style
+## CI Expectations
 
-- JS: ES2020+ syntax
-- Use `npm` as your package manager
-- Keep functions pure and testable
-- Avoid bloated packages — everything runs in-browser
+PRs to `main` should pass:
 
----
+- Frontend build + Playwright smoke tests
+- TypeScript package checks/tests/build
+- Java tests/build
 
-## 📬 Opening a PR
+## Pull Request Checklist
 
-1. Push your branch to GitHub
-2. Open a Pull Request
-3. Include:
-    - A description of what you did
-    - Screenshots or examples if it's UI-related
-    - Linked issues (if any)
-    - Mention if it's a breaking change
+- Clear description of what changed and why
+- Screenshots or short recordings for visible UI changes
+- Updated docs when behavior/setup changes
+- Tests added or updated for new functionality
 
----
-
-Thanks for contributing! 🎉 Let’s make VTL dev tooling awesome together.
+Thanks again for helping improve VTL Emulator.

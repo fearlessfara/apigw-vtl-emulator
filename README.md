@@ -1,6 +1,6 @@
-# VTL Emulator Pro
+# VTL Emulator
 
-**VTL Emulator Pro** is a browser-based editor and emulator
+**VTL Emulator** is a browser-based editor and emulator
 for [Apache Velocity Template Language (VTL)](https://velocity.apache.org/engine/1.7/user-guide.html), designed to
 simulate AWS API Gateway integration request/response templates.
 
@@ -116,7 +116,7 @@ The example above shows a VTL template that:
 
 ## 🚀 Quick Start (for the UI)
 
-The frontend is a React application. To run it locally:
+The frontend is a React + Vite application. To run it locally:
 
 ```bash
 git clone https://github.com/fearlessfara/apigw-vtl-emulator.git
@@ -125,7 +125,28 @@ npm install
 npm run dev
 ```
 
+Run UI smoke tests:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
 Or visit the live version at **[https://vtlemulator.dev](https://vtlemulator.dev)**
+
+## 🧱 Frontend Stack
+
+- React 19 + Vite
+- Monaco Editor
+- Radix UI primitives (dialog, dropdown, tabs, accordion)
+- Custom CSS design system (no Bootstrap runtime/components)
+- Playwright smoke tests for core user flows
 
 ---
 
