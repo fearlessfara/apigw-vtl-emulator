@@ -7,6 +7,7 @@ import ResultPanel from './components/ResultPanel';
 import LoadingOverlay from './components/LoadingOverlay';
 import HelpModal from './components/HelpModal';
 import SettingsModal from './components/SettingsModal';
+import ToastStack from './components/ToastStack';
 import { loadSettings, saveSettings } from './utils/settings';
 import { VelocitsAdapter } from './utils/vtlAdapters';
 import { setupVelocityLanguage } from './utils/monacoConfig';
@@ -37,7 +38,16 @@ function App() {
   const [error, setError] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [toasts, setToasts] = useState([]);
   const monacoInstanceRef = useRef(null);
+
+  const addToast = useCallback((message, tone = 'info') => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, message, tone }]);
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 2800);
+  }, []);
 
   // Initialize Monaco and engines
   useEffect(() => {
@@ -74,10 +84,11 @@ function App() {
         const config = JSON.parse(atob(configParam));
         loadConfiguration(config);
       } catch (error) {
-        console.error('Failed to load shared config:', error);
+          console.error('Failed to load shared config:', error);
+          addToast('Failed to load shared config from URL.', 'error');
+        }
       }
-    }
-  }, []);
+  }, [addToast]);
 
   // Apply theme
   useEffect(() => {
@@ -136,15 +147,16 @@ function App() {
 
   const render = useCallback(async () => {
     const startTime = performance.now();
-    let engine = engines[currentEngine];
+    let currentEngineInstance = engines[currentEngine];
     
-    if (!engine || !engine.isReady()) {
+    if (!currentEngineInstance || !currentEngineInstance.isReady()) {
       setLoading(true);
       setLoadingMessage('Initializing engine...');
       try {
-        await initializeEngine(currentEngine);
+        currentEngineInstance = await initializeEngine(currentEngine);
       } catch (error) {
         setError(`Engine initialization failed: ${error.message}`);
+        addToast(`Engine initialization failed: ${error.message}`, 'error');
         setLoading(false);
         return;
       }
@@ -161,8 +173,6 @@ function App() {
     }
 
     try {
-      const currentEngineInstance = engines[currentEngine];
-      
       // Merge variables into context
       let contextObj = {};
       try {
@@ -203,9 +213,10 @@ function App() {
       }
     } catch (error) {
       setError(error.message);
+      addToast(error.message, 'error');
       console.error('VTL Render Error:', error);
     }
-  }, [template, body, context, variables, currentEngine, engines, debugMode]);
+  }, [template, body, context, variables, currentEngine, engines, debugMode, addToast]);
 
   // Auto-render when content changes
   useEffect(() => {
@@ -227,13 +238,13 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template, body, context, variables, autoRender, settings.autoRenderDelay]);
 
-  const updateSettings = (newSettings) => {
+  const updateSettings = useCallback((newSettings) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
     saveSettings(updated);
-  };
+  }, [settings]);
 
-  const loadConfiguration = (config) => {
+  const loadConfiguration = useCallback((config) => {
     if (config.template) {
       setTemplate(config.template);
     } else if (config.templates && config.templates.length > 0) {
@@ -244,9 +255,9 @@ function App() {
     if (config.context) setContext(config.context);
     if (config.variables) setVariables(config.variables);
     if (config.settings) updateSettings(config.settings);
-  };
+  }, [updateSettings]);
 
-  const exportConfiguration = () => {
+  const exportConfiguration = useCallback(() => {
     const config = {
       template,
       body,
@@ -263,9 +274,10 @@ function App() {
     a.download = `vtl-config-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
+    addToast('Configuration exported.', 'success');
+  }, [template, body, context, variables, settings, addToast]);
 
-  const shareConfiguration = () => {
+  const shareConfiguration = useCallback(() => {
     const config = {
       template,
       body,
@@ -277,14 +289,49 @@ function App() {
       const encodedConfig = btoa(JSON.stringify(config));
       const shareUrl = `${window.location.origin}${window.location.pathname}?config=${encodedConfig}`;
       navigator.clipboard.writeText(shareUrl).then(() => {
-        // Show success toast
+        addToast('Share URL copied to clipboard.', 'success');
       }).catch(() => {
         prompt('Copy this URL to share your configuration:', shareUrl);
+        addToast('Clipboard unavailable. Share URL shown in prompt.', 'info');
       });
     } catch (e) {
       setError('Failed to generate share URL: ' + e.message);
+      addToast('Failed to generate share URL.', 'error');
     }
-  };
+  }, [template, body, context, variables, addToast]);
+
+  useEffect(() => {
+    const handleKeyboardShortcuts = (event) => {
+      const isPrimary = event.metaKey || event.ctrlKey;
+      if (!isPrimary) {
+        return;
+      }
+
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        render();
+        return;
+      }
+
+      if (event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        if (event.shiftKey) {
+          shareConfiguration();
+        } else {
+          exportConfiguration();
+        }
+        return;
+      }
+
+      if (event.key === '/') {
+        event.preventDefault();
+        setShowHelp(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyboardShortcuts);
+    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
+  }, [render, exportConfiguration, shareConfiguration]);
 
   const getCurrentEngineInstance = () => {
     return engines[currentEngine];
@@ -293,6 +340,10 @@ function App() {
   return (
     <div className="app-shell">
       <LoadingOverlay show={loading} message={loadingMessage} />
+      <ToastStack
+        toasts={toasts}
+        onDismiss={(id) => setToasts((prev) => prev.filter((toast) => toast.id !== id))}
+      />
       
       <Header 
         onThemeToggle={() => {
@@ -328,8 +379,10 @@ function App() {
                 try {
                   const config = JSON.parse(event.target.result);
                   loadConfiguration(config);
+                  addToast('Configuration imported.', 'success');
                 } catch (error) {
                   setError('Invalid configuration file: ' + error.message);
+                  addToast('Invalid configuration file.', 'error');
                 }
               };
               reader.readAsText(file);
@@ -369,19 +422,24 @@ function App() {
           <div className="custom-col custom-col-lg-4 workspace-column">
             <ResultPanel
               result={result}
-              onCopy={() => {
-                navigator.clipboard.writeText(result);
+              onCopy={(content) => {
+                navigator.clipboard.writeText(content ?? result);
+                addToast('Output copied.', 'success');
               }}
-              onDownload={() => {
-                const blob = new Blob([result], { type: 'text/plain' });
+              onDownload={(content) => {
+                const blob = new Blob([content ?? result], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'vtl-result.txt';
                 a.click();
                 URL.revokeObjectURL(url);
+                addToast('Output downloaded.', 'success');
               }}
-              onClear={() => setResult('Click "Render" to see the VTL output here...')}
+              onClear={() => {
+                setResult('Click "Render" to see the VTL output here...');
+                addToast('Output cleared.', 'info');
+              }}
               debugMode={debugMode}
               debugSteps={debugSteps}
               error={error}

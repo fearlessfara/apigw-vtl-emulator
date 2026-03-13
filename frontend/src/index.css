@@ -606,6 +606,45 @@ body {
     min-height: 0;
 }
 
+.modern-result-panel.result-wrap {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.result-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.result-chip {
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.result-chip.active {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background: var(--accent-light);
+}
+
+.result-font-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
 .result-panel-shell {
     display: flex;
     flex-direction: column;
@@ -776,6 +815,59 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 9999;
+}
+
+.toast-stack {
+    position: fixed;
+    top: 5.75rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 1200;
+    width: min(360px, calc(100vw - 2rem));
+}
+
+.toast-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 0.65rem 0.75rem;
+}
+
+.toast-item-success {
+    border-left: 3px solid var(--success);
+}
+
+.toast-item-error {
+    border-left: 3px solid var(--error);
+}
+
+.toast-item-info {
+    border-left: 3px solid var(--primary);
+}
+
+.toast-message {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+}
+
+.toast-dismiss {
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.7;
+    padding: 0;
+}
+
+.toast-dismiss:hover {
+    opacity: 1;
 }
 
 .modern-loading-content {
@@ -1081,6 +1173,11 @@ body {
 
     .modern-variable-row {
         flex-wrap: wrap;
+    }
+
+    .toast-stack {
+        top: auto;
+        bottom: 1rem;
     }
 }
 

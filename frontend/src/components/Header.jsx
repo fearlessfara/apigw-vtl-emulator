@@ -20,6 +20,7 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
               size="sm" 
               onClick={onThemeToggle}
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               className="header-icon-button"
             >
               <i className={`bi ${theme === 'dark' ? 'bi-sun' : 'bi-moon'}`}></i>
@@ -29,6 +30,7 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
               size="sm" 
               onClick={onHelpClick}
               title="Help"
+              aria-label="Help"
               className="header-icon-button"
             >
               <i className="bi bi-question-circle"></i>
@@ -38,6 +40,7 @@ function Header({ onThemeToggle, theme, onHelpClick, onSettingsClick }) {
               size="sm" 
               onClick={onSettingsClick}
               title="Settings"
+              aria-label="Settings"
               className="header-icon-button"
             >
               <i className="bi bi-gear"></i>
