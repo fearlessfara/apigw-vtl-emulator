@@ -73,7 +73,7 @@ The Java library is published to Maven Central via the `publish-maven` job in `.
 | `CENTRAL_PORTAL_USERNAME` | Sonatype Central Portal token username |
 | `CENTRAL_PORTAL_TOKEN` | Sonatype Central Portal token password |
 | `GPG_PRIVATE_KEY` | Base64-encoded GPG private key for artifact signing |
-| `GPG_PASSPHRASE` | Passphrase for the GPG key |
+| `GPG_PASSPHRASE` | Passphrase for the GPG key (exported as `MAVEN_GPG_PASSPHRASE` during Maven deploy) |
 
 Generate a Central Portal token at [central.sonatype.com](https://central.sonatype.com/). Publish the GPG public key to [keys.openpgp.org](https://keys.openpgp.org/) before the first release.
 
