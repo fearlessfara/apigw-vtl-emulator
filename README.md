@@ -171,6 +171,8 @@ Or visit the live version at **[https://vtlemulator.dev](https://vtlemulator.dev
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for full guidelines on contributing to either the UI or engine.
 
+This project follows the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold it.
+
 ---
 
 ## 📝 License
