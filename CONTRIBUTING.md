@@ -1,6 +1,8 @@
 # Contributing to VTL Emulator
 
-Thanks for contributing. This repository has two main parts:
+Thanks for contributing. This project follows the [Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you are expected to uphold it.
+
+This repository has two main parts:
 
 | Folder | Description |
 | --- | --- |
