@@ -12,20 +12,15 @@ jobs:
   test-frontend:
     name: Test Frontend UI
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
     defaults:
       run:
         working-directory: frontend
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -35,25 +30,6 @@ jobs:
 
       - name: Build frontend
         run: npm run build
-
-      - name: Get Playwright version
-        id: playwright-version
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ steps.playwright-version.outputs.version }}-${{ runner.os }}-${{ hashFiles('frontend/package-lock.json') }}
-
-      - name: Install Playwright browser
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: |
-          npx playwright install-deps chromium
-          npx playwright install chromium
-        env:
-          DEBIAN_FRONTEND: noninteractive
 
       - name: Run Playwright smoke tests
         run: npm run test:e2e
