@@ -4,9 +4,9 @@
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     [
-      "@semantic-release/npm",
+      "@semantic-release/exec",
       {
-        "npmPublish": false
+        "prepareCmd": "npm version ${nextRelease.version} --no-git-tag-version --allow-same-version"
       }
     ],
     "@semantic-release/github",
