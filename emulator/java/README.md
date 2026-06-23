@@ -20,14 +20,14 @@ A complete, fully-tested implementation of AWS API Gateway's VTL processor for J
 <dependency>
   <groupId>dev.vtlemulator</groupId>
   <artifactId>apigw-vtl-emulator</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("dev.vtlemulator:apigw-vtl-emulator:1.2.0")
+implementation("dev.vtlemulator:apigw-vtl-emulator:1.3.0")
 ```
 
 ## Quick Start
@@ -83,7 +83,7 @@ Optional fat JAR with bundled dependencies:
 
 ```bash
 mvn clean package -Pstandalone
-# target/apigw-vtl-emulator-1.2.0-standalone.jar
+# target/apigw-vtl-emulator-1.3.0-standalone.jar
 ```
 
 ## Related Packages
