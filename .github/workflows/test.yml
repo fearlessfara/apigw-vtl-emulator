@@ -9,6 +9,31 @@ on:
       - main
 
 jobs:
+  test-frontend:
+    name: Test Frontend UI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm run audit:prod
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run Playwright smoke tests
+        run: npm run test:e2e
+
   test-typescript:
     name: Test TypeScript Package
     runs-on: ubuntu-latest
@@ -22,12 +47,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: emulator/typescript/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Audit production dependencies
+        run: npm run audit:prod
 
       - name: Run type check
         run: npm run type-check

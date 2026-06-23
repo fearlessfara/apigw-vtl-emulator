@@ -24,6 +24,7 @@
   align-items: center;
   gap: 0.5rem;
   font-family: inherit;
+  position: relative;
 }
 
 .custom-tab:hover {
@@ -31,10 +32,16 @@
   background: var(--bg-secondary);
 }
 
-.custom-tab.active {
+.custom-tab.active,
+.custom-tab[data-state="active"] {
   color: var(--aws-orange);
   background: transparent;
   border-bottom-color: var(--aws-orange);
   font-weight: 600;
 }
 
+.custom-tab:focus-visible {
+  outline: none;
+  background: var(--bg-secondary);
+  box-shadow: inset 0 0 0 1px var(--border-hover);
+}

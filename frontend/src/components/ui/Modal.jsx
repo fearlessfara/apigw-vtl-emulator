@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import Button from './Button';
+import * as RadixDialog from '@radix-ui/react-dialog';
 import './Modal.css';
 
 export default function Modal({ show, onHide, title, children, size = 'md', ...props }) {
@@ -23,31 +23,22 @@ export default function Modal({ show, onHide, title, children, size = 'md', ...p
   );
 
   return (
-    <div className="custom-modal-overlay" onClick={onHide}>
-      <div 
-        className={`custom-modal custom-modal-${size}`}
-        onClick={(e) => e.stopPropagation()}
-        {...props}
-      >
-        {title && (
-          <div className="custom-modal-header">
-            <h5 className="custom-modal-title">{title}</h5>
-            <button 
-              className="custom-modal-close" 
-              onClick={onHide}
-              aria-label="Close"
-            >
-              <i className="bi bi-x"></i>
-            </button>
-          </div>
-        )}
-        {hasModalComponents ? children : (
-          <div className="custom-modal-body">
-            {children}
-          </div>
-        )}
-      </div>
-    </div>
+    <RadixDialog.Root open={show} onOpenChange={(open) => !open && onHide?.()}>
+      <RadixDialog.Portal>
+        <RadixDialog.Overlay className="custom-modal-overlay" />
+        <RadixDialog.Content className={`custom-modal custom-modal-${size}`} {...props}>
+          {title && (
+            <div className="custom-modal-header">
+              <RadixDialog.Title className="custom-modal-title">{title}</RadixDialog.Title>
+              <RadixDialog.Close className="custom-modal-close" aria-label="Close">
+                <i className="bi bi-x"></i>
+              </RadixDialog.Close>
+            </div>
+          )}
+          {hasModalComponents ? children : <div className="custom-modal-body">{children}</div>}
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 }
 
@@ -66,4 +57,3 @@ export function ModalBody({ children, ...props }) {
 export function ModalFooter({ children, ...props }) {
   return <div className="custom-modal-footer" {...props}>{children}</div>;
 }
-

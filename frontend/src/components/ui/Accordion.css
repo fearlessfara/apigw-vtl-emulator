@@ -11,7 +11,14 @@
   background: var(--bg-elevated);
 }
 
+.custom-accordion-header-shell {
+  margin: 0;
+}
+
 .custom-accordion-header {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
   padding: 1rem 1.25rem;
   background: var(--bg-secondary);
   cursor: pointer;
@@ -26,6 +33,31 @@
 
 .custom-accordion-header:hover {
   background: var(--bg-hover);
+}
+
+.custom-accordion-header:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent-light);
+}
+
+.custom-accordion-chevron {
+  transition: transform 0.2s ease;
+}
+
+.custom-accordion-item[data-state="open"] .custom-accordion-chevron {
+  transform: rotate(90deg);
+}
+
+.custom-accordion-content {
+  overflow: hidden;
+}
+
+.custom-accordion-content[data-state="open"] {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.custom-accordion-content[data-state="closed"] {
+  animation: accordion-up 0.2s ease-out;
 }
 
 .custom-accordion-body {
@@ -57,3 +89,22 @@
   font-family: monospace;
 }
 
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}

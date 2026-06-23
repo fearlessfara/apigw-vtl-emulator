@@ -5,6 +5,8 @@ import './ui/Layout.css';
 function VariablesTab({ variables, onVariablesChange }) {
   // Track stable IDs for each entry - key is the variable key, value is a unique ID
   const entryIdMapRef = useRef({});
+  const [notice, setNotice] = useState(null);
+  const [confirmClear, setConfirmClear] = useState(false);
   
   // Initialize entry IDs
   useEffect(() => {
@@ -36,6 +38,7 @@ function VariablesTab({ variables, onVariablesChange }) {
         [newKey]: ''
       }
     });
+    setNotice({ tone: 'success', message: `Added a new ${group} variable.` });
   };
 
   const updateVariable = (group, oldKey, newKey, newValue) => {
@@ -62,6 +65,7 @@ function VariablesTab({ variables, onVariablesChange }) {
       ...variables,
       [group]: newVars
     });
+    setNotice(null);
   };
 
   const removeVariable = (group, key) => {
@@ -74,23 +78,24 @@ function VariablesTab({ variables, onVariablesChange }) {
       ...variables,
       [group]: newVars
     });
+    setNotice({ tone: 'success', message: `Removed ${group} variable "${key}".` });
   };
 
   const clearAll = () => {
-    if (window.confirm('Are you sure you want to clear all variables?')) {
-      entryIdMapRef.current = {
-        querystring: {},
-        path: {},
-        header: {},
-        stage: {}
-      };
-      onVariablesChange({
-        querystring: {},
-        path: {},
-        header: {},
-        stage: {}
-      });
-    }
+    entryIdMapRef.current = {
+      querystring: {},
+      path: {},
+      header: {},
+      stage: {}
+    };
+    onVariablesChange({
+      querystring: {},
+      path: {},
+      header: {},
+      stage: {}
+    });
+    setConfirmClear(false);
+    setNotice({ tone: 'success', message: 'Cleared all variable groups.' });
   };
 
   const importVariables = () => {
@@ -109,9 +114,10 @@ function VariablesTab({ variables, onVariablesChange }) {
               ...variables,
               ...data
             });
+            setNotice({ tone: 'success', message: 'Variables imported successfully.' });
           }
         } catch (error) {
-          alert('Error importing variables: ' + error.message);
+          setNotice({ tone: 'error', message: `Error importing variables: ${error.message}` });
         }
       };
       reader.readAsText(file);
@@ -141,7 +147,6 @@ function VariablesTab({ variables, onVariablesChange }) {
             
             return (
               <div key={entryId} className="modern-variable-row">
-                <i className="bi bi-grip-vertical drag-handle"></i>
                 <input
                   className="form-control var-key"
                   placeholder="Key"
@@ -180,10 +185,13 @@ function VariablesTab({ variables, onVariablesChange }) {
   };
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center" style={{marginBottom: '1rem'}}>
-        <h6 style={{margin: 0, fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)'}}>Variable Groups</h6>
-        <div className="d-flex gap-1">
+    <div className="variables-shell">
+      <div className="panel-header panel-header-spaced variables-header">
+        <div>
+          <h6 className="panel-title">Variable Groups</h6>
+          <p className="panel-subtitle">Manage headers, query params, stage values, and path inputs.</p>
+        </div>
+        <div className="d-flex gap-1 variables-actions">
           <Button 
             variant="primary" 
             size="sm"
@@ -194,11 +202,23 @@ function VariablesTab({ variables, onVariablesChange }) {
           <Button variant="outline-secondary" size="sm" onClick={importVariables}>
             <i className="bi bi-upload"></i>Import
           </Button>
-          <Button variant="outline-secondary" size="sm" onClick={clearAll}>
-            <i className="bi bi-trash"></i>Clear All
-          </Button>
+          {confirmClear ? (
+            <>
+              <Button variant="outline-danger" size="sm" onClick={clearAll}>
+                <i className="bi bi-trash"></i>Confirm Clear
+              </Button>
+              <Button variant="outline-secondary" size="sm" onClick={() => setConfirmClear(false)}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button variant="outline-secondary" size="sm" onClick={() => setConfirmClear(true)}>
+              <i className="bi bi-trash"></i>Clear All
+            </Button>
+          )}
         </div>
       </div>
+      {notice && <div className={`editor-notice editor-notice-${notice.tone}`}>{notice.message}</div>}
       <div id="variableGroups">
         <VariableGroup group="querystring" label="Query String Parameters" icon="bi-link-45deg" />
         <VariableGroup group="path" label="Path Parameters" icon="bi-signpost" />

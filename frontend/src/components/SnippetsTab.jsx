@@ -10,23 +10,15 @@ function SnippetsTab({ onSnippetInsert }) {
   );
 
   return (
-    <div>
-      <div className="mb-3">
-        <h6 style={{fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)', marginBottom: '0.75rem'}}>VTL Snippet Library</h6>
+    <div className="snippets-shell">
+      <div className="panel-header panel-header-spaced">
+        <h6 className="panel-title">VTL Snippet Library</h6>
         <input
           type="text"
           placeholder="Search snippets..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.5rem 0.75rem',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-sm)',
-            background: 'var(--bg-elevated)',
-            color: 'var(--text-primary)',
-            fontSize: '0.875rem'
-          }}
+          className="form-control snippets-search"
         />
       </div>
       <div className="modern-snippet-library">
@@ -46,4 +38,3 @@ function SnippetsTab({ onSnippetInsert }) {
 }
 
 export default SnippetsTab;
-

@@ -11,11 +11,17 @@
   white-space: nowrap;
   transition: all 0.2s ease;
   line-height: 1.5;
+  min-height: 2.25rem;
 }
 
 .custom-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.custom-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 /* Sizes */
@@ -78,6 +84,7 @@
 .custom-btn-outline-secondary:hover:not(:disabled) {
   background: var(--bg-hover);
   border-color: var(--border-hover);
+  transform: translateY(-1px);
 }
 
 .custom-btn-outline-info {
@@ -102,4 +109,3 @@
   background: var(--error);
   color: white;
 }
-

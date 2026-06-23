@@ -23,7 +23,7 @@ A complete React + Vite frontend that replicates all functionality from the orig
 
 ✅ **VTL Engines**
 - Velocits (TypeScript) engine support
-- Engine initialization with loading states
+- Single built-in engine flow with initialization/loading states
 
 ✅ **Core Functionality**
 - Render templates
@@ -42,8 +42,8 @@ A complete React + Vite frontend that replicates all functionality from the orig
 - Performance stats
 - Responsive design
 
-✅ **AWS Amplify Ready**
-- `amplify.yml` configuration
+✅ **Vercel Ready**
+- `vercel.json` configuration (SPA rewrites + security headers)
 - Build scripts
 - Public assets support
 
@@ -76,7 +76,7 @@ frontend/
 │   ├── favicon.ico
 │   ├── robots.txt
 │   └── sitemap.xml
-├── amplify.yml
+├── vercel.json
 ├── package.json
 └── vite.config.js
 ```
@@ -99,7 +99,7 @@ frontend/
    npm run build
    ```
 
-## Deployment to AWS Amplify
+## Deployment to Vercel
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 

@@ -268,4 +268,7 @@ cdk.out/
 .aws/
 .aws-vault/
 *credentials*
-*secrets* 
+*secrets*
+
+# Vercel (contains project/org IDs from `vercel link` — never commit)
+.vercel/ 

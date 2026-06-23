@@ -1,40 +1,38 @@
-import { useState, Children, cloneElement } from 'react';
+import { Children } from 'react';
+import * as RadixAccordion from '@radix-ui/react-accordion';
 import './Accordion.css';
 
 export default function Accordion({ children, defaultActiveKey, ...props }) {
-  const [activeKey, setActiveKey] = useState(defaultActiveKey);
-
   return (
-    <div className="custom-accordion" {...props}>
-      {Children.map(children, (child, index) => {
-        if (!child) return null;
-        const key = child.props?.eventKey || index.toString();
-        return cloneElement(child, {
-          active: activeKey === key,
-          onToggle: () => setActiveKey(activeKey === key ? null : key)
-        });
-      })}
-    </div>
+    <RadixAccordion.Root
+      type="single"
+      collapsible
+      defaultValue={defaultActiveKey}
+      className="custom-accordion"
+      {...props}
+    >
+      {children}
+    </RadixAccordion.Root>
   );
 }
 
-export function AccordionItem({ children, eventKey, active, onToggle, ...props }) {
+export function AccordionItem({ children, eventKey, ...props }) {
   const childrenArray = Children.toArray(children);
   const header = childrenArray.find(child => child.type === AccordionHeader);
   const body = childrenArray.find(child => child.type === AccordionBody);
 
   return (
-    <div className="custom-accordion-item" {...props}>
-      <div className="custom-accordion-header" onClick={onToggle}>
-        <span>{header?.props?.children}</span>
-        <i className={`bi bi-chevron-${active ? 'down' : 'right'}`}></i>
-      </div>
-      {active && body && (
-        <div className="custom-accordion-body">
-          {body.props?.children}
-        </div>
-      )}
-    </div>
+    <RadixAccordion.Item className="custom-accordion-item" value={eventKey} {...props}>
+      <RadixAccordion.Header className="custom-accordion-header-shell">
+        <RadixAccordion.Trigger className="custom-accordion-header">
+          <span>{header?.props?.children}</span>
+          <i className="bi bi-chevron-right custom-accordion-chevron"></i>
+        </RadixAccordion.Trigger>
+      </RadixAccordion.Header>
+      <RadixAccordion.Content className="custom-accordion-content">
+        <div className="custom-accordion-body">{body?.props?.children}</div>
+      </RadixAccordion.Content>
+    </RadixAccordion.Item>
   );
 }
 
@@ -45,4 +43,3 @@ export function AccordionHeader({ children, ...props }) {
 export function AccordionBody({ children, ...props }) {
   return <div {...props}>{children}</div>;
 }
-

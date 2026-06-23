@@ -4,19 +4,13 @@ function LoadingOverlay({ show, message = 'Loading...' }) {
   return (
     <div className="modern-loading-overlay">
       <div className="modern-loading-content">
-        <div className="spinner-border text-primary mb-3" role="status">
-          <span className="visually-hidden">Loading...</span>
+        <div className="loading-spinner" role="status" aria-live="polite">
+          <span className="sr-only">Loading...</span>
         </div>
         <h5>Initializing VTL Engine</h5>
         <p>{message}</p>
-        <div className="loading-progress">
-          <div className="progress" style={{height: '4px'}}>
-            <div 
-              className="progress-bar progress-bar-striped progress-bar-animated" 
-              role="progressbar" 
-              style={{width: '0%'}}
-            ></div>
-          </div>
+        <div className="loading-progress" aria-hidden="true">
+          <div className="loading-progress-bar"></div>
         </div>
       </div>
     </div>
@@ -24,4 +18,3 @@ function LoadingOverlay({ show, message = 'Loading...' }) {
 }
 
 export default LoadingOverlay;
-

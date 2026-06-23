@@ -26,12 +26,13 @@ function HelpModal({ show, onHide }) {
             <AccordionHeader>Keyboard Shortcuts</AccordionHeader>
             <AccordionBody>
               <ul>
-                <li><kbd>Ctrl + Enter</kbd> - Render template</li>
+                <li><kbd>Ctrl/Cmd + Enter</kbd> - Render template</li>
                 <li><kbd>Ctrl + Space</kbd> - Show autocomplete</li>
                 <li><kbd>Ctrl + F</kbd> - Find in editor</li>
                 <li><kbd>Ctrl + H</kbd> - Find and replace</li>
-                <li><kbd>Ctrl + S</kbd> - Export configuration</li>
-                <li><kbd>F11</kbd> - Toggle fullscreen</li>
+                <li><kbd>Ctrl/Cmd + S</kbd> - Export configuration</li>
+                <li><kbd>Ctrl/Cmd + Shift + S</kbd> - Share configuration</li>
+                <li><kbd>Ctrl/Cmd + /</kbd> - Open help</li>
               </ul>
             </AccordionBody>
           </AccordionItem>
@@ -42,4 +43,3 @@ function HelpModal({ show, onHide }) {
 }
 
 export default HelpModal;
-

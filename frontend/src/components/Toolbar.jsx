@@ -4,8 +4,6 @@ function Toolbar({
   onRender,
   autoRender,
   onAutoRenderToggle,
-  currentEngine,
-  onEngineChange,
   onImport,
   onExport,
   onShare,
@@ -17,58 +15,51 @@ function Toolbar({
 }) {
   return (
     <div className="modern-toolbar">
-      <Button 
-        variant="primary" 
-        onClick={onRender}
-      >
-        <i className="bi bi-play-fill"></i>Render
-      </Button>
-      <Button 
-        variant={autoRender ? "success" : "outline-success"}
-        onClick={onAutoRenderToggle}
-        className={autoRender ? "active" : ""}
-      >
-        <i className="bi bi-arrow-repeat"></i>{autoRender ? 'Auto ON' : 'Auto'}
-      </Button>
-      <div className="vr"></div>
-      <div className="modern-engine-selector">
-        <label htmlFor="engineSelect">Engine:</label>
-        <select
-          id="engineSelect"
-          value={currentEngine}
-          onChange={(e) => onEngineChange(e.target.value)}
+      <div className="toolbar-action-group">
+        <Button 
+          variant="primary" 
+          onClick={onRender}
         >
-          <option value="velocits">Velocits (TypeScript) ⚡ Recommended</option>
-        </select>
+          <i className="bi bi-play-fill"></i>Render
+        </Button>
+        <Button 
+          variant={autoRender ? "success" : "outline-success"}
+          onClick={onAutoRenderToggle}
+          className={autoRender ? "active" : ""}
+        >
+          <i className="bi bi-arrow-repeat"></i>{autoRender ? 'Auto ON' : 'Auto'}
+        </Button>
       </div>
       <div className="vr"></div>
-      <Dropdown>
-        <DropdownToggle 
-          variant="outline-secondary" 
-          size="sm"
+      <div className="toolbar-action-group toolbar-action-group-secondary">
+        <Dropdown>
+          <DropdownToggle 
+            variant="outline-secondary" 
+            size="sm"
+            className="toolbar-menu-button"
+          >
+            <i className="bi bi-list"></i>Actions
+          </DropdownToggle>
+          <DropdownMenu align="end">
+            <DropdownItem onClick={onImport}>
+              <i className="bi bi-upload"></i>Import
+            </DropdownItem>
+            <DropdownItem onClick={onExport}>
+              <i className="bi bi-download"></i>Export
+            </DropdownItem>
+            <DropdownItem onClick={onShare}>
+              <i className="bi bi-share"></i>Share
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+        <Button 
+          variant="outline-info" 
+          onClick={onDebugToggle}
+          className={debugMode ? "active" : ""}
         >
-          <i className="bi bi-list"></i>
-        </DropdownToggle>
-        <DropdownMenu align="end">
-          <DropdownItem onClick={onImport}>
-            <i className="bi bi-upload"></i>Import
-          </DropdownItem>
-          <DropdownItem onClick={onExport}>
-            <i className="bi bi-download"></i>Export
-          </DropdownItem>
-          <DropdownItem onClick={onShare}>
-            <i className="bi bi-share"></i>Share
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-      <div className="vr"></div>
-      <Button 
-        variant="outline-info" 
-        onClick={onDebugToggle}
-        className={debugMode ? "active" : ""}
-      >
-        <i className="bi bi-bug"></i>Debug
-      </Button>
+          <i className="bi bi-bug"></i>Debug
+        </Button>
+      </div>
       <div className="modern-performance-stats">
         <span>Render: {renderTime}ms</span>
         <span>Size: {templateSize} chars</span>

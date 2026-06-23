@@ -1,6 +1,7 @@
+import { forwardRef } from 'react';
 import './Button.css';
 
-export default function Button({ 
+const Button = forwardRef(function Button({ 
   children, 
   variant = 'secondary', 
   size = 'md',
@@ -10,7 +11,7 @@ export default function Button({
   disabled = false,
   type = 'button',
   ...props 
-}) {
+}, ref) {
   const baseClass = 'custom-btn';
   const variantClass = `custom-btn-${variant}`;
   const sizeClass = `custom-btn-${size}`;
@@ -22,10 +23,12 @@ export default function Button({
       onClick={onClick}
       disabled={disabled}
       style={style}
+      ref={ref}
       {...props}
     >
       {children}
     </button>
   );
-}
+});
 
+export default Button;

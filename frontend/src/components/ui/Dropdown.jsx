@@ -1,82 +1,51 @@
-import { useState, useRef, useEffect, createContext, useContext } from 'react';
+import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import Button from './Button';
 import './Dropdown.css';
 
-const DropdownContext = createContext();
-
 export default function Dropdown({ children, ...props }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const toggle = () => setIsOpen(!isOpen);
-  const close = () => setIsOpen(false);
-
   return (
-    <DropdownContext.Provider value={{ isOpen, toggle, close }}>
-      <div className="custom-dropdown-wrapper" ref={dropdownRef} {...props}>
+    <RadixDropdownMenu.Root modal={false}>
+      <div className="custom-dropdown-wrapper" {...props}>
         {children}
       </div>
-    </DropdownContext.Provider>
+    </RadixDropdownMenu.Root>
   );
 }
 
 export function DropdownToggle({ children, as: Component = Button, ...props }) {
-  const { isOpen, toggle } = useContext(DropdownContext);
-
   return (
-    <Component onClick={toggle} {...props}>
-      {children}
-    </Component>
+    <RadixDropdownMenu.Trigger asChild>
+      <Component {...props}>{children}</Component>
+    </RadixDropdownMenu.Trigger>
   );
 }
 
 export function DropdownMenu({ children, align = 'end', ...props }) {
-  const { isOpen, close } = useContext(DropdownContext);
-
-  if (!isOpen) return null;
+  const alignValue = align === 'start' ? 'start' : 'end';
 
   return (
-    <div className="custom-dropdown-menu-wrapper">
-      <div 
-        className={`custom-dropdown-menu custom-dropdown-menu-${align}`} 
+    <RadixDropdownMenu.Portal>
+      <RadixDropdownMenu.Content
+        className={`custom-dropdown-menu custom-dropdown-menu-${alignValue}`}
+        align={alignValue}
+        sideOffset={6}
+        collisionPadding={8}
         {...props}
       >
         {children}
-      </div>
-    </div>
+      </RadixDropdownMenu.Content>
+    </RadixDropdownMenu.Portal>
   );
 }
 
 export function DropdownItem({ children, onClick, ...props }) {
-  const { close } = useContext(DropdownContext);
-
   return (
-    <div 
-      className="custom-dropdown-item" 
-      onClick={(e) => {
-        onClick?.(e);
-        close();
-      }}
+    <RadixDropdownMenu.Item
+      className="custom-dropdown-item"
+      onSelect={onClick}
       {...props}
     >
       {children}
-    </div>
+    </RadixDropdownMenu.Item>
   );
 }
-

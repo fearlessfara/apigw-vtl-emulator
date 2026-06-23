@@ -75,7 +75,8 @@
   width: 1px;
   height: 1.5rem;
   background: var(--border-color);
-  margin: 0 0.5rem;
+  margin: 0 0.25rem;
   align-self: center;
+  flex-shrink: 0;
 }
 
