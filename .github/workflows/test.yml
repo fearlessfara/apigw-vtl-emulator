@@ -88,3 +88,9 @@ jobs:
 
       - name: Build JAR
         run: mvn clean package -DskipTests
+
+      - name: Verify library artifacts
+        run: |
+          test -f target/apigw-vtl-emulator-*.jar
+          test -f target/apigw-vtl-emulator-*-sources.jar
+          test -f target/apigw-vtl-emulator-*-javadoc.jar

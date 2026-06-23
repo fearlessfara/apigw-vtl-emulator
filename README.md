@@ -30,15 +30,32 @@ workflows.
 
 ## 🚀 Engine
 
-The VTL Emulator uses a single built-in Velocits TypeScript engine for VTL processing in the browser:
+The VTL Emulator ships two published engine implementations:
 
-- **Type**: Pure TypeScript VTL processor
-- **Performance**: Fast
-- **Size**: Medium
-- **Features**: AWS API Gateway helpers, JSONPath support, browser-native execution
-- **Best for**: Fast development and testing without extra runtime assets
+| Platform | Package | Best for |
+|----------|---------|----------|
+| **TypeScript** (browser UI) | [`apigw-vtl-emulator`](https://www.npmjs.com/package/apigw-vtl-emulator) on npm | Browser and Node.js |
+| **Java** | `dev.vtlemulator:apigw-vtl-emulator` on Maven Central | JVM backends and integration tests |
 
-There is no runtime engine selector in the UI anymore; the frontend always uses the Velocits-powered emulator package.
+The frontend uses the TypeScript engine. Both implementations share the same VTL compatibility test suite.
+
+### TypeScript (npm)
+
+```bash
+npm install apigw-vtl-emulator
+```
+
+### Java (Maven)
+
+```xml
+<dependency>
+  <groupId>dev.vtlemulator</groupId>
+  <artifactId>apigw-vtl-emulator</artifactId>
+  <version>1.2.0</version>
+</dependency>
+```
+
+See [`emulator/README.md`](./emulator/README.md) for engine development and usage details.
 
 ---
 
@@ -50,7 +67,7 @@ This repository contains:
 |--------------------|--------------------------------------------------|
 | `/index.html`      | Redirect page to the new website                |
 | `/frontend/`       | React-based frontend application                 |
-| `/emulator/`       | The standalone VTL engine used by the UI and NPM |
+| `/emulator/`       | VTL engines published to npm and Maven Central     |
 | `/img.png`         | Screenshot used in documentation                 |
 | `/CONTRIBUTING.md` | Contribution guide for engine and UI development |
 

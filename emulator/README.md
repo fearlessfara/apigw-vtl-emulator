@@ -1,15 +1,15 @@
 # VTL Processor Implementations
 
-This directory contains two implementations of AWS API Gateway VTL (Velocity Template Language) processor:
+This directory contains two published implementations of AWS API Gateway VTL (Velocity Template Language) processor:
 
-1. **Java Implementation** - The original legacy processor
-2. **TypeScript Implementation** - A new velocits-based processor
+1. **Java Implementation** — JVM library on Maven Central (`dev.vtlemulator:apigw-vtl-emulator`)
+2. **TypeScript Implementation** — npm package (`apigw-vtl-emulator`)
 
 ## Directory Structure
 
 ```
 emulator/
-├── java/                           # Java implementation
+├── java/                           # Java implementation (Maven)
 │   ├── src/
 │   │   ├── main/java/dev/vtlemulator/engine/
 │   │   │   ├── VTLProcessor.java
@@ -19,9 +19,8 @@ emulator/
 │   │   └── test/
 │   │       ├── java/               # Unit tests
 │   │       └── resources/vtl-test-cases/  # File-based test cases
-│   ├── target/
-│   │   └── vtl-processor.jar
-│   └── pom.xml
+│   ├── pom.xml
+│   └── README.md
 │
 └── typescript/                     # TypeScript implementation (Velocits)
     ├── src/
@@ -50,6 +49,18 @@ Both implementations provide complete AWS API Gateway VTL compatibility, includi
 
 ## Java Implementation
 
+### Installation
+
+```xml
+<dependency>
+  <groupId>dev.vtlemulator</groupId>
+  <artifactId>apigw-vtl-emulator</artifactId>
+  <version>1.2.0</version>
+</dependency>
+```
+
+See [java/README.md](java/README.md) for full documentation.
+
 ### Prerequisites
 
 - Java 17 or higher
@@ -70,16 +81,22 @@ mvn test
 
 ### Usage
 
-#### Java API
-
 ```java
 import dev.vtlemulator.engine.VTLProcessor;
 
 VTLProcessor processor = new VTLProcessor();
-String result = processor.process(template, input, context);
+String result = processor.process(template, inputBody, contextJson);
 ```
 
 ## TypeScript Implementation
+
+### Installation
+
+```bash
+npm install apigw-vtl-emulator
+```
+
+See [typescript/README.md](typescript/README.md) for full documentation.
 
 ### Prerequisites
 
@@ -102,36 +119,21 @@ npm test
 
 ### Usage
 
-#### TypeScript/JavaScript API
-
 ```typescript
-import { VTLProcessor } from '@apigw-vtl-emulator/typescript';
+import { VTLProcessor } from 'apigw-vtl-emulator';
 
 const processor = new VTLProcessor();
 const result = processor.process(template, inputBody, contextJson);
 ```
 
-#### Browser Usage
-
-The TypeScript implementation can be imported directly in the frontend via Vite:
-
-```javascript
-import { VTLProcessor } from '@apigw-vtl-emulator/typescript';
-
-const processor = new VTLProcessor();
-const result = processor.process(template, body, context);
-```
-
 ## Comparison
 
-| Feature | Java (Legacy) | TypeScript (Velocits) |
-|---------|----------------|----------------------|
-| **Performance** | Medium (WebAssembly overhead) | Fast (native JavaScript) |
-| **Bundle Size** | Large (~10MB) | Medium (~500KB) |
-| **AWS Compatibility** | ✅ Full | ✅ Full |
-| **Browser Support** | ✅ All modern browsers | ✅ All modern browsers |
-| **Load Time** | ~2-5 seconds | ~100ms |
-| **Recommended** | Legacy support | ⚡ **Yes** |
+| Feature | Java | TypeScript (Velocits) |
+|---------|------|----------------------|
+| **Runtime** | JVM (Java 17+) | Node.js / browser |
+| **Registry** | Maven Central | npm |
+| **AWS Compatibility** | Full | Full |
+| **Best for** | JVM backends, integration tests | Browser UI, Node.js apps |
 
 ## Test Suite
 
@@ -192,7 +194,7 @@ cd typescript && npm test
 
 ## Frontend Integration
 
-The frontend uses the Velocits TypeScript implementation.
+The frontend uses the TypeScript implementation via the `apigw-vtl-emulator` npm package.
 
 ## Development
 
@@ -209,8 +211,8 @@ Both implementations must pass the same test suite to ensure AWS API Gateway com
 
 1. Update both implementations
 2. Run full test suite
-3. Verify frontend works with both engines
+3. Verify frontend works with the TypeScript engine
 
 ## License
 
-This project is part of the VTL Emulator suite and follows the same licensing terms.
+MIT — see LICENSE files in each implementation directory.
