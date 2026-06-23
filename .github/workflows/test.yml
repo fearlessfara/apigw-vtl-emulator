@@ -91,6 +91,7 @@ jobs:
 
       - name: Verify library artifacts
         run: |
-          test -f target/apigw-vtl-emulator-*.jar
+          main_jar=$(ls target/apigw-vtl-emulator-*.jar | grep -Ev 'sources|javadoc|standalone' | wc -l | tr -d ' ')
+          test "$main_jar" -eq 1
           test -f target/apigw-vtl-emulator-*-sources.jar
           test -f target/apigw-vtl-emulator-*-javadoc.jar
