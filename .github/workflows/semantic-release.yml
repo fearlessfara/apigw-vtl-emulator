@@ -135,10 +135,14 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --import
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+          echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --import
           gpgconf --kill gpg-agent
           gpgconf --launch gpg-agent
+          gpg --list-secret-keys --keyid-format=long
 
       - name: Configure Maven settings
         env:
@@ -161,4 +165,4 @@ jobs:
       - name: Publish to Maven Central
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: mvn -Prelease clean deploy -DskipTests
+        run: mvn -Prelease clean deploy -DskipTests -Dgpg.passphrase="$GPG_PASSPHRASE"
