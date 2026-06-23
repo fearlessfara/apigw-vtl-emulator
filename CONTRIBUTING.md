@@ -75,6 +75,8 @@ The Java library is published to Maven Central via the `publish-maven` job in `.
 
 Generate a Central Portal token at [central.sonatype.com](https://central.sonatype.com/). Publish the GPG public key to [keys.openpgp.org](https://keys.openpgp.org/) before the first release.
 
+Release tags and registry versions are managed by semantic-release. Version files on `main` (`package.json`, `pom.xml`) are bumped in publish jobs at release time and are not pushed back to `main` automatically because branch protection requires pull requests. After a release, open a small follow-up PR to sync those version files if they drift.
+
 ## CI Expectations
 
 PRs to `main` should pass:
