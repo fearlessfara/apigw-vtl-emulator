@@ -15,7 +15,7 @@ replay_pid*
 
 # Maven
 target/
-!emulator/target/vtl-processor.jar
+!emulator/java/target/apigw-vtl-emulator-*-standalone.jar
 
 # Generated assets (built by CI)
 assets/
@@ -248,9 +248,8 @@ coverage/
 *.sqlite3
 
 # Application specific
-# Keep the compiled JAR for the web application to use
-!emulator/target/vtl-processor.jar
-!frontend/public/vtl-processor.jar
+# Optional standalone fat JAR (mvn package -Pstandalone)
+!emulator/java/target/apigw-vtl-emulator-*-standalone.jar
 
 # AWS CDK
 # CDK output directory contains account IDs, IAM roles, and other sensitive information

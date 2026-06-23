@@ -5,8 +5,8 @@ Thanks for contributing. This repository has two main parts:
 | Folder | Description |
 | --- | --- |
 | `frontend/` | React 19 + Vite UI for template editing and rendering |
-| `emulator/typescript/` | Published TypeScript package (`apigw-vtl-emulator`) |
-| `emulator/java/` | Legacy Java implementation and compatibility tests |
+| `emulator/typescript/` | Published TypeScript package (`apigw-vtl-emulator` on npm) |
+| `emulator/java/` | Published Java library (`dev.vtlemulator:apigw-vtl-emulator` on Maven Central) |
 
 ## Prerequisites
 
@@ -60,7 +60,20 @@ mvn clean test
 
 - Include tests with all behavior changes
 - Keep AWS API Gateway compatibility as the baseline
-- Favor deterministic, browser-compatible behavior in the TypeScript package
+- Update both Java and TypeScript implementations when changing engine behavior
+
+## Maven Central Publishing (maintainers)
+
+The Java library is published to Maven Central via the `publish-maven` job in `.github/workflows/semantic-release.yml`. Required GitHub repository secrets in the `production` environment:
+
+| Secret | Description |
+| --- | --- |
+| `CENTRAL_PORTAL_USERNAME` | Sonatype Central Portal token username |
+| `CENTRAL_PORTAL_TOKEN` | Sonatype Central Portal token password |
+| `GPG_PRIVATE_KEY` | Base64-encoded GPG private key for artifact signing |
+| `GPG_PASSPHRASE` | Passphrase for the GPG key |
+
+Generate a Central Portal token at [central.sonatype.com](https://central.sonatype.com/). Publish the GPG public key to [keys.openpgp.org](https://keys.openpgp.org/) before the first release.
 
 ## CI Expectations
 

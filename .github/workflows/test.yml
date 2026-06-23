@@ -88,3 +88,10 @@ jobs:
 
       - name: Build JAR
         run: mvn clean package -DskipTests
+
+      - name: Verify library artifacts
+        run: |
+          main_jar=$(ls target/apigw-vtl-emulator-*.jar | grep -Ev 'sources|javadoc|standalone' | wc -l | tr -d ' ')
+          test "$main_jar" -eq 1
+          test -f target/apigw-vtl-emulator-*-sources.jar
+          test -f target/apigw-vtl-emulator-*-javadoc.jar
