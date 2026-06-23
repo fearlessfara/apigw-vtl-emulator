@@ -22,12 +22,14 @@ npm run test:e2e
 npm run build
 ```
 
-The build output will be in the `dist` directory, ready for deployment to AWS Amplify.
+The build output will be in the `dist` directory, ready for deployment to Vercel.
 
-## Deployment to AWS Amplify
+## Deployment to Vercel
 
-1. Connect your repository to AWS Amplify
-2. The `amplify.yml` file will automatically configure the build process
+1. Import the repository in Vercel and set **Root Directory** to `frontend`.
+2. `frontend/vercel.json` configures SPA rewrites and security headers.
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full instructions. Do not commit `.vercel/` or tokens — this repo is public.
 
 ## Features
 
